@@ -1,14 +1,20 @@
-// Este archivo define el esquema de la base de datos para Prisma
-// Ejecuta: npx prisma migrate dev --name init para crear la base de datos
+generator client {
+  provider = "prisma-client-js"
+}
 
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// Modelos del proyecto
 model Escuela {
-  id        Int        @id @default(autoincrement())
-  nombre    String
-  direccion String
-  turno     String
-
-  aulas     Aula[]
-  docentes  Docente[]
+  id          Int        @id @default(autoincrement())
+  nombre      String
+  direccion   String
+  turno       String
+  aulas       Aula[]
+  docentes    Docente[]
   estudiantes Estudiante[]
 }
 
@@ -16,14 +22,10 @@ model Aula {
   id        Int     @id @default(autoincrement())
   nombre    String
   grado     String
-
   escuelaId Int
   escuela   Escuela @relation(fields: [escuelaId], references: [id])
-
   docenteId Int
-  
   docente   Docente @relation(fields: [docenteId], references: [id])
-
   estudiantes Estudiante[]
 }
 
@@ -35,14 +37,12 @@ model Docente {
   grados    String
   horario   String
   rol       String
-
   escuelaId Int
   escuela   Escuela @relation(fields: [escuelaId], references: [id])
-
   aulas     Aula[]
   estudiantes Estudiante[]
   misiones  Mision[]
-  perfil Perfil[]
+  perfil    Perfil[]
 }
 
 model Estudiante {
@@ -52,36 +52,31 @@ model Estudiante {
   edad      Int
   grado     String
   horario   String
-
   escuelaId Int
   escuela   Escuela @relation(fields: [escuelaId], references: [id])
-
   docenteId Int
   docente   Docente @relation(fields: [docenteId], references: [id])
-
-  aulaId Int
-  aula   Aula @relation(fields: [aulaId], references: [id])
-
+  aulaId    Int
+  aula      Aula    @relation(fields: [aulaId], references: [id])
   skillTree SkillTree?
   asignatura Asignatura?
-  perfil Perfil[]
+  perfil    Perfil[]
 }
 
 model SkillTree {
   id           Int     @id @default(autoincrement())
-  progreso     Int     @default(0)   // % completado
-  xp           Int     @default(0)   // experiencia acumulada
+  progreso     Int     @default(0)
+  xp           Int     @default(0)
   estudianteId Int     @unique
   estudiante   Estudiante @relation(fields: [estudianteId], references: [id])
 }
 
 model Asignatura {
-  id        Int     @id @default(autoincrement())
-  nombre    String
+  id          Int     @id @default(autoincrement())
+  nombre      String
   descripcion String
-
   estudianteId Int     @unique
-  estudiante Estudiante @relation(fields: [estudianteId], references: [id])
+  estudiante   Estudiante @relation(fields: [estudianteId], references: [id])
 }
 
 model Mision {
@@ -90,7 +85,6 @@ model Mision {
   descripcion String
   estado    String
   grado     String
-
   docenteId Int
   docente   Docente @relation(fields: [docenteId], references: [id])
 }
@@ -98,12 +92,10 @@ model Mision {
 model Perfil {
   id           Int     @id @default(autoincrement())
   fotoPerfil   String?
-  exp          Int     @default(0)   // EXP global
+  exp          Int     @default(0)
   monedas      Int     @default(0)
-
-  estudianteId Int    @unique
+  estudianteId Int     @unique
   estudiante   Estudiante @relation(fields: [estudianteId], references: [id])
-
-  docenteId    Int   @unique
+  docenteId    Int     @unique
   docente      Docente @relation(fields: [docenteId], references: [id])
 }

@@ -1,27 +1,72 @@
-// MainLayout.jsx
-// Layout general con Sidebar y Navbar
-
 import React from 'react';
 import Sidebar from '../components/Sidebar';
 import Navbar from '../components/Navbar';
+import NotificationFAB from '../components/NotificationFAB';
 
+const MainLayout = ({ children }) => {
+  return (
+    <div style={{ 
+      minHeight: '100vh', 
+      width: '100%', 
+      backgroundColor: 'var(--color-bg)',
+      display: 'flex'
+    }}>
+      {/* Sidebar fija a la izquierda */}
+      <aside style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        height: '100vh',
+        width: 'var(--sidebar-width)',
+        backgroundColor: '#f8f9fa',
+        borderRight: '1px solid var(--color-border)',
+        boxShadow: 'var(--shadow-sm)',
+        zIndex: 30,
+        overflowY: 'auto'
+      }}>
+        <Sidebar />
+      </aside>
 
-const MainLayout = ({ children }) => (
-  <div className="min-h-screen w-full bg-[var(--color-bg)] font-sans">
-    {/* Sidebar encasillado a la izquierda */}
-    <div className="fixed top-0 left-0 h-screen w-[var(--sidebar-width)] bg-[var(--color-sidebar-bg)] border-r border-[var(--color-border)] shadow-lg z-30 hidden md:flex flex-col">
-      <Sidebar />
+      {/* Contenido principal: navbar arriba, main content centrado */}
+      <div style={{
+        marginLeft: 'var(--sidebar-width)',
+        flex: 1,
+        display: 'flex',
+        flexDirection: 'column',
+        minHeight: '100vh',
+        transition: 'margin-left var(--transition-normal)'
+      }}>
+        {/* Navbar sticky superior */}
+        <header style={{
+          position: 'sticky',
+          top: 0,
+          zIndex: 20,
+          width: '100%',
+          height: 'var(--navbar-height)',
+          backgroundColor: 'var(--color-card-bg)',
+          boxShadow: 'var(--shadow-sm)',
+          display: 'flex',
+          alignItems: 'center'
+        }}>
+          <Navbar />
+        </header>
+
+        {/* Main container centrado */}
+        <main style={{
+          flex: 1,
+          padding: '2rem',
+          maxWidth: '1280px',
+          width: '100%',
+          margin: '0 auto'
+        }}>
+          {children}
+        </main>
+      </div>
+
+      {/* FAB de notificaciones */}
+      <NotificationFAB />
     </div>
-    {/* Contenido principal: navbar arriba, main content a la derecha de sidebar */}
-    <div className="md:ml-[var(--sidebar-width)] flex flex-col min-h-screen transition-all duration-300">
-      <header className="sticky top-0 z-20 w-full h-[var(--navbar-height)] bg-[var(--color-card-bg)] shadow-[var(--shadow-navbar)] flex items-center">
-        <Navbar />
-      </header>
-      <main className="flex-1 px-6 md:px-8 py-8 max-w-1280 mx-auto w-full bg-[var(--color-bg)]">
-        {children}
-      </main>
-    </div>
-  </div>
-);
+  );
+};
 
 export default MainLayout;

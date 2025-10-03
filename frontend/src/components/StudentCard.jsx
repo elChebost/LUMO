@@ -1,21 +1,139 @@
-// StudentCard.jsx
-// Card para mostrar información básica de un alumno
-
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
+const StudentCard = ({ student, loading = false }) => {
+  const navigate = useNavigate();
 
-
-const StudentCard = ({ name, avatar, progress, level }) => (
-  <div className="bg-white rounded-2xl shadow-lg p-5 flex items-center gap-5 border border-gray-100 hover:shadow-2xl transition-all duration-200 group cursor-pointer">
-    <img src={avatar} alt={name} className="w-14 h-14 rounded-full border-2 border-[#1e88e5] object-cover group-hover:scale-105 transition" />
-    <div className="flex-1">
-      <div className="font-bold text-lg text-gray-900 group-hover:text-[#1e88e5] transition">{name}</div>
-      <div className="text-xs text-gray-500 mb-1">Nivel: {level}</div>
-      <div className="w-32 bg-gray-200 rounded h-2 mt-1">
-        <div className="bg-[#4caf50] h-2 rounded transition-all" style={{ width: `${progress}%` }}></div>
+  if (loading) {
+    return (
+      <div style={{
+        backgroundColor: 'var(--color-card-bg)',
+        borderRadius: 'var(--radius-md)',
+        padding: '0.75rem',
+        border: '1px solid var(--color-border)',
+        boxShadow: 'var(--shadow-sm)',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: '0.5rem',
+        minWidth: '140px'
+      }}>
+        <div style={{
+          width: '40px',
+          height: '40px',
+          borderRadius: '50%',
+          backgroundColor: 'var(--color-bg)',
+          animation: 'pulse 1.5s ease-in-out infinite'
+        }} />
+        <div style={{
+          width: '80%',
+          height: '12px',
+          borderRadius: '4px',
+          backgroundColor: 'var(--color-bg)',
+          animation: 'pulse 1.5s ease-in-out infinite'
+        }} />
+        <div style={{
+          width: '50%',
+          height: '16px',
+          borderRadius: '6px',
+          backgroundColor: 'var(--color-bg)',
+          animation: 'pulse 1.5s ease-in-out infinite'
+        }} />
       </div>
+    );
+  }
+
+  const { id, name, level, xp, email } = student || {};
+
+  const handleClick = () => {
+    if (id) {
+      navigate(`/students/${id}`);
+    }
+  };
+
+  return (
+    <div
+      onClick={handleClick}
+      style={{
+        backgroundColor: 'var(--color-card-bg)',
+        borderRadius: 'var(--radius-md)',
+        padding: '0.75rem',
+        border: '1px solid var(--color-border)',
+        boxShadow: 'var(--shadow-sm)',
+        transition: 'all var(--transition-fast)',
+        cursor: 'pointer',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: '0.5rem',
+        minWidth: '140px'
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.boxShadow = 'var(--shadow-md)';
+        e.currentTarget.style.transform = 'translateY(-2px)';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
+        e.currentTarget.style.transform = 'translateY(0)';
+      }}
+    >
+      {/* Avatar */}
+      <img
+        src="/avatar.png"
+        alt={name}
+        style={{
+          width: '40px',
+          height: '40px',
+          borderRadius: '50%',
+          border: '2px solid var(--color-primary)',
+          objectFit: 'cover'
+        }}
+      />
+
+      {/* Nombre */}
+      <p style={{
+        fontSize: '0.875rem',
+        fontWeight: 600,
+        color: 'var(--color-text-primary)',
+        margin: 0,
+        textAlign: 'center',
+        maxWidth: '100%',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        whiteSpace: 'nowrap'
+      }}>
+        {name}
+      </p>
+
+      {/* Badge de nivel */}
+      <div style={{
+        padding: '0.25rem 0.625rem',
+        borderRadius: 'var(--radius-full)',
+        backgroundColor: 'rgba(46, 125, 50, 0.1)',
+        border: '1px solid rgba(46, 125, 50, 0.2)',
+        fontSize: '0.75rem',
+        fontWeight: 600,
+        color: 'var(--color-primary)',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '0.25rem'
+      }}>
+        <span>Nv. {level}</span>
+      </div>
+
+      {/* XP */}
+      {xp !== undefined && (
+        <p style={{
+          fontSize: '0.6875rem',
+          color: 'var(--color-text-secondary)',
+          margin: 0
+        }}>
+          {xp} XP
+        </p>
+      )}
     </div>
-  </div>
-);
+  );
+};
 
 export default StudentCard;
+

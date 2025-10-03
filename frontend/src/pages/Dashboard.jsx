@@ -1,45 +1,353 @@
-// Dashboard.jsx
-// Pantalla principal del docente con resumen y accesos rápidos
-
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { FiTrendingUp, FiTarget, FiCheckCircle } from 'react-icons/fi';
 import StatCard from '../components/StatCard';
 import StudentCard from '../components/StudentCard';
 import MissionCard from '../components/MissionCard';
-import NotificationPanel from '../components/NotificationPanel';
-import PageHeader from '../components/PageHeader';
 
-const Dashboard = () => (
-  <div className="p-8 bg-[#f7f8fa] min-h-screen">
-    <PageHeader
-      title="Panel principal"
-      subtitle="Resumen general del curso y accesos rápidos"
-    />
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-      <div className="col-span-2 space-y-6">
-        <div className="grid grid-cols-2 gap-4">
-          <StatCard label="XP Promedio" value="1200" icon="⭐" />
-          <StatCard label="Tareas Entregadas" value="34/40" icon="📦" />
-        </div>
-        <div className="mt-6">
-          <h2 className="font-semibold mb-2">Alumnos destacados</h2>
-          <div className="flex gap-4">
-            <StudentCard name="Juan Pérez" avatar="https://i.pravatar.cc/100?img=1" progress={80} level={5} />
-            <StudentCard name="Ana López" avatar="https://i.pravatar.cc/100?img=2" progress={65} level={4} />
-          </div>
-        </div>
-        <div className="mt-6">
-          <h2 className="font-semibold mb-2">Misiones activas</h2>
-          <div className="flex gap-4">
-            <MissionCard title="Misión 1" description="Resolver ejercicios de álgebra" deadline="10/10/2025" status="Activa" />
-            <MissionCard title="Misión 2" description="Presentar proyecto de ciencias" deadline="15/10/2025" status="Activa" />
-          </div>
-        </div>
+const API_URL = 'http://localhost:4000/api';
+
+const Dashboard = () => {
+  const [stats, setStats] = useState(null);
+  const [topStudents, setTopStudents] = useState([]);
+  const [activeMissions, setActiveMissions] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadDashboardData();
+  }, []);
+
+  const loadDashboardData = async () => {
+    try {
+      setLoading(true);
+      
+      // Cargar estadísticas generales
+      const statsRes = await fetch(`${API_URL}/stats`);
+      const statsData = await statsRes.json();
+      setStats(statsData);
+
+      // Cargar alumnos destacados
+      const topStudentsRes = await fetch(`${API_URL}/stats/top-students`);
+      const topStudentsData = await topStudentsRes.json();
+      setTopStudents(topStudentsData.slice(0, 4));
+
+      // Cargar misiones activas
+      const missionsRes = await fetch(`${API_URL}/missions`);
+      const missionsData = await missionsRes.json();
+      const active = missionsData.filter(m => m.status === 'activa').slice(0, 3);
+      setActiveMissions(active);
+
+    } catch (error) {
+      console.error('Error cargando datos del dashboard:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div style={{ padding: '0' }}>
+      {/* Header de la página */}
+      <div style={{ marginBottom: '2rem' }}>
+        <h1 style={{
+          fontSize: '2rem',
+          fontWeight: 700,
+          color: 'var(--color-text-primary)',
+          margin: '0 0 0.5rem 0'
+        }}>
+          Panel principal
+        </h1>
+        <p style={{
+          fontSize: '0.875rem',
+          color: 'var(--color-text-secondary)',
+          margin: 0
+        }}>
+          Resumen general del curso y accesos rápidos
+        </p>
       </div>
-      <div>
-        <NotificationPanel />
+
+      {/* Fila de estadísticas (StatCards) */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+        gap: '1rem',
+        marginBottom: '2rem'
+      }}>
+        <StatCard
+          icon={FiTrendingUp}
+          label="XP Promedio"
+          value={loading ? '...' : stats?.avgXP || 0}
+          loading={loading}
+        />
+        <StatCard
+          icon={FiTarget}
+          label="Misiones Activas"
+          value={loading ? '...' : stats?.activeMissions || 0}
+          loading={loading}
+        />
+        <StatCard
+          icon={FiCheckCircle}
+          label="Total Alumnos"
+          value={loading ? '...' : stats?.totalStudents || 0}
+          loading={loading}
+        />
       </div>
+
+      {/* Sección: Alumnos destacados */}
+      <section style={{ marginBottom: '2rem' }}>
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: '1rem'
+        }}>
+          <h2 style={{
+            fontSize: '1.25rem',
+            fontWeight: 600,
+            color: 'var(--color-text-primary)',
+            margin: 0
+          }}>
+            Alumnos destacados
+          </h2>
+          <a 
+            href="/students"
+            style={{
+              fontSize: '0.875rem',
+              color: 'var(--color-primary)',
+              fontWeight: 600,
+              textDecoration: 'none',
+              transition: 'color var(--transition-fast)'
+            }}
+            onMouseEnter={(e) => e.target.style.color = 'var(--color-primary-hover)'}
+            onMouseLeave={(e) => e.target.style.color = 'var(--color-primary)'}
+          >
+            Ver todos →
+          </a>
+        </div>
+
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
+          gap: '1rem'
+        }}>
+          {loading ? (
+            <>
+              <StudentCard loading />
+              <StudentCard loading />
+              <StudentCard loading />
+              <StudentCard loading />
+            </>
+          ) : topStudents.length > 0 ? (
+            topStudents.map(student => (
+              <StudentCard key={student.id} student={student} />
+            ))
+          ) : (
+            <p style={{
+              gridColumn: '1 / -1',
+              textAlign: 'center',
+              color: 'var(--color-text-secondary)',
+              fontSize: '0.875rem',
+              padding: '2rem'
+            }}>
+              No hay alumnos registrados aún
+            </p>
+          )}
+        </div>
+      </section>
+
+      {/* Sección: Misiones activas */}
+      <section style={{ marginBottom: '2rem' }}>
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: '1rem'
+        }}>
+          <h2 style={{
+            fontSize: '1.25rem',
+            fontWeight: 600,
+            color: 'var(--color-text-primary)',
+            margin: 0
+          }}>
+            Misiones activas
+          </h2>
+          <a 
+            href="/missions"
+            style={{
+              fontSize: '0.875rem',
+              color: 'var(--color-primary)',
+              fontWeight: 600,
+              textDecoration: 'none',
+              transition: 'color var(--transition-fast)'
+            }}
+            onMouseEnter={(e) => e.target.style.color = 'var(--color-primary-hover)'}
+            onMouseLeave={(e) => e.target.style.color = 'var(--color-primary)'}
+          >
+            Ver todas →
+          </a>
+        </div>
+
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+          gap: '1rem'
+        }}>
+          {loading ? (
+            <>
+              <MissionCard loading />
+              <MissionCard loading />
+              <MissionCard loading />
+            </>
+          ) : activeMissions.length > 0 ? (
+            activeMissions.map(mission => (
+              <MissionCard key={mission.id} mission={mission} />
+            ))
+          ) : (
+            <p style={{
+              gridColumn: '1 / -1',
+              textAlign: 'center',
+              color: 'var(--color-text-secondary)',
+              fontSize: '0.875rem',
+              padding: '2rem'
+            }}>
+              No hay misiones activas en este momento
+            </p>
+          )}
+        </div>
+      </section>
+
+      {/* Sección: Accesos rápidos */}
+      <section>
+        <h2 style={{
+          fontSize: '1.25rem',
+          fontWeight: 600,
+          color: 'var(--color-text-primary)',
+          margin: '0 0 1rem 0'
+        }}>
+          Accesos rápidos
+        </h2>
+
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+          gap: '1rem'
+        }}>
+          <a
+            href="/students"
+            style={{
+              padding: '1.5rem',
+              backgroundColor: 'var(--color-card-bg)',
+              borderRadius: 'var(--radius-lg)',
+              border: '1px solid var(--color-border)',
+              boxShadow: 'var(--shadow-sm)',
+              textDecoration: 'none',
+              transition: 'all var(--transition-fast)',
+              cursor: 'pointer'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.boxShadow = 'var(--shadow-md)';
+              e.currentTarget.style.transform = 'translateY(-2px)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
+              e.currentTarget.style.transform = 'translateY(0)';
+            }}
+          >
+            <h3 style={{
+              fontSize: '1rem',
+              fontWeight: 600,
+              color: 'var(--color-text-primary)',
+              margin: '0 0 0.5rem 0'
+            }}>
+              Gestionar Alumnos
+            </h3>
+            <p style={{
+              fontSize: '0.875rem',
+              color: 'var(--color-text-secondary)',
+              margin: 0
+            }}>
+              Ver lista completa y perfiles
+            </p>
+          </a>
+
+          <a
+            href="/missions"
+            style={{
+              padding: '1.5rem',
+              backgroundColor: 'var(--color-card-bg)',
+              borderRadius: 'var(--radius-lg)',
+              border: '1px solid var(--color-border)',
+              boxShadow: 'var(--shadow-sm)',
+              textDecoration: 'none',
+              transition: 'all var(--transition-fast)',
+              cursor: 'pointer'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.boxShadow = 'var(--shadow-md)';
+              e.currentTarget.style.transform = 'translateY(-2px)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
+              e.currentTarget.style.transform = 'translateY(0)';
+            }}
+          >
+            <h3 style={{
+              fontSize: '1rem',
+              fontWeight: 600,
+              color: 'var(--color-text-primary)',
+              margin: '0 0 0.5rem 0'
+            }}>
+              Crear Misión
+            </h3>
+            <p style={{
+              fontSize: '0.875rem',
+              color: 'var(--color-text-secondary)',
+              margin: 0
+            }}>
+              Asignar nuevas tareas al curso
+            </p>
+          </a>
+
+          <a
+            href="/performance"
+            style={{
+              padding: '1.5rem',
+              backgroundColor: 'var(--color-card-bg)',
+              borderRadius: 'var(--radius-lg)',
+              border: '1px solid var(--color-border)',
+              boxShadow: 'var(--shadow-sm)',
+              textDecoration: 'none',
+              transition: 'all var(--transition-fast)',
+              cursor: 'pointer'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.boxShadow = 'var(--shadow-md)';
+              e.currentTarget.style.transform = 'translateY(-2px)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
+              e.currentTarget.style.transform = 'translateY(0)';
+            }}
+          >
+            <h3 style={{
+              fontSize: '1rem',
+              fontWeight: 600,
+              color: 'var(--color-text-primary)',
+              margin: '0 0 0.5rem 0'
+            }}>
+              Ver Rendimiento
+            </h3>
+            <p style={{
+              fontSize: '0.875rem',
+              color: 'var(--color-text-secondary)',
+              margin: 0
+            }}>
+              Estadísticas y métricas del curso
+            </p>
+          </a>
+        </div>
+      </section>
     </div>
-  </div>
-);
+  );
+};
 
 export default Dashboard;
+

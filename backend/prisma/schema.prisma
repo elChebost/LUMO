@@ -1,0 +1,41 @@
+generator client {
+  provider = "prisma-client-js"
+}
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  role      String   // "docente" o "alumno"
+  email     String   @unique
+  xp        Int      @default(0)
+  level     Int      @default(1)
+  missions  Mission[]
+  notifications Notification[] @relation("UserNotifications")
+  createdAt DateTime @default(now())
+}
+
+model Mission {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String
+  dueDate     DateTime
+  status      String   // "activa" o "cerrada"
+  students    User[]   @relation("StudentMissions")
+}
+
+model Notification {
+  id          Int      @id @default(autoincrement())
+  message     String
+  createdAt   DateTime @default(now())
+  read        Boolean  @default(false)
+  recipientId Int
+  recipient   User      @relation(fields: [recipientId], references: [id], name: "UserNotifications")
+}

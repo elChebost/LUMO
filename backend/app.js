@@ -5,6 +5,7 @@ import authRoutes from './routes/authRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import contactRoutes from './routes/contactRoutes.js';
 import { connectDB } from './config/db.js';
+import 'express-async-errors';
 
 dotenv.config();
 

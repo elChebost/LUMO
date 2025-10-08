@@ -37,23 +37,6 @@ const Missions = () => {
     return matchesSearch && matchesStatus;
   });
 
-  const handleCreateMission = async (newMission) => {
-    try {
-      const response = await fetch(`${API_URL}/missions`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newMission)
-      });
-      
-      if (response.ok) {
-        setShowModal(false);
-        loadMissions();
-      }
-    } catch (error) {
-      console.error('Error creando misión:', error);
-    }
-  };
-
   return (
     <div style={{ padding: '0' }}>
       {/* Header */}
@@ -259,7 +242,7 @@ const Missions = () => {
       {showModal && (
         <MissionFormModal
           onClose={() => setShowModal(false)}
-          onSubmit={handleCreateMission}
+          onMissionCreated={loadMissions}
         />
       )}
     </div>

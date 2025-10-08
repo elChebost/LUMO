@@ -1,21 +1,26 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
-import { FiSearch, FiChevronDown } from 'react-icons/fi';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { FiSearch, FiChevronDown, FiUser, FiClipboard } from 'react-icons/fi';
 
 const pageTitle = {
   '/dashboard': { title: 'Panel principal', subtitle: 'Resumen general del curso y accesos rápidos' },
   '/': { title: 'Panel principal', subtitle: 'Resumen general del curso y accesos rápidos' },
   '/students': { title: 'Alumnos', subtitle: 'Gestión y seguimiento de estudiantes' },
   '/missions': { title: 'Misiones', subtitle: 'Administra las misiones del curso' },
-  '/performance': { title: 'Rendimiento', subtitle: 'Estadísticas y métricas del curso' },
   '/settings': { title: 'Configuración', subtitle: 'Ajustes y preferencias' },
 };
+
+const API_URL = 'http://localhost:4000';
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchValue, setSearchValue] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [searchFocused, setSearchFocused] = useState(false);
   const menuRef = useRef(null);
+  const searchRef = useRef(null);
   const location = useLocation();
+  const navigate = useNavigate();
 
   const currentPage = pageTitle[location.pathname] || { title: 'LUMO', subtitle: '' };
 
@@ -25,12 +30,42 @@ const Navbar = () => {
       if (menuRef.current && !menuRef.current.contains(e.target)) {
         setMenuOpen(false);
       }
+      if (searchRef.current && !searchRef.current.contains(e.target)) {
+        setSearchFocused(false);
+      }
     }
-    if (menuOpen) {
+    if (menuOpen || searchFocused) {
       document.addEventListener('mousedown', handleClickOutside);
     }
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [menuOpen]);
+  }, [menuOpen, searchFocused]);
+
+  // Búsqueda inteligente
+  useEffect(() => {
+    const searchTimeout = setTimeout(async () => {
+      if (searchValue.length >= 2) {
+        try {
+          const response = await fetch(`${API_URL}/api/search?q=${encodeURIComponent(searchValue)}`);
+          const data = await response.json();
+          setSearchResults(data);
+        } catch (error) {
+          console.error('Error en búsqueda:', error);
+          setSearchResults([]);
+        }
+      } else {
+        setSearchResults([]);
+      }
+    }, 300);
+
+    return () => clearTimeout(searchTimeout);
+  }, [searchValue]);
+
+  const handleSearchSelect = (result) => {
+    navigate(result.url);
+    setSearchValue('');
+    setSearchResults([]);
+    setSearchFocused(false);
+  };
 
   return (
     <nav style={{
@@ -65,14 +100,14 @@ const Navbar = () => {
         )}
       </div>
 
-      {/* Buscador centrado */}
+      {/* Buscador centrado con sugerencias */}
       <div style={{
         flex: '1',
         display: 'flex',
         justifyContent: 'center',
         maxWidth: '400px'
       }}>
-        <div style={{
+        <div ref={searchRef} style={{
           position: 'relative',
           width: '100%'
         }}>
@@ -84,14 +119,16 @@ const Navbar = () => {
               top: '50%',
               transform: 'translateY(-50%)',
               color: 'var(--color-text-secondary)',
-              pointerEvents: 'none'
+              pointerEvents: 'none',
+              zIndex: 2
             }}
           />
           <input
             type="text"
-            placeholder="Buscar..."
+            placeholder="Buscar alumnos, misiones..."
             value={searchValue}
             onChange={(e) => setSearchValue(e.target.value)}
+            onFocus={() => setSearchFocused(true)}
             style={{
               width: '100%',
               height: '40px',
@@ -101,56 +138,79 @@ const Navbar = () => {
               fontSize: '0.875rem',
               backgroundColor: 'var(--color-card-bg)',
               color: 'var(--color-text-primary)',
-              transition: 'all var(--transition-fast)'
-            }}
-            onFocus={(e) => {
-              e.target.style.borderColor = 'var(--color-primary)';
-              e.target.style.boxShadow = '0 0 0 3px rgba(46, 125, 50, 0.1)';
-            }}
-            onBlur={(e) => {
-              e.target.style.borderColor = 'var(--color-border)';
-              e.target.style.boxShadow = 'none';
+              transition: 'all var(--transition-fast)',
+              borderColor: searchFocused ? 'var(--color-primary)' : 'var(--color-border)',
+              boxShadow: searchFocused ? '0 0 0 3px rgba(46, 125, 50, 0.1)' : 'none'
             }}
           />
+
+          {/* Dropdown de resultados */}
+          {searchFocused && searchResults.length > 0 && (
+            <div className="fade-in" style={{
+              position: 'absolute',
+              top: 'calc(100% + 0.5rem)',
+              left: 0,
+              right: 0,
+              backgroundColor: 'var(--color-card-bg)',
+              border: '1px solid var(--color-border)',
+              borderRadius: 'var(--radius-lg)',
+              boxShadow: 'var(--shadow-lg)',
+              maxHeight: '300px',
+              overflowY: 'auto',
+              zIndex: 50
+            }}>
+              {searchResults.map((result) => (
+                <div
+                  key={`${result.type}-${result.id}`}
+                  onClick={() => handleSearchSelect(result)}
+                  style={{
+                    padding: '0.75rem 1rem',
+                    cursor: 'pointer',
+                    borderBottom: '1px solid var(--color-border)',
+                    transition: 'background-color var(--transition-fast)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.75rem'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--color-bg)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                  }}
+                >
+                  {result.type === 'student' ? <FiUser size={18} color="var(--color-primary)" /> : <FiClipboard size={18} color="var(--color-primary)" />}
+                  <div style={{ flex: 1 }}>
+                    <p style={{
+                      margin: 0,
+                      fontSize: '0.875rem',
+                      fontWeight: 600,
+                      color: 'var(--color-text-primary)'
+                    }}>
+                      {result.title}
+                    </p>
+                    <p style={{
+                      margin: '0.125rem 0 0 0',
+                      fontSize: '0.75rem',
+                      color: 'var(--color-text-secondary)'
+                    }}>
+                      {result.subtitle}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Botón principal y avatar */}
+      {/* Avatar y menú desplegable */}
       <div style={{
         flex: '0 0 auto',
         display: 'flex',
         alignItems: 'center',
         gap: '1rem'
       }}>
-        {/* Botón principal */}
-        <button style={{
-          height: '44px',
-          padding: '0 1.5rem',
-          backgroundColor: 'var(--color-primary)',
-          color: 'white',
-          border: 'none',
-          borderRadius: 'var(--radius-md)',
-          fontSize: '0.875rem',
-          fontWeight: 600,
-          cursor: 'pointer',
-          transition: 'all var(--transition-fast)',
-          whiteSpace: 'nowrap'
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.backgroundColor = 'var(--color-primary-hover)';
-          e.currentTarget.style.transform = 'translateY(-1px)';
-          e.currentTarget.style.boxShadow = 'var(--shadow-md)';
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.backgroundColor = 'var(--color-primary)';
-          e.currentTarget.style.transform = 'translateY(0)';
-          e.currentTarget.style.boxShadow = 'none';
-        }}
-        >
-          Nueva Misión
-        </button>
-
-        {/* Avatar y menú desplegable */}
         <div ref={menuRef} style={{ position: 'relative' }}>
           <div
             onClick={() => setMenuOpen(!menuOpen)}
@@ -216,43 +276,22 @@ const Navbar = () => {
                   color: 'var(--color-text-primary)',
                   margin: 0
                 }}>
-                  Profesor Sebastián
+                  Elias Diaz
                 </p>
                 <p style={{
                   fontSize: '0.75rem',
                   color: 'var(--color-text-secondary)',
                   margin: '0.125rem 0 0 0'
                 }}>
-                  profesor@lumo.edu
+                  remindevelopment@gmail.com
                 </p>
               </div>
               
               <button
-                onClick={() => setMenuOpen(false)}
-                style={{
-                  width: '100%',
-                  textAlign: 'left',
-                  padding: '0.625rem 1rem',
-                  fontSize: '0.875rem',
-                  color: 'var(--color-text-primary)',
-                  backgroundColor: 'transparent',
-                  border: 'none',
-                  borderRadius: 'var(--radius-sm)',
-                  cursor: 'pointer',
-                  transition: 'background-color var(--transition-fast)'
+                onClick={() => {
+                  setMenuOpen(false);
+                  navigate('/settings');
                 }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = 'var(--color-bg)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = 'transparent';
-                }}
-              >
-                Ver perfil
-              </button>
-
-              <button
-                onClick={() => setMenuOpen(false)}
                 style={{
                   width: '100%',
                   textAlign: 'left',
@@ -282,7 +321,11 @@ const Navbar = () => {
               }} />
 
               <button
-                onClick={() => setMenuOpen(false)}
+                onClick={() => {
+                  setMenuOpen(false);
+                  // Aquí iría la lógica de logout cuando implementemos auth
+                  navigate('/login');
+                }}
                 style={{
                   width: '100%',
                   textAlign: 'left',

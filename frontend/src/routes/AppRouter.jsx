@@ -6,23 +6,26 @@ import Students from '../pages/Students';
 import StudentProfile from '../pages/StudentProfile';
 import Missions from '../pages/Missions';
 import MissionEdit from '../pages/MissionEdit';
-import Performance from '../pages/Performance';
 import Settings from '../pages/Settings';
+import Login from '../pages/Login';
 
 const AppRouter = () => (
   <BrowserRouter>
-    <MainLayout>
-      <Routes>
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/students" element={<Students />} />
-        <Route path="/students/:id" element={<StudentProfile />} />
-        <Route path="/missions" element={<Missions />} />
-        <Route path="/missions/:id/edit" element={<MissionEdit />} />
-        <Route path="/performance" element={<Performance />} />
-        <Route path="/settings" element={<Settings />} />
-      </Routes>
-    </MainLayout>
+    <Routes>
+      {/* Ruta de login sin layout */}
+      <Route path="/login" element={<Login />} />
+      
+      {/* Rutas con layout */}
+      <Route path="/" element={<MainLayout />}>
+        <Route index element={<Navigate to="/dashboard" replace />} />
+        <Route path="dashboard" element={<Dashboard />} />
+        <Route path="students" element={<Students />} />
+        <Route path="students/:id" element={<StudentProfile />} />
+        <Route path="missions" element={<Missions />} />
+        <Route path="missions/:id/edit" element={<MissionEdit />} />
+        <Route path="settings" element={<Settings />} />
+      </Route>
+    </Routes>
   </BrowserRouter>
 );
 

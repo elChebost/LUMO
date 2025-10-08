@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { FiTrendingUp, FiTarget, FiCheckCircle } from 'react-icons/fi';
 import StatCard from '../components/StatCard';
-import StudentCard from '../components/StudentCard';
 import MissionCard from '../components/MissionCard';
 
 const API_URL = 'http://localhost:4000/api';
 
 const Dashboard = () => {
   const [stats, setStats] = useState(null);
-  const [topStudents, setTopStudents] = useState([]);
   const [activeMissions, setActiveMissions] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     loadDashboardData();
@@ -24,11 +24,6 @@ const Dashboard = () => {
       const statsRes = await fetch(`${API_URL}/stats`);
       const statsData = await statsRes.json();
       setStats(statsData);
-
-      // Cargar alumnos destacados
-      const topStudentsRes = await fetch(`${API_URL}/stats/top-students`);
-      const topStudentsData = await topStudentsRes.json();
-      setTopStudents(topStudentsData.slice(0, 4));
 
       // Cargar misiones activas
       const missionsRes = await fetch(`${API_URL}/missions`);
@@ -91,70 +86,143 @@ const Dashboard = () => {
         />
       </div>
 
-      {/* Sección: Alumnos destacados */}
+      {/* Sección: Accesos rápidos */}
       <section style={{ marginBottom: '2rem' }}>
-        <div style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: '1rem'
+        <h2 style={{
+          fontSize: '1.25rem',
+          fontWeight: 600,
+          color: 'var(--color-text-primary)',
+          margin: '0 0 1rem 0'
         }}>
-          <h2 style={{
-            fontSize: '1.25rem',
-            fontWeight: 600,
-            color: 'var(--color-text-primary)',
-            margin: 0
-          }}>
-            Alumnos destacados
-          </h2>
-          <a 
-            href="/students"
-            style={{
-              fontSize: '0.875rem',
-              color: 'var(--color-primary)',
-              fontWeight: 600,
-              textDecoration: 'none',
-              transition: 'color var(--transition-fast)'
-            }}
-            onMouseEnter={(e) => e.target.style.color = 'var(--color-primary-hover)'}
-            onMouseLeave={(e) => e.target.style.color = 'var(--color-primary)'}
-          >
-            Ver todos →
-          </a>
-        </div>
+          Accesos rápidos
+        </h2>
 
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
           gap: '1rem'
         }}>
-          {loading ? (
-            <>
-              <StudentCard loading />
-              <StudentCard loading />
-              <StudentCard loading />
-              <StudentCard loading />
-            </>
-          ) : topStudents.length > 0 ? (
-            topStudents.map(student => (
-              <StudentCard key={student.id} student={student} />
-            ))
-          ) : (
-            <p style={{
-              gridColumn: '1 / -1',
-              textAlign: 'center',
-              color: 'var(--color-text-secondary)',
-              fontSize: '0.875rem',
-              padding: '2rem'
+          <button
+            onClick={() => navigate('/students')}
+            style={{
+              padding: '1.5rem',
+              backgroundColor: 'var(--color-card-bg)',
+              borderRadius: 'var(--radius-lg)',
+              border: '1px solid var(--color-border)',
+              boxShadow: 'var(--shadow-sm)',
+              textDecoration: 'none',
+              transition: 'all var(--transition-fast)',
+              cursor: 'pointer',
+              textAlign: 'left'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.boxShadow = 'var(--shadow-md)';
+              e.currentTarget.style.transform = 'translateY(-2px)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
+              e.currentTarget.style.transform = 'translateY(0)';
+            }}
+          >
+            <h3 style={{
+              fontSize: '1rem',
+              fontWeight: 600,
+              color: 'var(--color-text-primary)',
+              margin: '0 0 0.5rem 0'
             }}>
-              No hay alumnos registrados aún
+              Gestionar Alumnos
+            </h3>
+            <p style={{
+              fontSize: '0.875rem',
+              color: 'var(--color-text-secondary)',
+              margin: 0
+            }}>
+              Ver lista completa y perfiles
             </p>
-          )}
+          </button>
+
+          <button
+            onClick={() => navigate('/missions')}
+            style={{
+              padding: '1.5rem',
+              backgroundColor: 'var(--color-card-bg)',
+              borderRadius: 'var(--radius-lg)',
+              border: '1px solid var(--color-border)',
+              boxShadow: 'var(--shadow-sm)',
+              textDecoration: 'none',
+              transition: 'all var(--transition-fast)',
+              cursor: 'pointer',
+              textAlign: 'left'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.boxShadow = 'var(--shadow-md)';
+              e.currentTarget.style.transform = 'translateY(-2px)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
+              e.currentTarget.style.transform = 'translateY(0)';
+            }}
+          >
+            <h3 style={{
+              fontSize: '1rem',
+              fontWeight: 600,
+              color: 'var(--color-text-primary)',
+              margin: '0 0 0.5rem 0'
+            }}>
+              Crear Misión
+            </h3>
+            <p style={{
+              fontSize: '0.875rem',
+              color: 'var(--color-text-secondary)',
+              margin: 0
+            }}>
+              Asignar nuevas tareas al curso
+            </p>
+          </button>
+
+          <button
+            onClick={() => navigate('/settings')}
+            style={{
+              padding: '1.5rem',
+              backgroundColor: 'var(--color-card-bg)',
+              borderRadius: 'var(--radius-lg)',
+              border: '1px solid var(--color-border)',
+              boxShadow: 'var(--shadow-sm)',
+              textDecoration: 'none',
+              transition: 'all var(--transition-fast)',
+              cursor: 'pointer',
+              textAlign: 'left'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.boxShadow = 'var(--shadow-md)';
+              e.currentTarget.style.transform = 'translateY(-2px)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
+              e.currentTarget.style.transform = 'translateY(0)';
+            }}
+          >
+            <h3 style={{
+              fontSize: '1rem',
+              fontWeight: 600,
+              color: 'var(--color-text-primary)',
+              margin: '0 0 0.5rem 0'
+            }}>
+              Ver Estadísticas
+            </h3>
+            <p style={{
+              fontSize: '0.875rem',
+              color: 'var(--color-text-secondary)',
+              margin: 0
+            }}>
+              Métricas y análisis del curso
+            </p>
+          </button>
         </div>
       </section>
 
       {/* Sección: Misiones activas */}
-      <section style={{ marginBottom: '2rem' }}>
+      <section>
         <div style={{
           display: 'flex',
           justifyContent: 'space-between',
@@ -169,20 +237,23 @@ const Dashboard = () => {
           }}>
             Misiones activas
           </h2>
-          <a 
-            href="/missions"
+          <button
+            onClick={() => navigate('/missions')}
             style={{
               fontSize: '0.875rem',
               color: 'var(--color-primary)',
               fontWeight: 600,
               textDecoration: 'none',
-              transition: 'color var(--transition-fast)'
+              transition: 'color var(--transition-fast)',
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer'
             }}
             onMouseEnter={(e) => e.target.style.color = 'var(--color-primary-hover)'}
             onMouseLeave={(e) => e.target.style.color = 'var(--color-primary)'}
           >
             Ver todas →
-          </a>
+          </button>
         </div>
 
         <div style={{
@@ -211,138 +282,6 @@ const Dashboard = () => {
               No hay misiones activas en este momento
             </p>
           )}
-        </div>
-      </section>
-
-      {/* Sección: Accesos rápidos */}
-      <section>
-        <h2 style={{
-          fontSize: '1.25rem',
-          fontWeight: 600,
-          color: 'var(--color-text-primary)',
-          margin: '0 0 1rem 0'
-        }}>
-          Accesos rápidos
-        </h2>
-
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-          gap: '1rem'
-        }}>
-          <a
-            href="/students"
-            style={{
-              padding: '1.5rem',
-              backgroundColor: 'var(--color-card-bg)',
-              borderRadius: 'var(--radius-lg)',
-              border: '1px solid var(--color-border)',
-              boxShadow: 'var(--shadow-sm)',
-              textDecoration: 'none',
-              transition: 'all var(--transition-fast)',
-              cursor: 'pointer'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.boxShadow = 'var(--shadow-md)';
-              e.currentTarget.style.transform = 'translateY(-2px)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
-              e.currentTarget.style.transform = 'translateY(0)';
-            }}
-          >
-            <h3 style={{
-              fontSize: '1rem',
-              fontWeight: 600,
-              color: 'var(--color-text-primary)',
-              margin: '0 0 0.5rem 0'
-            }}>
-              Gestionar Alumnos
-            </h3>
-            <p style={{
-              fontSize: '0.875rem',
-              color: 'var(--color-text-secondary)',
-              margin: 0
-            }}>
-              Ver lista completa y perfiles
-            </p>
-          </a>
-
-          <a
-            href="/missions"
-            style={{
-              padding: '1.5rem',
-              backgroundColor: 'var(--color-card-bg)',
-              borderRadius: 'var(--radius-lg)',
-              border: '1px solid var(--color-border)',
-              boxShadow: 'var(--shadow-sm)',
-              textDecoration: 'none',
-              transition: 'all var(--transition-fast)',
-              cursor: 'pointer'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.boxShadow = 'var(--shadow-md)';
-              e.currentTarget.style.transform = 'translateY(-2px)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
-              e.currentTarget.style.transform = 'translateY(0)';
-            }}
-          >
-            <h3 style={{
-              fontSize: '1rem',
-              fontWeight: 600,
-              color: 'var(--color-text-primary)',
-              margin: '0 0 0.5rem 0'
-            }}>
-              Crear Misión
-            </h3>
-            <p style={{
-              fontSize: '0.875rem',
-              color: 'var(--color-text-secondary)',
-              margin: 0
-            }}>
-              Asignar nuevas tareas al curso
-            </p>
-          </a>
-
-          <a
-            href="/performance"
-            style={{
-              padding: '1.5rem',
-              backgroundColor: 'var(--color-card-bg)',
-              borderRadius: 'var(--radius-lg)',
-              border: '1px solid var(--color-border)',
-              boxShadow: 'var(--shadow-sm)',
-              textDecoration: 'none',
-              transition: 'all var(--transition-fast)',
-              cursor: 'pointer'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.boxShadow = 'var(--shadow-md)';
-              e.currentTarget.style.transform = 'translateY(-2px)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
-              e.currentTarget.style.transform = 'translateY(0)';
-            }}
-          >
-            <h3 style={{
-              fontSize: '1rem',
-              fontWeight: 600,
-              color: 'var(--color-text-primary)',
-              margin: '0 0 0.5rem 0'
-            }}>
-              Ver Rendimiento
-            </h3>
-            <p style={{
-              fontSize: '0.875rem',
-              color: 'var(--color-text-secondary)',
-              margin: 0
-            }}>
-              Estadísticas y métricas del curso
-            </p>
-          </a>
         </div>
       </section>
     </div>

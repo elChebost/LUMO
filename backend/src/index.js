@@ -5,25 +5,7 @@ import { PrismaClient } from "@prisma/client";
 const app = express();
 const prisma = new PrismaClient();
 
-// CORS: permitir localhost (desarrollo) y dominio de producción
-const allowedOrigins = [
-  "http://localhost:5173",
-  "http://lumo.anima.edu.uy",
-  "https://lumo.anima.edu.uy"
-];
-
-app.use(cors({ 
-  origin: function(origin, callback) {
-    // Permitir requests sin origin (como Postman, curl, etc.)
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  credentials: true
-}));
+app.use(cors({ origin: "http://localhost:5173" }));
 app.use(express.json());
 
 // ============== USUARIOS ==============

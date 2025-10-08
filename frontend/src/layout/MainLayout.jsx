@@ -1,9 +1,10 @@
 import React from 'react';
+import { Outlet } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import Navbar from '../components/Navbar';
 import NotificationFAB from '../components/NotificationFAB';
 
-const MainLayout = ({ children }) => {
+const MainLayout = () => {
   return (
     <div style={{ 
       minHeight: '100vh', 
@@ -59,7 +60,7 @@ const MainLayout = ({ children }) => {
           width: '100%',
           margin: '0 auto'
         }}>
-          {children}
+          <Outlet />
         </main>
       </div>
 

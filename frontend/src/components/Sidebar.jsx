@@ -1,13 +1,11 @@
 import React from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { FiHome, FiUsers, FiClipboard, FiBarChart2, FiSettings } from 'react-icons/fi';
+import { FiHome, FiUsers, FiClipboard } from 'react-icons/fi';
 
 const navItems = [
   { to: '/dashboard', icon: FiHome, label: 'Inicio' },
   { to: '/students', icon: FiUsers, label: 'Alumnos' },
   { to: '/missions', icon: FiClipboard, label: 'Misiones' },
-  { to: '/performance', icon: FiBarChart2, label: 'Rendimiento' },
-  { to: '/settings', icon: FiSettings, label: 'Configuración' },
 ];
 
 const Sidebar = () => {
@@ -18,15 +16,17 @@ const Sidebar = () => {
       display: 'flex',
       flexDirection: 'column',
       height: '100%',
-      padding: '2rem 1rem'
+      padding: '1.5rem 1rem'
     }}>
       {/* Logo LUMO */}
       <div style={{
         textAlign: 'center',
-        marginBottom: '2.5rem'
+        marginBottom: '2.5rem',
+        paddingBottom: '1.5rem',
+        borderBottom: '1px solid var(--color-border)'
       }}>
         <h1 style={{
-          fontSize: '1.75rem',
+          fontSize: '1.5rem',
           fontWeight: 700,
           color: 'var(--color-primary)',
           letterSpacing: '0.05em',
@@ -34,37 +34,6 @@ const Sidebar = () => {
         }}>
           LUMO
         </h1>
-      </div>
-
-      {/* Info del docente */}
-      <div style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        marginBottom: '2rem',
-        paddingBottom: '1.5rem',
-        borderBottom: '1px solid var(--color-border)'
-      }}>
-        <img 
-          src="/avatar.png" 
-          alt="Avatar docente" 
-          style={{
-            width: '40px',
-            height: '40px',
-            borderRadius: '50%',
-            border: '2px solid var(--color-primary)',
-            objectFit: 'cover',
-            marginBottom: '0.5rem'
-          }}
-        />
-        <span style={{
-          fontSize: '0.875rem',
-          fontWeight: 600,
-          color: 'var(--color-text-primary)',
-          textAlign: 'center'
-        }}>
-          Profesor Sebastián
-        </span>
       </div>
 
       {/* Navegación */}

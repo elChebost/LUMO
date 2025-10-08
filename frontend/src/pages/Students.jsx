@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { FiSearch, FiFilter, FiUserPlus } from 'react-icons/fi';
+import { FiSearch, FiUserPlus } from 'react-icons/fi';
 import StudentRow from '../components/StudentRow';
+import StudentFormModal from '../components/StudentFormModal';
 
 const API_URL = 'http://localhost:4000/api';
 
@@ -8,7 +9,9 @@ const Students = () => {
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterLevel, setFilterLevel] = useState('all');
+  const [filterStatus, setFilterStatus] = useState('all'); // all, submitted, pending
+  const [sortBy, setSortBy] = useState('name-asc'); // name-asc, name-desc, activity-recent, activity-old
+  const [modalOpen, setModalOpen] = useState(false);
 
   useEffect(() => {
     loadStudents();
@@ -29,13 +32,40 @@ const Students = () => {
     }
   };
 
-  // Filtrar estudiantes por búsqueda y nivel
-  const filteredStudents = students.filter(student => {
-    const matchesSearch = student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         student.email.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesLevel = filterLevel === 'all' || student.level === parseInt(filterLevel);
-    return matchesSearch && matchesLevel;
-  });
+  // Función de ordenamiento
+  const getSortedStudents = (studentsList) => {
+    const sorted = [...studentsList];
+    
+    switch (sortBy) {
+      case 'name-asc':
+        return sorted.sort((a, b) => a.name.localeCompare(b.name));
+      case 'name-desc':
+        return sorted.sort((a, b) => b.name.localeCompare(a.name));
+      case 'activity-recent':
+        return sorted.sort((a, b) => new Date(b.lastActivity) - new Date(a.lastActivity));
+      case 'activity-old':
+        return sorted.sort((a, b) => new Date(a.lastActivity) - new Date(b.lastActivity));
+      default:
+        return sorted;
+    }
+  };
+
+  // Filtrar y ordenar estudiantes
+  const filteredAndSortedStudents = getSortedStudents(
+    students.filter(student => {
+      const matchesSearch = student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           student.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           (student.firstName && student.firstName.toLowerCase().includes(searchTerm.toLowerCase())) ||
+                           (student.lastName && student.lastName.toLowerCase().includes(searchTerm.toLowerCase()));
+      
+      // Por ahora, todos los alumnos se consideran "sin entregar" ya que no hay sistema de entregas
+      const matchesStatus = filterStatus === 'all' || 
+                           (filterStatus === 'pending' && true) || 
+                           (filterStatus === 'submitted' && false);
+      
+      return matchesSearch && matchesStatus;
+    })
+  );
 
   return (
     <div style={{ padding: '0' }}>
@@ -111,16 +141,11 @@ const Students = () => {
           />
         </div>
 
-        {/* Filtro por nivel */}
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '0.5rem'
-        }}>
-          <FiFilter size={18} style={{ color: 'var(--color-text-secondary)' }} />
+        {/* Filtro por estado de entrega */}
+        <div style={{ position: 'relative' }}>
           <select
-            value={filterLevel}
-            onChange={(e) => setFilterLevel(e.target.value)}
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value)}
             style={{
               height: '44px',
               padding: '0 2.5rem 0 1rem',
@@ -133,21 +158,47 @@ const Students = () => {
               appearance: 'none',
               backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23757575' d='M6 9L1 4h10z'/%3E%3C/svg%3E")`,
               backgroundRepeat: 'no-repeat',
-              backgroundPosition: 'right 1rem center'
+              backgroundPosition: 'right 1rem center',
+              minWidth: '150px'
             }}
           >
-            <option value="all">Todos los niveles</option>
-            <option value="1">Nivel 1</option>
-            <option value="2">Nivel 2</option>
-            <option value="3">Nivel 3</option>
-            <option value="4">Nivel 4</option>
-            <option value="5">Nivel 5</option>
+            <option value="all">Todos</option>
+            <option value="submitted">Entregados</option>
+            <option value="pending">Sin entregar</option>
+          </select>
+        </div>
+
+        {/* Ordenar por */}
+        <div style={{ position: 'relative' }}>
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+            style={{
+              height: '44px',
+              padding: '0 2.5rem 0 1rem',
+              border: '1px solid var(--color-border)',
+              borderRadius: 'var(--radius-md)',
+              fontSize: '0.875rem',
+              backgroundColor: 'var(--color-card-bg)',
+              color: 'var(--color-text-primary)',
+              cursor: 'pointer',
+              appearance: 'none',
+              backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23757575' d='M6 9L1 4h10z'/%3E%3C/svg%3E")`,
+              backgroundRepeat: 'no-repeat',
+              backgroundPosition: 'right 1rem center',
+              minWidth: '180px'
+            }}
+          >
+            <option value="name-asc">A - Z</option>
+            <option value="name-desc">Z - A</option>
+            <option value="activity-recent">Actividad reciente</option>
+            <option value="activity-old">Actividad antigua</option>
           </select>
         </div>
 
         {/* Botón Agregar Alumno */}
         <button
-          onClick={() => console.log('Agregar alumno')}
+          onClick={() => setModalOpen(true)}
           style={{
             height: '44px',
             padding: '0 1.5rem',
@@ -158,12 +209,11 @@ const Students = () => {
             fontSize: '0.875rem',
             fontWeight: 600,
             cursor: 'pointer',
-            transition: 'all var(--transition-fast)',
             display: 'flex',
             alignItems: 'center',
             gap: '0.5rem',
-            whiteSpace: 'nowrap',
-            marginLeft: 'auto'
+            transition: 'all var(--transition-fast)',
+            whiteSpace: 'nowrap'
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.backgroundColor = 'var(--color-primary-hover)';
@@ -189,127 +239,71 @@ const Students = () => {
         boxShadow: 'var(--shadow-sm)',
         overflow: 'hidden'
       }}>
-        <div style={{ overflowX: 'auto' }}>
-          <table style={{
-            width: '100%',
-            borderCollapse: 'collapse'
-          }}>
-            <thead>
-              <tr style={{
-                backgroundColor: 'var(--color-bg)',
-                borderBottom: '2px solid var(--color-border)',
-                position: 'sticky',
-                top: 0,
-                zIndex: 10
-              }}>
-                <th style={{
-                  padding: '1rem',
-                  textAlign: 'left',
-                  fontSize: '0.75rem',
-                  fontWeight: 600,
-                  color: 'var(--color-text-secondary)',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.05em'
-                }}>
-                  Alumno
-                </th>
-                <th style={{
-                  padding: '1rem',
-                  textAlign: 'left',
-                  fontSize: '0.75rem',
-                  fontWeight: 600,
-                  color: 'var(--color-text-secondary)',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.05em'
-                }}>
-                  Nivel
-                </th>
-                <th style={{
-                  padding: '1rem',
-                  textAlign: 'left',
-                  fontSize: '0.75rem',
-                  fontWeight: 600,
-                  color: 'var(--color-text-secondary)',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.05em'
-                }}>
-                  XP
-                </th>
-                <th style={{
-                  padding: '1rem',
-                  textAlign: 'left',
-                  fontSize: '0.75rem',
-                  fontWeight: 600,
-                  color: 'var(--color-text-secondary)',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.05em'
-                }}>
-                  Misiones
-                </th>
-                <th style={{
-                  padding: '1rem',
-                  textAlign: 'left',
-                  fontSize: '0.75rem',
-                  fontWeight: 600,
-                  color: 'var(--color-text-secondary)',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.05em'
-                }}>
-                  Última actividad
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {loading ? (
-                <>
-                  <StudentRow loading />
-                  <StudentRow loading />
-                  <StudentRow loading />
-                  <StudentRow loading />
-                  <StudentRow loading />
-                </>
-              ) : filteredStudents.length > 0 ? (
-                filteredStudents.map(student => (
-                  <StudentRow key={student.id} student={student} />
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="5" style={{ padding: '3rem', textAlign: 'center' }}>
-                    <p style={{
-                      color: 'var(--color-text-secondary)',
-                      fontSize: '0.875rem',
-                      margin: 0
-                    }}>
-                      {searchTerm || filterLevel !== 'all'
-                        ? 'No se encontraron alumnos con esos criterios'
-                        : 'No hay alumnos registrados aún'}
-                    </p>
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+        {/* Header de tabla */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: '2fr 1.5fr 1fr 1fr 0.5fr',
+          padding: '1rem 1.5rem',
+          backgroundColor: 'var(--color-bg)',
+          borderBottom: '1px solid var(--color-border)',
+          fontSize: '0.75rem',
+          fontWeight: 600,
+          color: 'var(--color-text-secondary)',
+          textTransform: 'uppercase',
+          letterSpacing: '0.05em'
+        }}>
+          <div>Alumno</div>
+          <div>Email</div>
+          <div>Nivel</div>
+          <div>XP</div>
+          <div></div>
+        </div>
+
+        {/* Contenido de tabla */}
+        <div style={{
+          minHeight: '300px'
+        }}>
+          {loading ? (
+            <div style={{
+              padding: '3rem',
+              textAlign: 'center',
+              color: 'var(--color-text-secondary)'
+            }}>
+              Cargando alumnos...
+            </div>
+          ) : filteredAndSortedStudents.length > 0 ? (
+            filteredAndSortedStudents.map(student => (
+              <StudentRow key={student.id} student={student} />
+            ))
+          ) : (
+            <div style={{
+              padding: '3rem',
+              textAlign: 'center',
+              color: 'var(--color-text-secondary)'
+            }}>
+              {searchTerm || filterStatus !== 'all' 
+                ? 'No se encontraron alumnos con los filtros aplicados' 
+                : 'No hay alumnos registrados aún'}
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Footer con información */}
-      {!loading && filteredStudents.length > 0 && (
-        <div style={{
-          marginTop: '1rem',
-          padding: '1rem',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center'
-        }}>
-          <p style={{
-            fontSize: '0.875rem',
-            color: 'var(--color-text-secondary)',
-            margin: 0
-          }}>
-            Mostrando {filteredStudents.length} de {students.length} alumnos
-          </p>
-        </div>
-      )}
+      {/* Resumen */}
+      <div style={{
+        marginTop: '1rem',
+        fontSize: '0.875rem',
+        color: 'var(--color-text-secondary)'
+      }}>
+        Mostrando {filteredAndSortedStudents.length} de {students.length} alumnos
+      </div>
+
+      {/* Modal de agregar alumno */}
+      <StudentFormModal 
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        onStudentAdded={loadStudents}
+      />
     </div>
   );
 };

@@ -7,95 +7,41 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Modelos del proyecto
-model Escuela {
-  id          Int        @id @default(autoincrement())
-  nombre      String
-  direccion   String
-  turno       String
-  aulas       Aula[]
-  docentes    Docente[]
-  estudiantes Estudiante[]
+model User {
+  id            Int              @id @default(autoincrement())
+  firstName     String
+  lastName      String
+  name          String           // Nombre completo (para compatibilidad)
+  role          String           // "docente" o "alumno"
+  email         String           @unique
+  password      String
+  xp            Int              @default(0)
+  level         Int              @default(1)
+  missions      Mission[]        @relation("StudentMissions")
+  notifications Notification[]   @relation("UserNotifications")
+  lastActivity  DateTime         @default(now())
+  createdAt     DateTime         @default(now())
 }
 
-model Aula {
-  id        Int     @id @default(autoincrement())
-  nombre    String
-  grado     String
-  escuelaId Int
-  escuela   Escuela @relation(fields: [escuelaId], references: [id])
-  docenteId Int
-  docente   Docente @relation(fields: [docenteId], references: [id])
-  estudiantes Estudiante[]
+model Mission {
+  id             Int      @id @default(autoincrement())
+  title          String
+  description    String
+  subject        String   @default("General") // Asignatura: Matemáticas, Lengua, etc.
+  dueDate        DateTime
+  timeLimit      String   @default("23:59") // Hora límite en formato HH:MM
+  activationDate DateTime @default(now()) // Fecha de publicación
+  status         String   @default("activa") // "activa" o "cerrada"
+  students       User[]   @relation("StudentMissions")
+  createdAt      DateTime @default(now())
 }
 
-model Docente {
-  id        Int     @id @default(autoincrement())
-  nombre    String
-  email     String  @unique
-  clases    String
-  grados    String
-  horario   String
-  rol       String
-  escuelaId Int
-  escuela   Escuela @relation(fields: [escuelaId], references: [id])
-  aulas     Aula[]
-  estudiantes Estudiante[]
-  misiones  Mision[]
-  perfil    Perfil[]
+model Notification {
+  id          Int      @id @default(autoincrement())
+  message     String
+  createdAt   DateTime @default(now())
+  read        Boolean  @default(false)
+  recipientId Int
+  recipient   User     @relation(fields: [recipientId], references: [id], name: "UserNotifications")
 }
 
-model Estudiante {
-  id        Int     @id @default(autoincrement())
-  nombre    String
-  email     String  @unique
-  edad      Int
-  grado     String
-  horario   String
-  escuelaId Int
-  escuela   Escuela @relation(fields: [escuelaId], references: [id])
-  docenteId Int
-  docente   Docente @relation(fields: [docenteId], references: [id])
-  aulaId    Int
-  aula      Aula    @relation(fields: [aulaId], references: [id])
-  skillTree SkillTree?
-  asignatura Asignatura?
-  perfil    Perfil[]
-}
-
-model SkillTree {
-  id           Int     @id @default(autoincrement())
-  progreso     Int     @default(0)
-  xp           Int     @default(0)
-  estudianteId Int     @unique
-  estudiante   Estudiante @relation(fields: [estudianteId], references: [id])
-}
-
-model Asignatura {
-  id          Int     @id @default(autoincrement())
-  nombre      String
-  descripcion String
-  estudianteId Int     @unique
-  estudiante   Estudiante @relation(fields: [estudianteId], references: [id])
-}
-
-model Mision {
-  id        Int     @id @default(autoincrement())
-  titulo    String
-  descripcion String
-  estado    String
-  grado     String
-  docenteId Int
-  docente   Docente @relation(fields: [docenteId], references: [id])
-}
-
-model Perfil {
-  id           Int     @id @default(autoincrement())
-  fotoPerfil   String?
-  exp          Int     @default(0)
-  monedas      Int     @default(0)
-  estudianteId Int     @unique
-  estudiante   Estudiante @relation(fields: [estudianteId], references: [id])
-  docenteId    Int     @unique
-  docente      Docente @relation(fields: [docenteId], references: [id])
-}

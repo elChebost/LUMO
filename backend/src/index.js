@@ -5,7 +5,25 @@ import { PrismaClient } from "@prisma/client";
 const app = express();
 const prisma = new PrismaClient();
 
-app.use(cors({ origin: "http://localhost:5173" }));
+// CORS: permitir localhost (desarrollo) y dominio de producción
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://lumo.anima.edu.uy",
+  "https://lumo.anima.edu.uy"
+];
+
+app.use(cors({ 
+  origin: function(origin, callback) {
+    // Permitir requests sin origin (como Postman, curl, etc.)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true
+}));
 app.use(express.json());
 
 // ============== USUARIOS ==============
@@ -45,11 +63,113 @@ app.get("/api/users/:id", async (req, res) => {
 // POST crear usuario
 app.post("/api/users", async (req, res) => {
   try {
-    const { name, email, role = "alumno", xp = 0, level = 1 } = req.body;
+    const { firstName, lastName, email, password, role = "alumno", xp = 0, level = 1 } = req.body;
+    
+    // Verificar si el email ya existe
+    const existingUser = await prisma.user.findUnique({ where: { email } });
+    if (existingUser) {
+      return res.status(400).json({ error: "El correo ya está registrado" });
+    }
+
+    const name = `${firstName} ${lastName}`;
     const user = await prisma.user.create({ 
-      data: { name, email, role, xp, level } 
+      data: { firstName, lastName, name, email, password, role, xp, level } 
     });
+    
     res.status(201).json(user);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// POST login
+app.post("/api/auth/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    
+    const user = await prisma.user.findUnique({ 
+      where: { email },
+      include: {
+        missions: true,
+        notifications: true
+      }
+    });
+    
+    if (!user) {
+      return res.status(401).json({ error: "Credenciales incorrectas" });
+    }
+    
+    // En producción esto debería usar bcrypt para comparar hashes
+    if (user.password !== password) {
+      return res.status(401).json({ error: "Credenciales incorrectas" });
+    }
+    
+    // No devolver la contraseña
+    const { password: _, ...userWithoutPassword } = user;
+    res.json(userWithoutPassword);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// GET búsqueda global
+app.get("/api/search", async (req, res) => {
+  try {
+    const { q } = req.query;
+    if (!q || q.length < 2) {
+      return res.json([]);
+    }
+
+    const searchTerm = q.toLowerCase();
+
+    // Buscar alumnos
+    const students = await prisma.user.findMany({
+      where: {
+        AND: [
+          { role: "alumno" },
+          {
+            OR: [
+              { name: { contains: searchTerm } },
+              { firstName: { contains: searchTerm } },
+              { lastName: { contains: searchTerm } },
+              { email: { contains: searchTerm } }
+            ]
+          }
+        ]
+      },
+      take: 5
+    });
+
+    // Buscar misiones
+    const missions = await prisma.mission.findMany({
+      where: {
+        OR: [
+          { title: { contains: searchTerm } },
+          { description: { contains: searchTerm } },
+          { subject: { contains: searchTerm } }
+        ]
+      },
+      take: 5
+    });
+
+    const results = [
+      ...students.map(s => ({ 
+        id: s.id, 
+        type: 'student', 
+        title: s.name, 
+        subtitle: s.email,
+        url: `/students/${s.id}`
+      })),
+      ...missions.map(m => ({ 
+        id: m.id, 
+        type: 'mission', 
+        title: m.title, 
+        subtitle: m.subject,
+        url: `/missions/${m.id}`
+      }))
+    ];
+
+    res.json(results);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -90,9 +210,33 @@ app.get("/api/missions/:id", async (req, res) => {
 // POST crear misión
 app.post("/api/missions", async (req, res) => {
   try {
-    const { title, description, dueDate, status = "activa" } = req.body;
+    const { 
+      title, 
+      description, 
+      subject = "General",
+      dueDate, 
+      timeLimit = "23:59",
+      activationDate,
+      status = "activa",
+      studentIds = []
+    } = req.body;
+
     const mission = await prisma.mission.create({
-      data: { title, description, dueDate: new Date(dueDate), status }
+      data: { 
+        title, 
+        description, 
+        subject,
+        dueDate: new Date(dueDate), 
+        timeLimit,
+        activationDate: activationDate ? new Date(activationDate) : new Date(),
+        status,
+        students: {
+          connect: studentIds.map(id => ({ id: parseInt(id) }))
+        }
+      },
+      include: {
+        students: true
+      }
     });
     res.status(201).json(mission);
   } catch (error) {
@@ -103,14 +247,25 @@ app.post("/api/missions", async (req, res) => {
 // PUT actualizar misión
 app.put("/api/missions/:id", async (req, res) => {
   try {
-    const { title, description, dueDate, status } = req.body;
+    const { title, description, subject, dueDate, timeLimit, activationDate, status, studentIds } = req.body;
     const mission = await prisma.mission.update({
       where: { id: parseInt(req.params.id) },
       data: { 
         ...(title && { title }),
         ...(description && { description }),
+        ...(subject && { subject }),
         ...(dueDate && { dueDate: new Date(dueDate) }),
-        ...(status && { status })
+        ...(timeLimit && { timeLimit }),
+        ...(activationDate && { activationDate: new Date(activationDate) }),
+        ...(status && { status }),
+        ...(studentIds && {
+          students: {
+            set: studentIds.map(id => ({ id: parseInt(id) }))
+          }
+        })
+      },
+      include: {
+        students: true
       }
     });
     res.json(mission);

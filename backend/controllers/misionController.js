@@ -1,6 +1,6 @@
 import {
   createMision,
-  getMisions,
+  getMisiones,
   getMisionById,
   updateMision,
   deleteMision,
@@ -25,7 +25,7 @@ export const createMisionHandler = async (req, res) => {
 // Listar todas
 export const getMisionesHandler = async (req, res) => {
   try {
-    const misiones = await getMisions();
+    const misiones = await getMisiones();
     res.json(misiones);
   } catch (error) {
     res.status(500).json({ error: error.message });

@@ -1,7 +1,7 @@
 import prisma from '../config/db.js';
 
 // Crear una mision
-export const createMision = async ({ titulo, descripcion, estado, grado, docenteId }) => {
+export const createMision = async ({ titulo, descripcion, estado, grado, fechaLimite, docenteId }) => {
   try {
   return await prisma.mision.create({
     data: {
@@ -9,6 +9,7 @@ export const createMision = async ({ titulo, descripcion, estado, grado, docente
       descripcion,
       estado,
       grado,
+      fechaLimite,
       docenteId
     },
   });

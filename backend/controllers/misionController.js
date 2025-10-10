@@ -9,9 +9,9 @@ import {
 // Crear
 export const createMisionHandler = async (req, res) => {
   try {
-    const { titulo, descripcion, estado, grado, docenteId } = req.body;
+    const { titulo, descripcion, estado, grado, fechaLimite, docenteId } = req.body;
 
-    if (!titulo || !descripcion || !estado || !grado || !docenteId) {
+    if (!titulo || !descripcion || !estado || !grado || !fechaLimite || !docenteId) {
       return res.status(400).json({ message: 'Faltan campos obligatorios' });
     }
 

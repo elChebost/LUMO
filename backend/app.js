@@ -13,7 +13,6 @@ import misionRoutes from './routes/misionRoutes.js';
 import perfilRoutes from './routes/perfilRoutes.js';
 import contactRoutes from './routes/contactRoutes.js';
 import { connectDB } from './config/db.js';
-import 'express-async-errors';
 
 dotenv.config();
 

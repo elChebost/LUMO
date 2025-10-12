@@ -88,3 +88,46 @@ export const deleteEstudianteHandler = async (req, res) => {
     res.status(500).json({ message: 'Error interno del servidor.' });
   }
 };
+
+// Buscar estudiantes por nombre o email
+export const searchEstudiantesHandler = async (req, res) => {
+  try {
+    const { nombre, email } = req.query;
+
+    if (!nombre && !email) return res.status(400).json({ message: 'Debe proporcionar nombre o email para filtrar.' });
+
+    const estudiantes = await searchEstudiantes({ nombre, email });
+
+    if (estudiantes.length === 0) return res.status(404).json({ message: 'No se encontraron estudiantes con los criterios proporcionados.' });
+
+    res.json(estudiantes);
+  } catch (error) {
+    console.error('Error al filtrar estudiantes:', error);
+    res.status(500).json({ message: 'Error interno del servidor.' });
+  }
+};
+
+// Obtener XP promedio de un estudiante
+export const getXpPromedioHandler = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const xpPromedio = await getXpPromedio(parseInt(id));
+    res.json({ estudianteId: id, xpPromedio });
+  } catch (error) {
+    console.error('Error al calcular XP promedio:', error);
+    res.status(500).json({ message: 'Error interno del servidor.' });
+  }
+};
+
+import { getTotalEstudiantes } from '../services/estudianteService.js';
+
+// Obtener total de estudiantes
+export const getTotalEstudiantesHandler = async (req, res) => {
+  try {
+    const total = await getTotalEstudiantes();
+    res.json({ totalEstudiantes: total });
+  } catch (error) {
+    console.error('Error al calcular total de estudiantes:', error);
+    res.status(500).json({ message: 'Error interno del servidor.' });
+  }
+};

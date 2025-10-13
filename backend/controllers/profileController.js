@@ -1,22 +1,22 @@
 import {
-  createPerfil,
-  getPerfiles,
-  getPerfilById,
-  updatePerfil,
-  deletePerfil,
-} from '../services/perfilService.js';
+  createProfile,
+  getProfiles,
+  getProfileById,
+  updateProfile,
+  deleteProfile,
+} from '../services/profileService.js';
 
 // Crear perfil
-export const createPerfilHandler = async (req, res) => {
+export const createProfileHandler = async (req, res) => {
   try {
-    const { fotoPerfil, exp, monedas, estudianteId } = req.body;
+    const { profilePicture, exp, coins, studentId } = req.body;
 
-    if (!fotoPerfil || exp == null || monedas == null || !estudianteId) {
+    if (!profilePicture || exp == null || coins == null || !studentId) {
       return res.status(400).json({ message: 'Faltan campos obligatorios.' });
     }
 
-    const perfil = await createPerfil({ fotoPerfil, exp, monedas, estudianteId });
-    res.status(201).json(perfil);
+    const profile = await createProfile({ profilePicture, exp, coins, studentId });
+    res.status(201).json(profile);
   } catch (error) {
     console.error('Error al crear perfil:', error);
     res.status(500).json({ message: 'Error interno del servidor.' });
@@ -24,10 +24,10 @@ export const createPerfilHandler = async (req, res) => {
 };
 
 // Listar todos los perfiles
-export const getPerfilesHandler = async (req, res) => {
+export const getProfilesHandler = async (req, res) => {
   try {
-    const perfiles = await getPerfiles();
-    res.json(perfiles);
+    const profiles = await getProfiles();
+    res.json(profiles);
   } catch (error) {
     console.error('Error al obtener perfiles:', error);
     res.status(500).json({ message: 'Error interno del servidor.' });
@@ -35,16 +35,16 @@ export const getPerfilesHandler = async (req, res) => {
 };
 
 // Obtener perfil por ID
-export const getPerfilByIdHandler = async (req, res) => {
+export const getProfileByIdHandler = async (req, res) => {
   try {
     const { id } = req.params;
-    const perfil = await getPerfilById(id);
+    const profile = await getProfileById(id);
 
-    if (!perfil) {
+    if (!profile) {
       return res.status(404).json({ message: 'Perfil no encontrado.' });
     }
 
-    res.json(perfil);
+    res.json(profile);
   } catch (error) {
     console.error('Error al obtener perfil:', error);
     res.status(500).json({ message: 'Error interno del servidor.' });
@@ -52,16 +52,16 @@ export const getPerfilByIdHandler = async (req, res) => {
 };
 
 // Actualizar perfil
-export const updatePerfilHandler = async (req, res) => {
+export const updateProfileHandler = async (req, res) => {
   try {
     const { id } = req.params;
-    const perfil = await updatePerfil(id, req.body);
+    const profile = await updateProfile(id, req.body);
 
-    if (!perfil) {
+    if (!profile) {
       return res.status(404).json({ message: 'Perfil no encontrado.' });
     }
 
-    res.json(perfil);
+    res.json(profile);
   } catch (error) {
     console.error('Error al actualizar perfil:', error);
     res.status(500).json({ message: 'Error interno del servidor.' });
@@ -69,16 +69,16 @@ export const updatePerfilHandler = async (req, res) => {
 };
 
 // Eliminar perfil
-export const deletePerfilHandler = async (req, res) => {
+export const deleteProfileHandler = async (req, res) => {
   try {
     const { id } = req.params;
-    const existing = await getPerfilById(id);
+    const existing = await getProfileById(id);
 
     if (!existing) {
       return res.status(404).json({ message: 'Perfil no encontrado.' });
     }
 
-    await deletePerfil(id);
+    await deleteProfile(id);
     res.json({ message: 'Perfil eliminado correctamente.' });
   } catch (error) {
     console.error('Error al eliminar perfil:', error);

@@ -1,23 +1,23 @@
 import {
-  createDocente,
-  getDocentes,
-  getDocenteById,
-  updateDocente,
-  deleteDocente
-} from '../services/docenteService.js';
+  createTeacher,
+  getTeachers,
+  getTeacherById,
+  updateTeacher,
+  deleteTeacher
+} from '../services/teacherService.js';
 
 // Crear docente
-export const createDocenteHandler = async (req, res) => {
+export const createTeacherHandler = async (req, res) => {
   try {
-    const { nombre, email, clases, grados, horario, rol } = req.body;
+    const { name, email, subjects, grades, schedule, role } = req.body;
 
     // Validaciones básicas
-    if (!nombre || !email || !rol) {
+    if (!name || !email || !role) {
       return res.status(400).json({ message: 'Faltan datos obligatorios: nombre, email o rol.' });
     }
 
-    const docente = await createDocente({ nombre, email, clases, grados, horario, rol });
-    res.status(201).json(docente);
+    const teacher = await createTeacher({ name, email, subjects, grades, schedule, role });
+    res.status(201).json(teacher);
   } catch (error) {
     console.error('Error al crear docente:', error);
     res.status(500).json({ message: 'Error interno del servidor.' });
@@ -25,10 +25,10 @@ export const createDocenteHandler = async (req, res) => {
 };
 
 // Listar todos los docentes
-export const getDocentesHandler = async (req, res) => {
+export const getTeachersHandler = async (req, res) => {
   try {
-    const docentes = await getDocentes();
-    res.json(docentes);
+    const teachers = await getTeachers();
+    res.json(teachers);
   } catch (error) {
     console.error('Error al obtener docentes:', error);
     res.status(500).json({ message: 'Error interno del servidor.' });
@@ -36,16 +36,16 @@ export const getDocentesHandler = async (req, res) => {
 };
 
 // Obtener docente por ID
-export const getDocenteByIdHandler = async (req, res) => {
+export const getTeacherByIdHandler = async (req, res) => {
   try {
     const { id } = req.params;
-    const docente = await getDocenteById(id);
+    const teacher = await getTeacherById(id);
 
-    if (!docente) {
+    if (!teacher) {
       return res.status(404).json({ message: 'Docente no encontrado.' });
     }
 
-    res.json(docente);
+    res.json(teacher);
   } catch (error) {
     console.error('Error al obtener docente:', error);
     res.status(500).json({ message: 'Error interno del servidor.' });
@@ -53,18 +53,18 @@ export const getDocenteByIdHandler = async (req, res) => {
 };
 
 // Actualizar docente
-export const updateDocenteHandler = async (req, res) => {
+export const updateTeacherHandler = async (req, res) => {
   try {
     const { id } = req.params;
     const data = req.body;
 
-    const existing = await getDocenteById(id);
+    const existing = await getTeacherById(id);
     if (!existing) {
       return res.status(404).json({ message: 'Docente no encontrado.' });
     }
 
-    const docente = await updateDocente(id, data);
-    res.json(docente);
+    const teacher = await updateTeacher(id, data);
+    res.json(teacher);
   } catch (error) {
     console.error('Error al actualizar docente:', error);
     res.status(500).json({ message: 'Error interno del servidor.' });
@@ -72,16 +72,16 @@ export const updateDocenteHandler = async (req, res) => {
 };
 
 // Eliminar docente
-export const deleteDocenteHandler = async (req, res) => {
+export const deleteTeacherHandler = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const existing = await getDocenteById(id);
+    const existing = await getTeacherById(id);
     if (!existing) {
       return res.status(404).json({ message: 'Docente no encontrado.' });
     }
 
-    await deleteDocente(id);
+    await deleteTeacher(id);
     res.json({ message: 'Docente eliminado correctamente.' });
   } catch (error) {
     console.error('Error al eliminar docente:', error);

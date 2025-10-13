@@ -3,110 +3,110 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
 // Modelos del proyecto
-model Escuela {
-  id          Int        @id @default(autoincrement())
-  nombre      String
-  direccion   String
-  turno       String
-  aulas       Aula[]
-  docentes    Docente[]
-  estudiantes Estudiante[]
+model School {
+  id        Int      @id @default(autoincrement())
+  name      String
+  address   String
+  shift     String
+  classrooms Classroom[]
+  teachers  Teacher[]
+  students  Student[]
 }
 
-model Aula {
-  id          Int          @id @default(autoincrement())
-  nombre      String
-  grado       String
-  escuelaId   Int
-  escuela     Escuela      @relation(fields: [escuelaId], references: [id])
-  docenteId   Int
-  docente     Docente      @relation(fields: [docenteId], references: [id])
-  estudiantes Estudiante[]
+model Classroom {
+  id        Int       @id @default(autoincrement())
+  name      String
+  grade     String
+  schoolId  Int
+  school    School    @relation(fields: [schoolId], references: [id])
+  teacherId Int
+  teacher   Teacher   @relation(fields: [teacherId], references: [id])
+  students  Student[]
 }
 
-model Docente {
-  id          Int          @id @default(autoincrement())
-  nombre      String
-  email       String       @unique
-  clases      String
-  grados      String
-  horario     String
-  rol         String
-  escuelaId   Int
-  escuela     Escuela      @relation(fields: [escuelaId], references: [id])
-  aulas       Aula[]
-  estudiantes Estudiante[]
-  misiones    Mision[]
-  perfil      Perfil[]
+model Teacher {
+  id        Int       @id @default(autoincrement())
+  name      String
+  email     String    @unique
+  subjects  String
+  grades    String
+  schedule  String
+  role      String
+  schoolId  Int
+  school    School    @relation(fields: [schoolId], references: [id])
+  classrooms Classroom[]
+  students  Student[]
+  missions  Mission[]
+  profile   Profile[]
 }
 
-model Estudiante {
-  id          Int          @id @default(autoincrement())
-  nombre      String
-  email       String       @unique
-  edad        Int
-  grado       String
-  nivel       Int          @default(1)   // Nuevo: nivel del estudiante
-  horario     String
-  escuelaId   Int
-  escuela     Escuela      @relation(fields: [escuelaId], references: [id])
-  docenteId   Int
-  docente     Docente      @relation(fields: [docenteId], references: [id])
-  aulaId      Int
-  aula        Aula         @relation(fields: [aulaId], references: [id])
-  skillTree   SkillTree?
-  asignatura  Asignatura?
-  perfil      Perfil[]
+model Student {
+  id        Int       @id @default(autoincrement())
+  name      String
+  email     String    @unique
+  age       Int
+  grade     String
+  level     Int       @default(1) // Nuevo: nivel del estudiante
+  schedule  String
+  schoolId  Int
+  school    School    @relation(fields: [schoolId], references: [id])
+  teacherId Int
+  teacher   Teacher   @relation(fields: [teacherId], references: [id])
+  classroomId Int
+  classroom Classroom @relation(fields: [classroomId], references: [id])
+  skillTree SkillTree?
+  subject   Subject?
+  profile   Profile[]
 }
 
 model SkillTree {
-  id           Int         @id @default(autoincrement())
-  progreso     Int         @default(0)
-  xp           Int         @default(0)
-  estudianteId Int         @unique
-  estudiante   Estudiante  @relation(fields: [estudianteId], references: [id])
+  id         Int     @id @default(autoincrement())
+  progress   Int     @default(0)
+  xp         Int     @default(0)
+  studentId  Int     @unique
+  student    Student @relation(fields: [studentId], references: [id])
 }
 
-model Asignatura {
-  id           Int         @id @default(autoincrement())
-  nombre       String
-  descripcion  String
-  estudianteId Int         @unique
-  estudiante   Estudiante  @relation(fields: [estudianteId], references: [id])
+model Subject {
+  id         Int     @id @default(autoincrement())
+  name       String
+  description String
+  studentId  Int     @unique
+  student    Student @relation(fields: [studentId], references: [id])
 }
 
-model Mision {
-  id           Int         @id @default(autoincrement())
-  titulo       String
-  descripcion  String
-  estado       String
-  grado        String
-  fechaLimite  DateTime?   // Nuevo: fecha límite para completar la misión
-  docenteId    Int
-  docente      Docente     @relation(fields: [docenteId], references: [id])
+model Mission {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String
+  status      String
+  grade       String
+  dueDate     DateTime?   // Nuevo: fecha límite para completar la misión
+  teacherId   Int
+  teacher     Teacher  @relation(fields: [teacherId], references: [id])
 }
 
-model Perfil {
-  id            Int         @id @default(autoincrement())
-  fotoPerfil    String?
-  exp           Int         @default(0)
-  monedas       Int         @default(0)
-  nombre        String?     // Nuevo: nombre del usuario (docente o estudiante)
-  email         String?     // Nuevo: email del usuario
-  estudianteId  Int?        
-  estudiante    Estudiante? @relation(fields: [estudianteId], references: [id])
-  docenteId     Int?
-  docente       Docente?    @relation(fields: [docenteId], references: [id])
+model Profile {
+  id         Int      @id @default(autoincrement())
+  avatar     String?
+  exp        Int      @default(0)
+  coins      Int      @default(0)
+  name       String?  // Nuevo: nombre del usuario (docente o estudiante)
+  email      String?  // Nuevo: email del usuario
+  studentId  Int?
+  student    Student? @relation(fields: [studentId], references: [id])
+  teacherId  Int?
+  teacher    Teacher? @relation(fields: [teacherId], references: [id])
 }
 
 model User {
   id        Int      @id @default(autoincrement())
-  nombre    String
+  name      String
   email     String   @unique
   password  String
   createdAt DateTime @default(now())
@@ -115,9 +115,9 @@ model User {
 
 model Contact {
   id        Int      @id @default(autoincrement())
-  nombre    String
+  name      String
   email     String
-  mensaje   String
+  message   String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

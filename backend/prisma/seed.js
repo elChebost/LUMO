@@ -1,203 +1,403 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';import { PrismaClient } from '@prisma/client';
 
-const prisma = new PrismaClient();
 
-async function main() {
-  console.log('🌱 Sembrando datos de prueba...');
 
-  // Limpiar datos existentes
-  await prisma.notification.deleteMany();
-  await prisma.mission.deleteMany();
-  await prisma.user.deleteMany();
+const prisma = new PrismaClient();const prisma = new PrismaClient();
 
-  // Crear docente
-  const teacher = await prisma.user.create({
-    data: {
-      firstName: 'Elias',
-      lastName: 'Diaz',
-      name: 'Elias Diaz',
-      email: 'remindevelopment@gmail.com',
-      password: 'testing1234', // En producción usar hash bcrypt
+
+
+async function main() {async function main() {
+
+  console.log('🌱 Sembrando datos de prueba...');  console.log('🌱 Sembrando datos de prueba...');
+
+
+
+  // Crear usuarios (docentes y alumnos)  // Limpiar datos existentes
+
+  const docente = await prisma.user.create({  await prisma.notification.deleteMany();
+
+    data: {  await prisma.mission.deleteMany();
+
+      firstName: 'María',  await prisma.user.deleteMany();
+
+      lastName: 'González',
+
+      name: 'María González',  // Crear docente
+
+      email: 'maria@lumo.com',  const teacher = await prisma.user.create({
+
+      password: '123456',    data: {
+
+      role: 'docente',      firstName: 'Elias',
+
+      xp: 5000,      lastName: 'Diaz',
+
+      level: 10      name: 'Elias Diaz',
+
+    }      email: 'remindevelopment@gmail.com',
+
+  });      password: 'testing1234', // En producción usar hash bcrypt
+
       role: 'docente',
-      xp: 0,
-      level: 1
-    }
-  });
 
-  console.log('✅ Docente creado:', teacher.name);
+  const alumnos = [];      xp: 0,
 
-  // Crear alumnos
-  const students = await Promise.all([
-    prisma.user.create({
-      data: {
-        firstName: 'Juan',
-        lastName: 'Pérez',
-        name: 'Juan Pérez',
-        email: 'juan.perez@alumno.edu',
+        level: 1
+
+  const alumno1 = await prisma.user.create({    }
+
+    data: {  });
+
+      firstName: 'Juan',
+
+      lastName: 'Pérez',  console.log('✅ Docente creado:', teacher.name);
+
+      name: 'Juan Pérez',
+
+      email: 'juan@lumo.com',  // Crear alumnos
+
+      password: '123456',  const students = await Promise.all([
+
+      role: 'alumno',    prisma.user.create({
+
+      xp: 1500,      data: {
+
+      level: 3        firstName: 'Juan',
+
+    }        lastName: 'Pérez',
+
+  });        name: 'Juan Pérez',
+
+  alumnos.push(alumno1);        email: 'juan.perez@alumno.edu',
+
         password: 'alumno123',
+
+  const alumno2 = await prisma.user.create({        role: 'alumno',
+
+    data: {        xp: 1850,
+
+      firstName: 'Ana',        level: 5,
+
+      lastName: 'Martínez',        lastActivity: new Date('2025-10-02')
+
+      name: 'Ana Martínez',      }
+
+      email: 'ana@lumo.com',    }),
+
+      password: '123456',    prisma.user.create({
+
+      role: 'alumno',      data: {
+
+      xp: 2000,        firstName: 'Ana',
+
+      level: 4        lastName: 'López',
+
+    }        name: 'Ana López',
+
+  });        email: 'ana.lopez@alumno.edu',
+
+  alumnos.push(alumno2);        password: 'alumno123',
+
         role: 'alumno',
-        xp: 1850,
-        level: 5,
-        lastActivity: new Date('2025-10-02')
-      }
-    }),
-    prisma.user.create({
-      data: {
-        firstName: 'Ana',
-        lastName: 'López',
-        name: 'Ana López',
-        email: 'ana.lopez@alumno.edu',
-        password: 'alumno123',
-        role: 'alumno',
-        xp: 1420,
-        level: 4,
-        lastActivity: new Date('2025-10-03')
-      }
-    }),
-    prisma.user.create({
-      data: {
-        firstName: 'Pedro',
-        lastName: 'Gómez',
-        name: 'Pedro Gómez',
-        email: 'pedro.gomez@alumno.edu',
-        password: 'alumno123',
-        role: 'alumno',
+
+  const alumno3 = await prisma.user.create({        xp: 1420,
+
+    data: {        level: 4,
+
+      firstName: 'Carlos',        lastActivity: new Date('2025-10-03')
+
+      lastName: 'López',      }
+
+      name: 'Carlos López',    }),
+
+      email: 'carlos@lumo.com',    prisma.user.create({
+
+      password: '123456',      data: {
+
+      role: 'alumno',        firstName: 'Pedro',
+
+      xp: 1800,        lastName: 'Gómez',
+
+      level: 3        name: 'Pedro Gómez',
+
+    }        email: 'pedro.gomez@alumno.edu',
+
+  });        password: 'alumno123',
+
+  alumnos.push(alumno3);        role: 'alumno',
+
         xp: 980,
-        level: 3,
-        lastActivity: new Date('2025-10-01')
-      }
-    }),
-    prisma.user.create({
-      data: {
-        firstName: 'María',
-        lastName: 'García',
-        name: 'María García',
-        email: 'maria.garcia@alumno.edu',
-        password: 'alumno123',
-        role: 'alumno',
-        xp: 1650,
+
+  const alumno4 = await prisma.user.create({        level: 3,
+
+    data: {        lastActivity: new Date('2025-10-01')
+
+      firstName: 'Laura',      }
+
+      lastName: 'Sánchez',    }),
+
+      name: 'Laura Sánchez',    prisma.user.create({
+
+      email: 'laura@lumo.com',      data: {
+
+      password: '123456',        firstName: 'María',
+
+      role: 'alumno',        lastName: 'García',
+
+      xp: 2200,        name: 'María García',
+
+      level: 5        email: 'maria.garcia@alumno.edu',
+
+    }        password: 'alumno123',
+
+  });        role: 'alumno',
+
+  alumnos.push(alumno4);        xp: 1650,
+
         level: 4,
-        lastActivity: new Date('2025-09-30')
-      }
-    }),
-    prisma.user.create({
-      data: {
-        firstName: 'Carlos',
-        lastName: 'Rodríguez',
-        name: 'Carlos Rodríguez',
-        email: 'carlos.rodriguez@alumno.edu',
-        password: 'alumno123',
-        role: 'alumno',
-        xp: 750,
-        level: 2,
+
+  const alumno5 = await prisma.user.create({        lastActivity: new Date('2025-09-30')
+
+    data: {      }
+
+      firstName: 'Diego',    }),
+
+      lastName: 'Rodríguez',    prisma.user.create({
+
+      name: 'Diego Rodríguez',      data: {
+
+      email: 'diego@lumo.com',        firstName: 'Carlos',
+
+      password: '123456',        lastName: 'Rodríguez',
+
+      role: 'alumno',        name: 'Carlos Rodríguez',
+
+      xp: 1200,        email: 'carlos.rodriguez@alumno.edu',
+
+      level: 2        password: 'alumno123',
+
+    }        role: 'alumno',
+
+  });        xp: 750,
+
+  alumnos.push(alumno5);        level: 2,
+
         lastActivity: new Date('2025-09-28')
-      }
+
+  console.log(`✅ ${alumnos.length + 1} usuarios creados`);      }
+
     }),
-    prisma.user.create({
+
+  // Crear misiones    prisma.user.create({
+
+  const mision1 = await prisma.mission.create({      data: {
+
+    data: {        firstName: 'Laura',
+
+      title: 'Resolver ecuaciones cuadráticas',        lastName: 'Martínez',
+
+      description: 'Practicar la resolución de ecuaciones de segundo grado usando la fórmula general',        name: 'Laura Martínez',
+
+      subject: 'Matemáticas',        email: 'laura.martinez@alumno.edu',
+
+      dueDate: new Date('2025-10-20'),        password: 'alumno123',
+
+      timeLimit: '23:59',        role: 'alumno',
+
+      status: 'activa',        xp: 2100,
+
+      students: {        level: 5,
+
+        connect: [{ id: alumno1.id }, { id: alumno2.id }, { id: alumno3.id }]        lastActivity: new Date('2025-10-03')
+
+      }      }
+
+    }    }),
+
+  });    prisma.user.create({
+
       data: {
-        firstName: 'Laura',
-        lastName: 'Martínez',
-        name: 'Laura Martínez',
-        email: 'laura.martinez@alumno.edu',
-        password: 'alumno123',
-        role: 'alumno',
-        xp: 2100,
-        level: 5,
-        lastActivity: new Date('2025-10-03')
-      }
-    }),
-    prisma.user.create({
-      data: {
-        firstName: 'Diego',
-        lastName: 'Fernández',
-        name: 'Diego Fernández',
-        email: 'diego.fernandez@alumno.edu',
-        password: 'alumno123',
-        role: 'alumno',
-        xp: 1200,
-        level: 3,
-        lastActivity: new Date('2025-09-29')
-      }
-    }),
-    prisma.user.create({
-      data: {
+
+  const mision2 = await prisma.mission.create({        firstName: 'Diego',
+
+    data: {        lastName: 'Fernández',
+
+      title: 'Análisis de "Don Quijote"',        name: 'Diego Fernández',
+
+      description: 'Leer los primeros 5 capítulos y escribir un ensayo sobre los personajes principales',        email: 'diego.fernandez@alumno.edu',
+
+      subject: 'Lengua',        password: 'alumno123',
+
+      dueDate: new Date('2025-10-25'),        role: 'alumno',
+
+      timeLimit: '20:00',        xp: 1200,
+
+      status: 'activa',        level: 3,
+
+      students: {        lastActivity: new Date('2025-09-29')
+
+        connect: [{ id: alumno2.id }, { id: alumno4.id }]      }
+
+      }    }),
+
+    }    prisma.user.create({
+
+  });      data: {
+
         firstName: 'Sofía',
-        lastName: 'Sánchez',
-        name: 'Sofía Sánchez',
-        email: 'sofia.sanchez@alumno.edu',
-        password: 'alumno123',
-        role: 'alumno',
-        xp: 890,
-        level: 2,
-        lastActivity: new Date('2025-10-02')
-      }
-    })
-  ]);
 
-  console.log(`✅ ${students.length} alumnos creados`);
+  const mision3 = await prisma.mission.create({        lastName: 'Sánchez',
 
-  // Crear misiones
-  const missions = await Promise.all([
-    prisma.mission.create({
-      data: {
-        title: 'Resolver ejercicios de álgebra',
-        description: 'Completar los ejercicios del capítulo 3 sobre ecuaciones lineales y sistemas de ecuaciones.',
-        subject: 'Matemáticas',
-        dueDate: new Date('2025-10-15'),
-        timeLimit: '23:59',
-        activationDate: new Date('2025-10-01'),
-        status: 'activa',
-        students: {
-          connect: students.slice(0, 5).map(s => ({ id: s.id }))
+    data: {        name: 'Sofía Sánchez',
+
+      title: 'Experimento de fotosíntesis',        email: 'sofia.sanchez@alumno.edu',
+
+      description: 'Realizar el experimento de fotosíntesis con plantas y documentar el proceso',        password: 'alumno123',
+
+      subject: 'Ciencias',        role: 'alumno',
+
+      dueDate: new Date('2025-10-18'),        xp: 890,
+
+      timeLimit: '18:00',        level: 2,
+
+      status: 'activa',        lastActivity: new Date('2025-10-02')
+
+      students: {      }
+
+        connect: [{ id: alumno1.id }, { id: alumno3.id }, { id: alumno5.id }]    })
+
+      }  ]);
+
+    }
+
+  });  console.log(`✅ ${students.length} alumnos creados`);
+
+
+
+  const mision4 = await prisma.mission.create({  // Crear misiones
+
+    data: {  const missions = await Promise.all([
+
+      title: 'Proyecto de historia: Revolución Industrial',    prisma.mission.create({
+
+      description: 'Crear una presentación sobre los cambios sociales durante la Revolución Industrial',      data: {
+
+      subject: 'Historia',        title: 'Resolver ejercicios de álgebra',
+
+      dueDate: new Date('2025-10-15'),        description: 'Completar los ejercicios del capítulo 3 sobre ecuaciones lineales y sistemas de ecuaciones.',
+
+      timeLimit: '23:59',        subject: 'Matemáticas',
+
+      status: 'cerrada',        dueDate: new Date('2025-10-15'),
+
+      students: {        timeLimit: '23:59',
+
+        connect: [{ id: alumno4.id }, { id: alumno5.id }]        activationDate: new Date('2025-10-01'),
+
+      }        status: 'activa',
+
+    }        students: {
+
+  });          connect: students.slice(0, 5).map(s => ({ id: s.id }))
+
         }
-      }
+
+  console.log('✅ 4 misiones creadas');      }
+
     }),
-    prisma.mission.create({
-      data: {
-        title: 'Proyecto de ciencias naturales',
-        description: 'Investigar sobre el ciclo del agua y presentar un informe con ilustraciones.',
-        subject: 'Ciencias Naturales',
-        dueDate: new Date('2025-10-20'),
-        timeLimit: '18:00',
-        activationDate: new Date('2025-10-02'),
+
+  // Crear notificaciones    prisma.mission.create({
+
+  await prisma.notification.create({      data: {
+
+    data: {        title: 'Proyecto de ciencias naturales',
+
+      message: 'Nueva misión de Matemáticas asignada',        description: 'Investigar sobre el ciclo del agua y presentar un informe con ilustraciones.',
+
+      recipientId: alumno1.id,        subject: 'Ciencias Naturales',
+
+      read: false        dueDate: new Date('2025-10-20'),
+
+    }        timeLimit: '18:00',
+
+  });        activationDate: new Date('2025-10-02'),
+
         status: 'activa',
-        students: {
-          connect: students.slice(2, 7).map(s => ({ id: s.id }))
-        }
-      }
-    }),
-    prisma.mission.create({
-      data: {
+
+  await prisma.notification.create({        students: {
+
+    data: {          connect: students.slice(2, 7).map(s => ({ id: s.id }))
+
+      message: 'Tu ensayo de Lengua ha sido evaluado',        }
+
+      recipientId: alumno2.id,      }
+
+      read: true    }),
+
+    }    prisma.mission.create({
+
+  });      data: {
+
         title: 'Lectura de Don Quijote - Capítulo 1',
-        description: 'Leer el primer capítulo de Don Quijote y responder las preguntas de comprensión.',
-        subject: 'Lengua',
-        dueDate: new Date('2025-10-12'),
-        timeLimit: '23:59',
-        activationDate: new Date('2025-09-30'),
-        status: 'activa',
-        students: {
+
+  await prisma.notification.create({        description: 'Leer el primer capítulo de Don Quijote y responder las preguntas de comprensión.',
+
+    data: {        subject: 'Lengua',
+
+      message: 'Recordatorio: La misión de Ciencias vence mañana',        dueDate: new Date('2025-10-12'),
+
+      recipientId: alumno3.id,        timeLimit: '23:59',
+
+      read: false        activationDate: new Date('2025-09-30'),
+
+    }        status: 'activa',
+
+  });        students: {
+
           connect: students.map(s => ({ id: s.id }))
-        }
+
+  console.log('✅ 3 notificaciones creadas');        }
+
       }
-    }),
-    prisma.mission.create({
-      data: {
-        title: 'Práctica de verbos en inglés',
-        description: 'Completar el ejercicio de conjugación de verbos irregulares en pasado.',
-        subject: 'Inglés',
-        dueDate: new Date('2025-09-28'),
-        timeLimit: '20:00',
-        activationDate: new Date('2025-09-20'),
-        status: 'cerrada',
+
+  console.log('\n🎉 Base de datos sembrada exitosamente!');    }),
+
+  console.log('\n📊 Resumen:');    prisma.mission.create({
+
+  console.log(`   - ${alumnos.length} alumnos`);      data: {
+
+  console.log(`   - 1 docente`);        title: 'Práctica de verbos en inglés',
+
+  console.log(`   - 4 misiones`);        description: 'Completar el ejercicio de conjugación de verbos irregulares en pasado.',
+
+  console.log(`   - 3 notificaciones`);        subject: 'Inglés',
+
+  console.log('\n🔑 Credenciales de prueba:');        dueDate: new Date('2025-09-28'),
+
+  console.log('   Docente: maria@lumo.com / 123456');        timeLimit: '20:00',
+
+  console.log('   Alumno: juan@lumo.com / 123456');        activationDate: new Date('2025-09-20'),
+
+}        status: 'cerrada',
+
         students: {
-          connect: students.slice(0, 6).map(s => ({ id: s.id }))
-        }
-      }
-    }),
-    prisma.mission.create({
-      data: {
-        title: 'Trabajo sobre la Revolución Industrial',
-        description: 'Elaborar una presentación sobre las causas y consecuencias de la Revolución Industrial.',
+
+main()          connect: students.slice(0, 6).map(s => ({ id: s.id }))
+
+  .catch((e) => {        }
+
+    console.error('❌ Error:', e);      }
+
+    process.exit(1);    }),
+
+  })    prisma.mission.create({
+
+  .finally(async () => {      data: {
+
+    await prisma.$disconnect();        title: 'Trabajo sobre la Revolución Industrial',
+
+  });        description: 'Elaborar una presentación sobre las causas y consecuencias de la Revolución Industrial.',
+
         subject: 'Historia',
         dueDate: new Date('2025-10-25'),
         timeLimit: '23:59',

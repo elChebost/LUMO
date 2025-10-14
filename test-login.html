@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test de Login - LUMO</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2rem;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 0.9rem;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+        
+        input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .message {
+            margin-top: 20px;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            display: none;
+        }
+        
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            display: block;
+        }
+        
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            display: block;
+        }
+        
+        .message.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+            display: block;
+        }
+        
+        .test-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .test-btn {
+            padding: 10px;
+            background: #f0f0f0;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: background 0.2s;
+        }
+        
+        .test-btn:hover {
+            background: #e0e0e0;
+        }
+        
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            font-size: 0.85rem;
+        }
+        
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        
+        .status-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .badge {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .badge.success {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .badge.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        pre {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-size: 0.85rem;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 Test de Login LUMO</h1>
+        <p class="subtitle">Prueba directa del backend sin React</p>
+        
+        <div class="status">
+            <div class="status-item">
+                <span>Backend:</span>
+                <span class="badge" id="backend-status">Verificando...</span>
+            </div>
+            <div class="status-item">
+                <span>Navegador:</span>
+                <span id="browser-name"></span>
+            </div>
+        </div>
+        
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input 
+                    type="email" 
+                    id="email" 
+                    value="remindevelopment@gmail.com" 
+                    required
+                >
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input 
+                    type="password" 
+                    id="password" 
+                    value="docentest123" 
+                    required
+                >
+            </div>
+            
+            <button type="submit" id="loginBtn">Iniciar Sesión</button>
+        </form>
+        
+        <div class="test-buttons">
+            <button class="test-btn" onclick="testAPI()">🔍 Test API</button>
+            <button class="test-btn" onclick="testCORS()">🌐 Test CORS</button>
+        </div>
+        
+        <div id="message" class="message"></div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:4000';
+        
+        // Detectar navegador
+        const browserName = (() => {
+            const ua = navigator.userAgent;
+            if (ua.includes('Brave')) return '🦁 Brave Browser';
+            if (ua.includes('Chrome')) return '🔵 Chrome';
+            if (ua.includes('Firefox')) return '🦊 Firefox';
+            if (ua.includes('Safari')) return '🧭 Safari';
+            if (ua.includes('Edge')) return '🌐 Edge';
+            return 'Desconocido';
+        })();
+        
+        document.getElementById('browser-name').textContent = browserName;
+        
+        // Verificar backend al cargar
+        async function checkBackend() {
+            try {
+                const response = await fetch(`${API_URL}/api/users`);
+                if (response.ok) {
+                    const badge = document.getElementById('backend-status');
+                    badge.textContent = '✅ Online';
+                    badge.className = 'badge success';
+                } else {
+                    throw new Error('Backend responde con error');
+                }
+            } catch (error) {
+                const badge = document.getElementById('backend-status');
+                badge.textContent = '❌ Offline';
+                badge.className = 'badge error';
+                showMessage('⚠️ Backend no responde. Verifica que esté corriendo en puerto 4000.', 'error');
+            }
+        }
+        
+        // Test API
+        async function testAPI() {
+            showMessage('🔍 Probando conexión con la API...', 'info');
+            try {
+                const response = await fetch(`${API_URL}/api/users`);
+                const data = await response.json();
+                showMessage(`✅ API funciona correctamente! ${data.length} usuarios encontrados.`, 'success');
+            } catch (error) {
+                showMessage(`❌ Error: ${error.message}`, 'error');
+            }
+        }
+        
+        // Test CORS
+        async function testCORS() {
+            showMessage('🌐 Probando CORS...', 'info');
+            try {
+                const response = await fetch(`${API_URL}/api/users`, {
+                    method: 'GET',
+                    mode: 'cors',
+                    credentials: 'include'
+                });
+                if (response.ok) {
+                    showMessage('✅ CORS configurado correctamente!', 'success');
+                } else {
+                    showMessage('⚠️ CORS responde pero con status: ' + response.status, 'error');
+                }
+            } catch (error) {
+                showMessage(`❌ Error CORS: ${error.message}`, 'error');
+            }
+        }
+        
+        // Login
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const loginBtn = document.getElementById('loginBtn');
+            
+            loginBtn.disabled = true;
+            loginBtn.textContent = 'Iniciando sesión...';
+            showMessage('🔄 Conectando con el servidor...', 'info');
+            
+            try {
+                console.log('Intentando login en:', `${API_URL}/api/auth/login`);
+                
+                const response = await fetch(`${API_URL}/api/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password }),
+                    mode: 'cors',
+                    credentials: 'include',
+                });
+                
+                console.log('Respuesta recibida:', response.status);
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showMessage(`✅ ¡Login exitoso! Bienvenido ${data.name} (${data.role})`, 'success');
+                    console.log('Usuario:', data);
+                } else {
+                    showMessage(`❌ Error: ${data.error || 'Error al iniciar sesión'}`, 'error');
+                }
+            } catch (error) {
+                console.error('Error capturado:', error);
+                showMessage(`❌ Error de conexión: ${error.message}
+                
+📋 Posibles causas:
+• Backend no está corriendo
+• Brave Browser está bloqueando la petición
+• Problema de CORS
+
+💡 Soluciones:
+• Abre esta página en Firefox o Chrome
+• Usa una ventana privada de Brave
+• Verifica que el backend esté corriendo`, 'error');
+            } finally {
+                loginBtn.disabled = false;
+                loginBtn.textContent = 'Iniciar Sesión';
+            }
+        });
+        
+        function showMessage(text, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = text;
+            messageDiv.className = `message ${type}`;
+            messageDiv.style.whiteSpace = 'pre-line';
+        }
+        
+        // Verificar backend al cargar
+        checkBackend();
+    </script>
+</body>
+</html>

@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagnóstico LUMO - Completo</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .status-item {
+            background: #f8f9fa;
+            padding: 16px;
+            border-radius: 8px;
+            border-left: 4px solid #ddd;
+        }
+        
+        .status-item.success { border-left-color: #28a745; }
+        .status-item.error { border-left-color: #dc3545; }
+        .status-item.warning { border-left-color: #ffc107; }
+        
+        .status-label {
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 4px;
+        }
+        
+        .status-value {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .test-section {
+            margin-bottom: 24px;
+        }
+        
+        .test-section h3 {
+            color: #333;
+            margin-bottom: 12px;
+            font-size: 1.2rem;
+        }
+        
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            margin-right: 8px;
+            margin-bottom: 8px;
+            transition: background 0.2s;
+        }
+        
+        button:hover { background: #0056b3; }
+        button:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+        
+        .log-container {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 16px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 12px;
+        }
+        
+        .log-entry {
+            margin-bottom: 4px;
+            padding: 4px 0;
+        }
+        
+        .log-entry.success { color: #4ec9b0; }
+        .log-entry.error { color: #f48771; }
+        .log-entry.info { color: #9cdcfe; }
+        .log-entry.warning { color: #dcdcaa; }
+        
+        .alert {
+            padding: 12px 16px;
+            border-radius: 6px;
+            margin-bottom: 16px;
+            border-left: 4px solid;
+        }
+        
+        .alert.success {
+            background: #d4edda;
+            color: #155724;
+            border-left-color: #28a745;
+        }
+        
+        .alert.error {
+            background: #f8d7da;
+            color: #721c24;
+            border-left-color: #dc3545;
+        }
+        
+        .alert.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border-left-color: #17a2b8;
+        }
+        
+        pre {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-size: 0.85rem;
+            margin-top: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Diagnóstico Completo - LUMO</h1>
+        <p style="color: #666; margin-bottom: 24px;">
+            Esta página te dirá exactamente qué está fallando en tu navegador
+        </p>
+
+        <!-- Estado General -->
+        <div class="card">
+            <h3>📊 Estado del Sistema</h3>
+            <div class="status-grid">
+                <div class="status-item" id="backend-status">
+                    <div class="status-label">Backend</div>
+                    <div class="status-value">Verificando...</div>
+                </div>
+                <div class="status-item" id="cors-status">
+                    <div class="status-label">CORS</div>
+                    <div class="status-value">Verificando...</div>
+                </div>
+                <div class="status-item" id="login-status">
+                    <div class="status-label">Login API</div>
+                    <div class="status-value">Verificando...</div>
+                </div>
+                <div class="status-item" id="browser-status">
+                    <div class="status-label">Navegador</div>
+                    <div class="status-value" id="browser-name">Detectando...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Alerta principal -->
+        <div id="main-alert" style="display: none;"></div>
+
+        <!-- Tests Automáticos -->
+        <div class="card">
+            <div class="test-section">
+                <h3>🧪 Tests de Conectividad</h3>
+                <button onclick="runAllTests()">▶️ Ejecutar Todos los Tests</button>
+                <button onclick="clearLog()">🗑️ Limpiar Log</button>
+            </div>
+            
+            <div class="test-section">
+                <h3>Tests Individuales</h3>
+                <button onclick="testBackend()">Test 1: Backend Online</button>
+                <button onclick="testCORS()">Test 2: CORS Headers</button>
+                <button onclick="testPreflight()">Test 3: Preflight Request</button>
+                <button onclick="testLogin()">Test 4: Login API</button>
+                <button onclick="testWithCredentials()">Test 5: Credentials</button>
+            </div>
+
+            <div class="log-container" id="log-container">
+                <div class="log-entry info">💡 Presiona "Ejecutar Todos los Tests" para comenzar...</div>
+            </div>
+        </div>
+
+        <!-- Información del Navegador -->
+        <div class="card">
+            <h3>🌐 Información del Navegador</h3>
+            <pre id="browser-info">Cargando...</pre>
+        </div>
+
+        <!-- Soluciones Sugeridas -->
+        <div class="card" id="solutions" style="display: none;">
+            <h3>💡 Soluciones Sugeridas</h3>
+            <div id="solutions-content"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:4000';
+        const logs = [];
+
+        // Detectar navegador
+        function detectBrowser() {
+            const ua = navigator.userAgent;
+            let browser = 'Desconocido';
+            
+            if (ua.includes('Edg/')) browser = 'Microsoft Edge';
+            else if (ua.includes('Chrome/') && !ua.includes('Edg/')) browser = 'Google Chrome';
+            else if (ua.includes('Firefox/')) browser = 'Mozilla Firefox';
+            else if (ua.includes('Safari/') && !ua.includes('Chrome/')) browser = 'Safari';
+            
+            // Detectar Brave (más difícil)
+            if (navigator.brave && navigator.brave.isBrave) {
+                browser = 'Brave Browser';
+            }
+            
+            return browser;
+        }
+
+        // Log functions
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = { timestamp, message, type };
+            logs.push(logEntry);
+            
+            const container = document.getElementById('log-container');
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            entry.textContent = `[${timestamp}] ${message}`;
+            container.appendChild(entry);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function clearLog() {
+            document.getElementById('log-container').innerHTML = '';
+            logs.length = 0;
+            log('Log limpiado', 'info');
+        }
+
+        function updateStatus(id, value, type) {
+            const element = document.getElementById(id);
+            element.className = `status-item ${type}`;
+            element.querySelector('.status-value').textContent = value;
+        }
+
+        function showAlert(message, type) {
+            const alert = document.getElementById('main-alert');
+            alert.className = `alert ${type}`;
+            alert.innerHTML = message;
+            alert.style.display = 'block';
+        }
+
+        function showSolutions(issues) {
+            const solutionsDiv = document.getElementById('solutions');
+            const contentDiv = document.getElementById('solutions-content');
+            
+            if (issues.length === 0) {
+                solutionsDiv.style.display = 'none';
+                return;
+            }
+            
+            let html = '<ul style="margin-left: 20px;">';
+            issues.forEach(issue => {
+                html += `<li style="margin-bottom: 12px;"><strong>${issue.title}</strong><br>${issue.solution}</li>`;
+            });
+            html += '</ul>';
+            
+            contentDiv.innerHTML = html;
+            solutionsDiv.style.display = 'block';
+        }
+
+        // Tests
+        async function testBackend() {
+            log('🔍 Probando conexión con backend...', 'info');
+            try {
+                const response = await fetch(`${API_URL}/api/users`);
+                if (response.ok) {
+                    const data = await response.json();
+                    log(`✅ Backend está online y respondiendo (${data.length} usuarios)`, 'success');
+                    updateStatus('backend-status', '✅ Online', 'success');
+                    return true;
+                } else {
+                    log(`❌ Backend respondió con status ${response.status}`, 'error');
+                    updateStatus('backend-status', '❌ Error', 'error');
+                    return false;
+                }
+            } catch (error) {
+                log(`❌ Error al conectar con backend: ${error.message}`, 'error');
+                updateStatus('backend-status', '❌ Offline', 'error');
+                return false;
+            }
+        }
+
+        async function testCORS() {
+            log('🌐 Probando headers CORS...', 'info');
+            try {
+                const response = await fetch(`${API_URL}/api/users`, {
+                    method: 'GET',
+                    mode: 'cors',
+                    credentials: 'include'
+                });
+                
+                const origin = response.headers.get('Access-Control-Allow-Origin');
+                const credentials = response.headers.get('Access-Control-Allow-Credentials');
+                
+                if (origin && credentials) {
+                    log(`✅ CORS configurado correctamente`, 'success');
+                    log(`   Origin: ${origin}`, 'info');
+                    log(`   Credentials: ${credentials}`, 'info');
+                    updateStatus('cors-status', '✅ OK', 'success');
+                    return true;
+                } else {
+                    log(`⚠️ CORS parcialmente configurado`, 'warning');
+                    updateStatus('cors-status', '⚠️ Parcial', 'warning');
+                    return false;
+                }
+            } catch (error) {
+                log(`❌ Error en CORS: ${error.message}`, 'error');
+                updateStatus('cors-status', '❌ Error', 'error');
+                return false;
+            }
+        }
+
+        async function testPreflight() {
+            log('✈️ Probando preflight request...', 'info');
+            try {
+                const response = await fetch(`${API_URL}/api/auth/login`, {
+                    method: 'OPTIONS',
+                    headers: {
+                        'Access-Control-Request-Method': 'POST',
+                        'Access-Control-Request-Headers': 'Content-Type'
+                    }
+                });
+                
+                if (response.status === 204 || response.status === 200) {
+                    log(`✅ Preflight request exitoso (${response.status})`, 'success');
+                    return true;
+                } else {
+                    log(`⚠️ Preflight request respondió con ${response.status}`, 'warning');
+                    return false;
+                }
+            } catch (error) {
+                log(`❌ Error en preflight: ${error.message}`, 'error');
+                return false;
+            }
+        }
+
+        async function testLogin() {
+            log('🔐 Probando endpoint de login...', 'info');
+            try {
+                const response = await fetch(`${API_URL}/api/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: 'remindevelopment@gmail.com',
+                        password: 'docentest123'
+                    }),
+                    mode: 'cors',
+                    credentials: 'include'
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    log(`✅ Login exitoso! Usuario: ${data.name} (${data.role})`, 'success');
+                    updateStatus('login-status', '✅ Funciona', 'success');
+                    return true;
+                } else {
+                    log(`❌ Login falló: ${data.error || 'Error desconocido'}`, 'error');
+                    updateStatus('login-status', '❌ Error', 'error');
+                    return false;
+                }
+            } catch (error) {
+                log(`❌ Error al hacer login: ${error.message}`, 'error');
+                updateStatus('login-status', '❌ Bloqueado', 'error');
+                return false;
+            }
+        }
+
+        async function testWithCredentials() {
+            log('🍪 Probando envío de credentials...', 'info');
+            try {
+                const response = await fetch(`${API_URL}/api/users`, {
+                    method: 'GET',
+                    credentials: 'include'
+                });
+                
+                if (response.ok) {
+                    log(`✅ Credentials enviados correctamente`, 'success');
+                    return true;
+                } else {
+                    log(`⚠️ Credentials no funcionan correctamente`, 'warning');
+                    return false;
+                }
+            } catch (error) {
+                log(`❌ Error con credentials: ${error.message}`, 'error');
+                return false;
+            }
+        }
+
+        async function runAllTests() {
+            clearLog();
+            log('🚀 Iniciando batería completa de tests...', 'info');
+            log('', 'info');
+            
+            const issues = [];
+            
+            const backendOk = await testBackend();
+            if (!backendOk) {
+                issues.push({
+                    title: 'Backend no responde',
+                    solution: 'Verifica que el backend esté corriendo: lsof -ti :4000'
+                });
+            }
+            
+            await new Promise(r => setTimeout(r, 500));
+            
+            const corsOk = await testCORS();
+            if (!corsOk) {
+                issues.push({
+                    title: 'Problema con CORS',
+                    solution: 'El backend no está enviando los headers CORS correctos'
+                });
+            }
+            
+            await new Promise(r => setTimeout(r, 500));
+            await testPreflight();
+            await new Promise(r => setTimeout(r, 500));
+            
+            const loginOk = await testLogin();
+            if (!loginOk && backendOk) {
+                issues.push({
+                    title: 'Login bloqueado por el navegador',
+                    solution: 'Tu navegador está bloqueando la petición. Intenta: <br>' +
+                              '• Abrir en modo incógnito/privado<br>' +
+                              '• Desactivar extensiones (bloqueadores de anuncios)<br>' +
+                              '• Usar otro navegador (Firefox, Chrome sin extensiones)'
+                });
+            }
+            
+            await new Promise(r => setTimeout(r, 500));
+            await testWithCredentials();
+            
+            log('', 'info');
+            log('═══════════════════════════════════════', 'info');
+            if (issues.length === 0) {
+                log('🎉 ¡Todos los tests pasaron exitosamente!', 'success');
+                showAlert('✅ ¡Todo está funcionando correctamente! Deberías poder hacer login en la aplicación.', 'success');
+            } else {
+                log(`⚠️ Se encontraron ${issues.length} problema(s)`, 'warning');
+                showAlert(`❌ Se encontraron ${issues.length} problema(s). Revisa las soluciones sugeridas abajo.`, 'error');
+                showSolutions(issues);
+            }
+        }
+
+        // Información del navegador
+        function displayBrowserInfo() {
+            const browser = detectBrowser();
+            document.getElementById('browser-name').textContent = browser;
+            updateStatus('browser-status', browser, 'info');
+            
+            const info = {
+                'Navegador': browser,
+                'User Agent': navigator.userAgent,
+                'Idioma': navigator.language,
+                'Cookies habilitadas': navigator.cookieEnabled,
+                'Modo online': navigator.onLine,
+                'Plataforma': navigator.platform
+            };
+            
+            let html = '';
+            for (const [key, value] of Object.entries(info)) {
+                html += `<strong>${key}:</strong> ${value}\n`;
+            }
+            
+            document.getElementById('browser-info').textContent = html;
+        }
+
+        // Inicialización
+        window.addEventListener('load', () => {
+            displayBrowserInfo();
+            log('💡 Sistema de diagnóstico listo', 'info');
+            log('💡 Presiona "Ejecutar Todos los Tests" para comenzar', 'info');
+        });
+    </script>
+</body>
+</html>

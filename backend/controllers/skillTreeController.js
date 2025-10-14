@@ -9,13 +9,13 @@ import {
 // Crear
 export const createSkillTreeHandler = async (req, res) => {
   try {
-    const { progreso, xp, estudianteId } = req.body;
+    const { progress, xp, studentId } = req.body;
 
-    if (progreso == null || xp == null || !estudianteId) {
+    if (progress == null || xp == null || !studentId) {
       return res.status(400).json({ message: 'Faltan datos obligatorios.' });
     }
 
-    const skillTree = await createSkillTree({ progreso, xp, estudianteId });
+    const skillTree = await createSkillTree({ progress, xp, studentId });
     res.status(201).json(skillTree);
   } catch (error) {
     console.error('Error al crear SkillTree:', error);

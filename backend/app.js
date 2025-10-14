@@ -6,6 +6,8 @@ import { PrismaClient } from "@prisma/client";
 // Cargar variables de entorno
 dotenv.config();
 
+// Reinicio forzado - Schema actualizado
+
 const app = express();
 const prisma = new PrismaClient();
 

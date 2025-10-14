@@ -7,117 +7,41 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Modelos del proyecto
-model School {
-  id        Int      @id @default(autoincrement())
-  name      String
-  address   String
-  shift     String
-  classrooms Classroom[]
-  teachers  Teacher[]
-  students  Student[]
-}
-
-model Classroom {
-  id        Int       @id @default(autoincrement())
-  name      String
-  grade     String
-  schoolId  Int
-  school    School    @relation(fields: [schoolId], references: [id])
-  teacherId Int
-  teacher   Teacher   @relation(fields: [teacherId], references: [id])
-  students  Student[]
-}
-
-model Teacher {
-  id        Int       @id @default(autoincrement())
-  name      String
-  email     String    @unique
-  subjects  String
-  grades    String
-  schedule  String
-  role      String
-  schoolId  Int
-  school    School    @relation(fields: [schoolId], references: [id])
-  classrooms Classroom[]
-  students  Student[]
-  missions  Mission[]
-  profile   Profile[]
-}
-
-model Student {
-  id        Int       @id @default(autoincrement())
-  name      String
-  email     String    @unique
-  age       Int
-  grade     String
-  level     Int       @default(1) // Nuevo: nivel del estudiante
-  schedule  String
-  schoolId  Int
-  school    School    @relation(fields: [schoolId], references: [id])
-  teacherId Int
-  teacher   Teacher   @relation(fields: [teacherId], references: [id])
-  classroomId Int
-  classroom Classroom @relation(fields: [classroomId], references: [id])
-  skillTree SkillTree?
-  subject   Subject?
-  profile   Profile[]
-}
-
-model SkillTree {
-  id         Int     @id @default(autoincrement())
-  progress   Int     @default(0)
-  xp         Int     @default(0)
-  studentId  Int     @unique
-  student    Student @relation(fields: [studentId], references: [id])
-}
-
-model Subject {
-  id         Int     @id @default(autoincrement())
-  name       String
-  description String
-  studentId  Int     @unique
-  student    Student @relation(fields: [studentId], references: [id])
+model User {
+  id            Int              @id @default(autoincrement())
+  firstName     String
+  lastName      String
+  name          String           // Nombre completo (para compatibilidad)
+  role          String           // "docente" o "alumno"
+  email         String           @unique
+  password      String
+  xp            Int              @default(0)
+  level         Int              @default(1)
+  missions      Mission[]        @relation("StudentMissions")
+  notifications Notification[]   @relation("UserNotifications")
+  lastActivity  DateTime         @default(now())
+  createdAt     DateTime         @default(now())
 }
 
 model Mission {
+  id             Int      @id @default(autoincrement())
+  title          String
+  description    String
+  subject        String   @default("General") // Asignatura: Matemáticas, Lengua, etc.
+  dueDate        DateTime
+  timeLimit      String   @default("23:59") // Hora límite en formato HH:MM
+  activationDate DateTime @default(now()) // Fecha de publicación
+  status         String   @default("activa") // "activa" o "cerrada"
+  students       User[]   @relation("StudentMissions")
+  createdAt      DateTime @default(now())
+}
+
+model Notification {
   id          Int      @id @default(autoincrement())
-  title       String
-  description String
-  status      String
-  grade       String
-  dueDate     DateTime?   // Nuevo: fecha límite para completar la misión
-  teacherId   Int
-  teacher     Teacher  @relation(fields: [teacherId], references: [id])
+  message     String
+  createdAt   DateTime @default(now())
+  read        Boolean  @default(false)
+  recipientId Int
+  recipient   User     @relation(fields: [recipientId], references: [id], name: "UserNotifications")
 }
 
-model Profile {
-  id         Int      @id @default(autoincrement())
-  avatar     String?
-  exp        Int      @default(0)
-  coins      Int      @default(0)
-  name       String?  // Nuevo: nombre del usuario (docente o estudiante)
-  email      String?  // Nuevo: email del usuario
-  studentId  Int?
-  student    Student? @relation(fields: [studentId], references: [id])
-  teacherId  Int?
-  teacher    Teacher? @relation(fields: [teacherId], references: [id])
-}
-
-model User {
-  id        Int      @id @default(autoincrement())
-  name      String
-  email     String   @unique
-  password  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model Contact {
-  id        Int      @id @default(autoincrement())
-  name      String
-  email     String
-  message   String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}

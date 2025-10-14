@@ -1,15 +1,15 @@
 import prisma from '../config/db.js';
 
 // Crear una skillTree
-export const createSkillTree = async ({ progreso, xp, estudianteId }) => {
+export const createSkillTree = async ({ progress, xp, studentId }) => {
   try {
-  return await prisma.SkillTree.create({
-    data: {
-      progreso,
-      xp,
-      estudianteId
-    },
-  });
+    return await prisma.skillTree.create({
+      data: {
+        progress,
+        xp,
+        studentId
+      },
+    });
   } catch (error) {
     throw error; // el controller se encarga de responder
   }
@@ -18,7 +18,7 @@ export const createSkillTree = async ({ progreso, xp, estudianteId }) => {
 // Obtener todas las skillTrees
 export const getSkillTrees = async () => {
   try {
-  return await prisma.skillTree.findMany();
+    return await prisma.skillTree.findMany();
   } catch (error) {
     throw error; 
   }
@@ -27,9 +27,9 @@ export const getSkillTrees = async () => {
 // Obtener una skillTree por ID
 export const getSkillTreeById = async (id) => {
   try {
-  return await prisma.skillTree.findUnique({
-    where: { id: Number(id) },
-  });
+    return await prisma.skillTree.findUnique({
+      where: { id: Number(id) },
+    });
   } catch (error) {
     throw error; 
   }
@@ -38,10 +38,10 @@ export const getSkillTreeById = async (id) => {
 // Actualizar una skillTree
 export const updateSkillTree = async (id, data) => {
   try {
-  return await prisma.skillTree.update({
-    where: { id: Number(id) },
-    data,
-  });
+    return await prisma.skillTree.update({
+      where: { id: Number(id) },
+      data,
+    });
   } catch (error) {
     throw error; 
   }
@@ -50,9 +50,9 @@ export const updateSkillTree = async (id, data) => {
 // Eliminar una skillTree
 export const deleteSkillTree = async (id) => {
   try {
-  return await prisma.skillTree.delete({
-    where: { id: Number(id) },
-  });
+    return await prisma.skillTree.delete({
+      where: { id: Number(id) },
+    });
   } catch (error) {
     throw error; 
   }

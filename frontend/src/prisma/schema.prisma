@@ -1,0 +1,26 @@
+// schema.prisma
+// Esquema de ejemplo para pruebas visuales (dummy)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Student {
+  id      Int     @id @default(autoincrement())
+  name    String
+  level   Int
+  xp      Int
+}
+
+model Mission {
+  id          Int     @id @default(autoincrement())
+  title       String
+  description String
+  deadline    DateTime
+  status      String
+}

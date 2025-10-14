@@ -331,4 +331,3 @@ app.get("/api/stats/top-students", async (req, res) => {
 });
 
 app.listen(4000, () => console.log("Backend en http://localhost:4000"));
-

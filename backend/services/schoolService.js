@@ -1,10 +1,10 @@
 import prisma from '../config/db.js';
 
 // Crear una escuela
-export const createEscuela = async ({ nombre, direccion, turno }) => {
+export const createSchool = async ({ name, address, shift }) => {
   try {
-    return await prisma.escuela.create({
-      data: { nombre, direccion, turno },
+    return await prisma.school.create({
+      data: { name, address, shift },
     });
   } catch (error) {
     throw error; // el controller se encarga de responder
@@ -12,18 +12,18 @@ export const createEscuela = async ({ nombre, direccion, turno }) => {
 };
 
 // Obtener todas las escuelas
-export const getEscuelas = async () => {
+export const getSchools = async () => {
   try {
-    return await prisma.escuela.findMany();
+    return await prisma.school.findMany();
   } catch (error) {
     throw error;
   }
 };
 
 // Obtener una escuela por ID
-export const getEscuelaById = async (id) => {
+export const getSchoolById = async (id) => {
   try {
-    return await prisma.escuela.findUnique({
+    return await prisma.school.findUnique({
       where: { id: Number(id) },
     });
   } catch (error) {
@@ -32,9 +32,9 @@ export const getEscuelaById = async (id) => {
 };
 
 // Actualizar una escuela
-export const updateEscuela = async (id, data) => {
+export const updateSchool = async (id, data) => {
   try {
-    return await prisma.escuela.update({
+    return await prisma.school.update({
       where: { id: Number(id) },
       data,
     });
@@ -44,9 +44,9 @@ export const updateEscuela = async (id, data) => {
 };
 
 // Eliminar una escuela
-export const deleteEscuela = async (id) => {
+export const deleteSchool = async (id) => {
   try {
-    return await prisma.escuela.delete({
+    return await prisma.school.delete({
       where: { id: Number(id) },
     });
   } catch (error) {

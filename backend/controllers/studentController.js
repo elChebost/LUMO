@@ -1,23 +1,26 @@
 import {
-  createEstudiante,
-  getEstudiantes,
-  getEstudianteById,
-  updateEstudiante,
-  deleteEstudiante
-} from '../services/estudianteService.js';
+  createStudent,
+  getStudents,
+  getStudentById,
+  updateStudent,
+  deleteStudent,
+  searchStudents,
+  getXpAverage,
+  getTotalStudents
+} from '../services/studentService.js';
 
 // Crear estudiante
-export const createEstudianteHandler = async (req, res) => {
+export const createStudentHandler = async (req, res) => {
   try {
-    const { nombre, email, edad, grado, horario } = req.body;
+    const { name, email, age, grade, schedule } = req.body;
 
     // Validaciones básicas
-    if (!nombre || !email || !edad || !grado || !horario) {
+    if (!name || !email || !age || !grade || !schedule) {
       return res.status(400).json({ message: 'Faltan datos obligatorios.' });
     }
 
-    const estudiante = await createEstudiante({ nombre, email, edad, grado, horario });
-    res.status(201).json(estudiante);
+    const student = await createStudent({ name, email, age, grade, schedule });
+    res.status(201).json(student);
   } catch (error) {
     console.error('Error al crear estudiante:', error);
     res.status(500).json({ message: 'Error interno del servidor.' });
@@ -25,10 +28,10 @@ export const createEstudianteHandler = async (req, res) => {
 };
 
 // Listar todos los estudiantes
-export const getEstudiantesHandler = async (req, res) => {
+export const getStudentsHandler = async (req, res) => {
   try {
-    const estudiantes = await getEstudiantes();
-    res.json(estudiantes);
+    const students = await getStudents();
+    res.json(students);
   } catch (error) {
     console.error('Error al obtener estudiantes:', error);
     res.status(500).json({ message: 'Error interno del servidor.' });
@@ -36,16 +39,16 @@ export const getEstudiantesHandler = async (req, res) => {
 };
 
 // Obtener estudiante por ID
-export const getEstudianteByIdHandler = async (req, res) => {
+export const getStudentByIdHandler = async (req, res) => {
   try {
     const { id } = req.params;
-    const estudiante = await getEstudianteById(id);
+    const student = await getStudentById(id);
 
-    if (!estudiante) {
+    if (!student) {
       return res.status(404).json({ message: 'Estudiante no encontrado.' });
     }
 
-    res.json(estudiante);
+    res.json(student);
   } catch (error) {
     console.error('Error al obtener estudiante:', error);
     res.status(500).json({ message: 'Error interno del servidor.' });
@@ -53,18 +56,18 @@ export const getEstudianteByIdHandler = async (req, res) => {
 };
 
 // Actualizar estudiante
-export const updateEstudianteHandler = async (req, res) => {
+export const updateStudentHandler = async (req, res) => {
   try {
     const { id } = req.params;
     const data = req.body;
 
-    const existing = await getEstudianteById(id);
+    const existing = await getStudentById(id);
     if (!existing) {
       return res.status(404).json({ message: 'Estudiante no encontrado.' });
     }
 
-    const estudiante = await updateEstudiante(id, data);
-    res.json(estudiante);
+    const student = await updateStudent(id, data);
+    res.json(student);
   } catch (error) {
     console.error('Error al actualizar estudiante:', error);
     res.status(500).json({ message: 'Error interno del servidor.' });
@@ -72,16 +75,16 @@ export const updateEstudianteHandler = async (req, res) => {
 };
 
 // Eliminar estudiante
-export const deleteEstudianteHandler = async (req, res) => {
+export const deleteStudentHandler = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const existing = await getEstudianteById(id);
+    const existing = await getStudentById(id);
     if (!existing) {
       return res.status(404).json({ message: 'Estudiante no encontrado.' });
     }
 
-    await deleteEstudiante(id);
+    await deleteStudent(id);
     res.json({ message: 'Estudiante eliminado correctamente.' });
   } catch (error) {
     console.error('Error al eliminar estudiante:', error);
@@ -90,17 +93,19 @@ export const deleteEstudianteHandler = async (req, res) => {
 };
 
 // Buscar estudiantes por nombre o email
-export const searchEstudiantesHandler = async (req, res) => {
+export const searchStudentsHandler = async (req, res) => {
   try {
-    const { nombre, email } = req.query;
+    const { name, email } = req.query;
 
-    if (!nombre && !email) return res.status(400).json({ message: 'Debe proporcionar nombre o email para filtrar.' });
+    if (!name && !email)
+      return res.status(400).json({ message: 'Debe proporcionar nombre o email para filtrar.' });
 
-    const estudiantes = await searchEstudiantes({ nombre, email });
+    const students = await searchStudents({ name, email });
 
-    if (estudiantes.length === 0) return res.status(404).json({ message: 'No se encontraron estudiantes con los criterios proporcionados.' });
+    if (students.length === 0)
+      return res.status(404).json({ message: 'No se encontraron estudiantes con los criterios proporcionados.' });
 
-    res.json(estudiantes);
+    res.json(students);
   } catch (error) {
     console.error('Error al filtrar estudiantes:', error);
     res.status(500).json({ message: 'Error interno del servidor.' });
@@ -108,24 +113,22 @@ export const searchEstudiantesHandler = async (req, res) => {
 };
 
 // Obtener XP promedio de un estudiante
-export const getXpPromedioHandler = async (req, res) => {
+export const getXpAverageHandler = async (req, res) => {
   try {
     const { id } = req.params;
-    const xpPromedio = await getXpPromedio(parseInt(id));
-    res.json({ estudianteId: id, xpPromedio });
+    const xpAverage = await getXpAverage(parseInt(id));
+    res.json({ studentId: id, xpAverage });
   } catch (error) {
     console.error('Error al calcular XP promedio:', error);
     res.status(500).json({ message: 'Error interno del servidor.' });
   }
 };
 
-import { getTotalEstudiantes } from '../services/estudianteService.js';
-
 // Obtener total de estudiantes
-export const getTotalEstudiantesHandler = async (req, res) => {
+export const getTotalStudentsHandler = async (req, res) => {
   try {
-    const total = await getTotalEstudiantes();
-    res.json({ totalEstudiantes: total });
+    const total = await getTotalStudents();
+    res.json({ totalStudents: total });
   } catch (error) {
     console.error('Error al calcular total de estudiantes:', error);
     res.status(500).json({ message: 'Error interno del servidor.' });

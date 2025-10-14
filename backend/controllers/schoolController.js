@@ -1,22 +1,22 @@
 import {
-  createEscuela,
-  getEscuelas,
-  getEscuelaById,
-  updateEscuela,
-  deleteEscuela,
-} from '../services/escuelaService.js';
+  createSchool,
+  getSchools,
+  getSchoolById,
+  updateSchool,
+  deleteSchool,
+} from '../services/schoolService.js';
 
 // Crear
-export const createEscuelaHandler = async (req, res) => {
+export const createSchoolHandler = async (req, res) => {
   try {
-    const { nombre, direccion, turno } = req.body;
+    const { name, address, shift } = req.body;
 
-    if (!nombre || !direccion || !turno) {
+    if (!name || !address || !shift) {
       return res.status(400).json({ message: 'Faltan datos requeridos.' });
     }
 
-    const escuela = await createEscuela({ nombre, direccion, turno });
-    res.status(201).json(escuela);
+    const school = await createSchool({ name, address, shift });
+    res.status(201).json(school);
   } catch (error) {
     // Ejemplo de conflicto: escuela duplicada
     if (error.code === 'P2002') {
@@ -29,13 +29,13 @@ export const createEscuelaHandler = async (req, res) => {
 };
 
 // Listar todas
-export const getEscuelasHandler = async (req, res) => {
+export const getSchoolsHandler = async (req, res) => {
   try {
-    const escuelas = await getEscuelas();
-    if (escuelas.length === 0) {
+    const schools = await getSchools();
+    if (schools.length === 0) {
       return res.status(404).json({ message: 'No hay escuelas registradas.' });
     }
-    res.json(escuelas);
+    res.json(schools);
   } catch (error) {
     console.error('Error al obtener escuelas:', error);
     res.status(500).json({ message: 'Error interno del servidor.' });
@@ -43,16 +43,16 @@ export const getEscuelasHandler = async (req, res) => {
 };
 
 // Obtener por ID
-export const getEscuelaByIdHandler = async (req, res) => {
+export const getSchoolByIdHandler = async (req, res) => {
   try {
     const { id } = req.params;
-    const escuela = await getEscuelaById(id);
+    const school = await getSchoolById(id);
 
-    if (!escuela) {
+    if (!school) {
       return res.status(404).json({ message: 'Escuela no encontrada.' });
     }
 
-    res.json(escuela);
+    res.json(school);
   } catch (error) {
     console.error('Error al obtener escuela:', error);
     res.status(500).json({ message: 'Error interno del servidor.' });
@@ -60,17 +60,17 @@ export const getEscuelaByIdHandler = async (req, res) => {
 };
 
 // Actualizar
-export const updateEscuelaHandler = async (req, res) => {
+export const updateSchoolHandler = async (req, res) => {
   try {
     const { id } = req.params;
-    const { nombre, direccion, turno } = req.body;
+    const { name, address, shift } = req.body;
 
-    if (!nombre && !direccion && !turno) {
+    if (!name && !address && !shift) {
       return res.status(400).json({ message: 'Debe enviar al menos un campo para actualizar.' });
     }
 
-    const escuela = await updateEscuela(id, req.body);
-    res.json(escuela);
+    const school = await updateSchool(id, req.body);
+    res.json(school);
   } catch (error) {
     if (error.code === 'P2025') {
       return res.status(404).json({ message: 'Escuela no encontrada para actualizar.' });
@@ -82,10 +82,10 @@ export const updateEscuelaHandler = async (req, res) => {
 };
 
 // Eliminar
-export const deleteEscuelaHandler = async (req, res) => {
+export const deleteSchoolHandler = async (req, res) => {
   try {
     const { id } = req.params;
-    await deleteEscuela(id);
+    await deleteSchool(id);
     res.json({ message: 'Escuela eliminada correctamente.' });
   } catch (error) {
     if (error.code === 'P2025') {

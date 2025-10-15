@@ -1,0 +1,127 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// Modelos del proyecto
+model School {
+  id         Int         @id @default(autoincrement())
+  name       String
+  address    String
+  shift      String
+  classrooms Classroom[]
+  teachers   Teacher[]
+  students   Student[]
+}
+
+model Classroom {
+  id         Int        @id @default(autoincrement())
+  name       String
+  grade      String
+  schoolId   Int
+  school     School     @relation(fields: [schoolId], references: [id])
+  teacherId  Int
+  teacher    Teacher    @relation(fields: [teacherId], references: [id])
+  students   Student[]
+}
+
+model Teacher {
+  id          Int              @id @default(autoincrement())
+  name        String
+  email       String           @unique
+  subjects    String
+  grades      String
+  schedule    String
+  role        String
+  schoolId    Int
+  school      School           @relation(fields: [schoolId], references: [id])
+  classrooms  Classroom[]
+  students    Student[]
+  missions    Mission[]
+  profile     TeacherProfile?
+}
+
+model Student {
+  id           Int              @id @default(autoincrement())
+  name         String
+  email        String           @unique
+  age          Int
+  grade        String
+  level        Int              @default(1)
+  schedule     String
+  schoolId     Int
+  school       School           @relation(fields: [schoolId], references: [id])
+  teacherId    Int
+  teacher      Teacher          @relation(fields: [teacherId], references: [id])
+  classroomId  Int
+  classroom    Classroom        @relation(fields: [classroomId], references: [id])
+  skillTree    SkillTree?
+  subject      Subject?
+  profile      StudentProfile?
+}
+
+model SkillTree {
+  id         Int      @id @default(autoincrement())
+  progress   Int      @default(0)
+  xp         Int      @default(0)
+  studentId  Int      @unique
+  student    Student  @relation(fields: [studentId], references: [id])
+}
+
+model Subject {
+  id         Int      @id @default(autoincrement())
+  name       String
+  description String
+  studentId  Int      @unique
+  student    Student  @relation(fields: [studentId], references: [id])
+}
+
+model Mission {
+  id          Int       @id @default(autoincrement())
+  title       String
+  description String
+  status      String
+  grade       String
+  dueDate     DateTime?
+  teacherId   Int
+  teacher     Teacher   @relation(fields: [teacherId], references: [id])
+}
+
+model StudentProfile {
+  id        Int      @id @default(autoincrement())
+  avatar    String?
+  exp       Int      @default(0)
+  coins     Int      @default(0)
+  studentId Int      @unique
+  student   Student  @relation(fields: [studentId], references: [id])
+}
+
+model TeacherProfile {
+  id        Int      @id @default(autoincrement())
+  avatar    String?
+  bio       String?  
+  teacherId Int      @unique
+  teacher   Teacher  @relation(fields: [teacherId], references: [id])
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Contact {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String
+  message   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

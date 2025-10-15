@@ -1,132 +1,216 @@
-# 🚀 Inicio Rápido - LUMO Corregido
+# 🚀 INICIO RÁPIDO - LUMO FRONTEND
 
-## ✅ Correcciones Aplicadas
-
-1. ✅ Advertencias de React Router v7 eliminadas
-2. ✅ Mejor manejo del error ERR_BLOCKED_BY_CLIENT
-3. ✅ Configuración de API centralizada
-4. ✅ CORS mejorado en el backend
-
----
-
-## 🎯 Para Iniciar
-
-### Paso 1: Iniciar los Servidores
+## ⚡ Comando Rápido
 
 ```bash
-cd /workspaces/LUMO/LUMO
-./start-fixed.sh
+# Desde la raíz del proyecto
+./iniciar.sh
 ```
 
-O manualmente:
+**O manualmente:**
+
 ```bash
-cd /workspaces/LUMO/LUMO
+cd frontend
 npm run dev
 ```
 
-### Paso 2: Abrir el Navegador
+---
 
-1. **Abre en modo incógnito** (recomendado para evitar bloqueadores):
-   - Chrome/Edge: `Ctrl + Shift + N`
-   - Firefox: `Ctrl + Shift + P`
+## 📍 IMPORTANTE: Ubicación de los Comandos
 
-2. **O desactiva tu bloqueador de anuncios**:
-   - Click en el icono del bloqueador
-   - Desactívalo para `localhost`
+### ❌ NO ejecutar desde la raíz:
+```bash
+# ❌ ESTO NO FUNCIONA (no hay package.json en raíz)
+npm run dev
+```
 
-3. **Ve a:** http://localhost:5173/login
+### ✅ SÍ ejecutar desde /frontend:
+```bash
+# ✅ CORRECTO
+cd frontend
+npm run dev
+```
 
 ---
 
-## ⚠️ Si Recibes ERR_BLOCKED_BY_CLIENT
+## 🔧 Primera Vez
 
-Este error es causado por **extensiones del navegador** que bloquean peticiones.
-
-### Solución Rápida:
-1. Abre el navegador en **modo incógnito**
-2. O desactiva **todas las extensiones**
-3. O prueba en **otro navegador**
-
-### Verificar Extensiones:
-- Chrome: `chrome://extensions/`
-- Firefox: `about:addons`
-- Edge: `edge://extensions/`
-
-**Extensiones comunes que causan el problema:**
-- uBlock Origin
-- AdBlock / AdBlock Plus
-- Privacy Badger
-- Ghostery
-- Antivirus con protección web
-
----
-
-## 🔍 Verificación
-
-### ¿Los servidores están corriendo?
+### 1. Configurar Variables de Entorno
 
 ```bash
-# Backend (debe mostrar un número)
-lsof -ti :4000
-
-# Frontend (debe mostrar un número)
-lsof -ti :5173
+cd frontend
+cp .env.example .env
+nano .env  # o cualquier editor
 ```
 
-### ¿La API responde?
-
-Abre la consola del navegador (F12) y ejecuta:
-
-```javascript
-fetch('http://localhost:4000/api/auth/login', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ email: 'test', password: 'test' })
-})
-.then(r => r.json())
-.then(console.log)
-.catch(console.error);
+Edita `.env`:
+```env
+VITE_API_URL=http://localhost:4000
 ```
 
-Si esto funciona = El problema son las extensiones del navegador ✅  
-Si esto falla = Revisa que el backend esté corriendo ❌
+### 2. Instalar Dependencias
+
+```bash
+npm install
+```
+
+### 3. Iniciar Servidor
+
+```bash
+npm run dev
+```
+
+### 4. Abrir Navegador
+
+```
+http://localhost:5173
+```
 
 ---
 
-## 📁 Archivos Importantes
+## 📋 Scripts Disponibles
 
-- **Configuración API:** `frontend/src/config.js`
-- **Variables de entorno:** `frontend/.env`
-- **Login mejorado:** `frontend/src/pages/Login.jsx`
-- **CORS mejorado:** `backend/app.js`
-- **Router actualizado:** `frontend/src/routes/AppRouter.jsx`
+**Todos ejecutados desde `/frontend`:**
 
----
+```bash
+# Desarrollo
+npm run dev          # Servidor de desarrollo (puerto 5173)
 
-## 📖 Documentación Completa
+# Producción
+npm run build        # Construir para producción
+npm run preview      # Previsualizar build
 
-Para más detalles, ver:
-- `CORRECCIONES_APLICADAS.md` - Resumen completo de cambios
-- `SOLUCION_ERR_BLOCKED_BY_CLIENT.md` - Guía detallada del error
-
----
-
-## 💡 Tips
-
-1. **Siempre usa modo incógnito** para desarrollo (evita problemas con extensiones)
-2. **Verifica los logs** en la consola del navegador (F12)
-3. **Revisa que ambos servidores estén corriendo** antes de probar
-4. **Si cambias código del backend**, reinicia el servidor
+# Calidad
+npm run lint         # Ejecutar ESLint
+```
 
 ---
 
-## 🎉 ¡Todo Listo!
+## 🐛 Solución de Problemas
 
-Las correcciones están aplicadas. Solo necesitas:
-1. Iniciar los servidores
-2. Abrir en modo incógnito o desactivar bloqueador
-3. ¡Disfrutar de LUMO sin errores!
+### Error: "Could not read package.json"
+
+**Causa:** Estás en el directorio raíz, no en `/frontend`
+
+**Solución:**
+```bash
+cd frontend
+npm run dev
+```
+
+### Error: "Cannot find module"
+
+**Causa:** Dependencias no instaladas
+
+**Solución:**
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+### Error: "vite: not found"
+
+**Causa:** Dependencias corruptas o mal instaladas
+
+**Solución rápida:**
+```bash
+# Desde la raíz
+chmod +x reparar-frontend.sh
+./reparar-frontend.sh
+```
+
+**O manual:**
+```bash
+cd frontend
+rm -rf node_modules package-lock.json
+npm install
+npm run dev
+```
+
+Ver `SOLUCION_VITE_NOT_FOUND.md` para más detalles.
+
+### Error: "EADDRINUSE: address already in use"
+
+**Causa:** Puerto 5173 ya está en uso
+
+**Solución:**
+```bash
+# Matar proceso en puerto 5173
+lsof -ti :5173 | xargs kill -9
+
+# Reiniciar
+npm run dev
+```
+
+### Error: "Failed to fetch from backend"
+
+**Causa:** Backend no está corriendo o URL incorrecta
+
+**Solución:**
+1. Verifica que el backend esté corriendo
+2. Revisa `.env` → `VITE_API_URL`
+3. Abre DevTools (F12) para ver errores
 
 ---
 
-**Última actualización:** 13 de Octubre de 2025
+## 🔗 Backend
+
+Este frontend espera un backend corriendo en:
+```
+http://localhost:4000
+```
+
+Configura la URL en `frontend/.env`:
+```env
+VITE_API_URL=http://localhost:4000
+```
+
+Ver `README.md` para más detalles sobre la API esperada.
+
+---
+
+## 📦 Estructura del Proyecto
+
+```
+LUMO/
+├── iniciar.sh           # Script de inicio rápido ⭐
+├── README.md            # Documentación completa
+├── BITACORA_TECNICA.md # Documentación técnica
+└── frontend/            # DIRECTORIO PRINCIPAL
+    ├── .env            # Tu configuración
+    ├── .env.example    # Plantilla
+    ├── package.json    # Dependencias ⭐
+    ├── vite.config.js  # Configuración de Vite
+    └── src/            # Código fuente
+```
+
+---
+
+## ✅ Checklist Inicial
+
+- [ ] `cd frontend`
+- [ ] Copiar `.env.example` a `.env`
+- [ ] Editar `.env` con URL del backend
+- [ ] `npm install`
+- [ ] `npm run dev`
+- [ ] Abrir http://localhost:5173
+- [ ] Verificar conexión con backend
+
+---
+
+## 🎯 Credenciales de Prueba
+
+### Docente:
+- Email: `remindevelopment@gmail.com`
+- Password: `docentest123`
+
+### Alumno:
+- Email: `alumno.ejemplo@gmail.com`
+- Password: `alumnotest123`
+
+---
+
+**¿Más información?** Lee `README.md` en la raíz del proyecto.
+
+**Fecha:** 15 de Octubre 2025

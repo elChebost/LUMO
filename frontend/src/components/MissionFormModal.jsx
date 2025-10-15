@@ -1,37 +1,34 @@
 import React, { useState, useEffect } from 'react';
 import { FiX, FiAlertCircle } from 'react-icons/fi';
 
-const API_URL = 'http://localhost:4000';
+// ⚠️ Cambiado de 4000 a 3000 para coincidir con el backend
+const API_URL = 'http://localhost:3000';
 
 const MissionFormModal = ({ onClose, onMissionCreated }) => {
   const [students, setStudents] = useState([]);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    subject: 'Matemáticas',
-    dueDate: '',
-    timeLimit: '23:59',
-    activationDate: new Date().toISOString().split('T')[0],
-    status: 'activa',
-    studentIds: []
+    grade: '1° Primaria',
+    status: 'activa'
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  useEffect(() => {
-    loadStudents();
-  }, []);
+  // ⚠️ Comentado - no se necesita cargar estudiantes para este formulario simplificado
+  // useEffect(() => {
+  //   loadStudents();
+  // }, []);
 
-  const loadStudents = async () => {
-    try {
-      const response = await fetch(`${API_URL}/api/users`);
-      const data = await response.json();
-      const studentsOnly = data.filter(user => user.role === 'alumno');
-      setStudents(studentsOnly);
-    } catch (error) {
-      console.error('Error cargando alumnos:', error);
-    }
-  };
+  // const loadStudents = async () => {
+  //   try {
+  //     const response = await fetch(`${API_URL}/api/students`);
+  //     const data = await response.json();
+  //     setStudents(data);
+  //   } catch (error) {
+  //     console.error('Error cargando alumnos:', error);
+  //   }
+  // };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -44,12 +41,19 @@ const MissionFormModal = ({ onClose, onMissionCreated }) => {
     setLoading(true);
 
     try {
+      // ✅ Adaptado al endpoint /api/missions con mapeo de status
       const response = await fetch(`${API_URL}/api/missions`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          title: formData.title,
+          description: formData.description,
+          grade: formData.grade,
+          status: formData.status === 'activa' ? 'active' : 'inactive', // ✅ Mapear status
+          teacherId: 1  // ⚠️ Valor temporal - cambiar cuando se implemente auth
+        }),
       });
 
       const data = await response.json();
@@ -71,23 +75,24 @@ const MissionFormModal = ({ onClose, onMissionCreated }) => {
     }
   };
 
-  const toggleStudent = (studentId) => {
-    setFormData(prev => ({
-      ...prev,
-      studentIds: prev.studentIds.includes(studentId)
-        ? prev.studentIds.filter(id => id !== studentId)
-        : [...prev.studentIds, studentId]
-    }));
-  };
+  // ⚠️ Funciones comentadas - no se usan en la versión simplificada
+  // const toggleStudent = (studentId) => {
+  //   setFormData(prev => ({
+  //     ...prev,
+  //     studentIds: prev.studentIds.includes(studentId)
+  //       ? prev.studentIds.filter(id => id !== studentId)
+  //       : [...prev.studentIds, studentId]
+  //   }));
+  // };
 
-  const toggleAllStudents = () => {
-    setFormData(prev => ({
-      ...prev,
-      studentIds: prev.studentIds.length === students.length
-        ? []
-        : students.map(s => s.id)
-    }));
-  };
+  // const toggleAllStudents = () => {
+  //   setFormData(prev => ({
+  //     ...prev,
+  //     studentIds: prev.studentIds.length === students.length
+  //       ? []
+  //       : students.map(s => s.id)
+  //   }));
+  // };
 
   const styles = {
     form: {
@@ -271,8 +276,9 @@ const MissionFormModal = ({ onClose, onMissionCreated }) => {
             </label>
             <input
               type="text"
+              name="title"
               value={formData.title}
-              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+              onChange={handleChange}
               style={styles.input}
               placeholder="Ej: Ejercicios de matemáticas"
               required
@@ -281,32 +287,12 @@ const MissionFormModal = ({ onClose, onMissionCreated }) => {
 
           <div style={styles.formGroup}>
             <label style={styles.label}>
-              Asignatura <span style={styles.required}>*</span>
-            </label>
-            <select
-              value={formData.subject}
-              onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-              style={styles.input}
-              required
-            >
-              <option value="Matemáticas">Matemáticas</option>
-              <option value="Lengua">Lengua</option>
-              <option value="Ciencias Naturales">Ciencias Naturales</option>
-              <option value="Historia">Historia</option>
-              <option value="Inglés">Inglés</option>
-              <option value="Educación Física">Educación Física</option>
-              <option value="Artes">Artes</option>
-              <option value="General">General</option>
-            </select>
-          </div>
-
-          <div style={styles.formGroup}>
-            <label style={styles.label}>
               Descripción <span style={styles.required}>*</span>
             </label>
             <textarea
+              name="description"
               value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              onChange={handleChange}
               style={{ ...styles.input, ...styles.textarea }}
               placeholder="Describe la misión..."
               rows="4"
@@ -314,90 +300,37 @@ const MissionFormModal = ({ onClose, onMissionCreated }) => {
             />
           </div>
 
-          <div style={styles.formRow}>
-            <div style={styles.formGroup}>
-              <label style={styles.label}>
-                Fecha de activación <span style={styles.required}>*</span>
-              </label>
-              <input
-                type="date"
-                value={formData.activationDate}
-                onChange={(e) => setFormData({ ...formData, activationDate: e.target.value })}
-                style={styles.input}
-                required
-              />
-            </div>
-
-            <div style={styles.formGroup}>
-              <label style={styles.label}>
-                Fecha de entrega <span style={styles.required}>*</span>
-              </label>
-              <input
-                type="date"
-                value={formData.dueDate}
-                onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
-                style={styles.input}
-                min={formData.activationDate || new Date().toISOString().split('T')[0]}
-                required
-              />
-            </div>
-
-            <div style={styles.formGroup}>
-              <label style={styles.label}>
-                Hora límite <span style={styles.required}>*</span>
-              </label>
-              <input
-                type="time"
-                value={formData.timeLimit}
-                onChange={(e) => setFormData({ ...formData, timeLimit: e.target.value })}
-                style={styles.input}
-                required
-              />
-            </div>
+          <div style={styles.formGroup}>
+            <label style={styles.label}>
+              Grado <span style={styles.required}>*</span>
+            </label>
+            <select
+              name="grade"
+              value={formData.grade}
+              onChange={handleChange}
+              style={styles.input}
+              required
+            >
+              <option value="1° Primaria">1° Primaria</option>
+              <option value="2° Primaria">2° Primaria</option>
+              <option value="3° Primaria">3° Primaria</option>
+              <option value="4° Primaria">4° Primaria</option>
+              <option value="5° Primaria">5° Primaria</option>
+              <option value="6° Primaria">6° Primaria</option>
+            </select>
           </div>
 
           <div style={styles.formGroup}>
             <label style={styles.label}>Estado</label>
             <select
+              name="status"
               value={formData.status}
-              onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+              onChange={handleChange}
               style={styles.input}
             >
               <option value="activa">Activa</option>
               <option value="cerrada">Cerrada</option>
             </select>
-          </div>
-
-          <div style={styles.formGroup}>
-            <label style={styles.label}>
-              Asignar a alumnos <span style={styles.required}>*</span>
-            </label>
-            <div style={styles.checkboxGroup}>
-              <label style={styles.checkboxLabel}>
-                <input
-                  type="checkbox"
-                  checked={formData.studentIds.length === students.length && students.length > 0}
-                  onChange={toggleAllStudents}
-                  style={styles.checkbox}
-                />
-                <span style={styles.checkboxText}>Seleccionar todos</span>
-              </label>
-            </div>
-            <div style={styles.studentList}>
-              {students.map(student => (
-                <label key={student.id} style={styles.checkboxLabel}>
-                  <input
-                    type="checkbox"
-                    checked={formData.studentIds.includes(student.id)}
-                    onChange={() => toggleStudent(student.id)}
-                    style={styles.checkbox}
-                  />
-                  <span style={styles.checkboxText}>
-                    {student.firstName} {student.lastName}
-                  </span>
-                </label>
-              ))}
-            </div>
           </div>
 
           {/* Footer */}

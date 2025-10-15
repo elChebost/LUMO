@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
 import { FiX, FiAlertCircle } from 'react-icons/fi';
-
-const API_URL = 'http://localhost:4000';
+import { API_URL } from '../config/api';
+import { getAuthHeaders } from '../utils/auth';
 
 const StudentFormModal = ({ isOpen, onClose, onStudentAdded }) => {
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
+    name: '',
     email: '',
-    password: ''
+    password: '', // ✅ Campo para el registro de usuario
+    age: '',
+    grade: ''
   });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
@@ -18,12 +19,8 @@ const StudentFormModal = ({ isOpen, onClose, onStudentAdded }) => {
   const validateForm = () => {
     const newErrors = {};
 
-    if (!formData.firstName.trim()) {
-      newErrors.firstName = 'El nombre es requerido';
-    }
-
-    if (!formData.lastName.trim()) {
-      newErrors.lastName = 'El apellido es requerido';
+    if (!formData.name.trim()) {
+      newErrors.name = 'El nombre es requerido';
     }
 
     if (!formData.email.trim()) {
@@ -32,10 +29,16 @@ const StudentFormModal = ({ isOpen, onClose, onStudentAdded }) => {
       newErrors.email = 'El correo no es válido';
     }
 
-    if (!formData.password.trim()) {
-      newErrors.password = 'La contraseña es requerida';
-    } else if (formData.password.length < 6) {
+    if (!formData.password || formData.password.length < 6) {
       newErrors.password = 'La contraseña debe tener al menos 6 caracteres';
+    }
+
+    if (!formData.age || formData.age < 1 || formData.age > 100) {
+      newErrors.age = 'La edad debe ser válida';
+    }
+
+    if (!formData.grade.trim()) {
+      newErrors.grade = 'El grado es requerido';
     }
 
     setErrors(newErrors);
@@ -49,37 +52,58 @@ const StudentFormModal = ({ isOpen, onClose, onStudentAdded }) => {
 
     setLoading(true);
     try {
-      const response = await fetch(`${API_URL}/api/users`, {
+      // ✅ Primero crear usuario con /api/users/register
+      const userResponse = await fetch(`${API_URL}/api/users/register`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: getAuthHeaders(),
         body: JSON.stringify({
-          ...formData,
-          role: 'alumno',
-          xp: 0,
-          level: 1
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
+          role: 'student'
         }),
       });
 
-      const data = await response.json();
+      const userData = await userResponse.json();
 
-      if (!response.ok) {
-        if (data.error && data.error.includes('correo')) {
+      if (!userResponse.ok) {
+        if (userData.error && userData.error.includes('email')) {
           setErrors({ email: 'Este correo ya está registrado' });
         } else {
-          setErrors({ general: data.error || 'Error al crear el alumno' });
+          setErrors({ general: userData.error || 'Error al crear el usuario' });
         }
         setLoading(false);
         return;
       }
 
-      // TODO: Aquí se enviaría el email de invitación
-      console.log('Enviar email a:', formData.email);
-      console.log('Mensaje: El profesor te invitó a su aula en LUMO');
+      // ✅ Luego crear el alumno con el userId obtenido
+      const studentResponse = await fetch(`${API_URL}/api/students`, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          age: Number(formData.age),
+          grade: formData.grade,
+          level: 1,
+          schedule: 'Matutino',
+          schoolId: 1,
+          teacherId: 1,
+          classroomId: 1,
+          userId: userData.id // ✅ Asociar usuario creado con el alumno
+        }),
+      });
+
+      const studentData = await studentResponse.json();
+
+      if (!studentResponse.ok) {
+        setErrors({ general: studentData.error || 'Error al crear el alumno' });
+        setLoading(false);
+        return;
+      }
 
       // Limpiar formulario y cerrar modal
-      setFormData({ firstName: '', lastName: '', email: '', password: '' });
+      setFormData({ name: '', email: '', password: '', age: '', grade: '' });
       setErrors({});
       onStudentAdded();
       onClose();
@@ -178,7 +202,7 @@ const StudentFormModal = ({ isOpen, onClose, onStudentAdded }) => {
             </div>
           )}
 
-          {/* Nombre */}
+          {/* Nombre completo */}
           <div style={{ marginBottom: '1.25rem' }}>
             <label style={{
               display: 'block',
@@ -187,17 +211,18 @@ const StudentFormModal = ({ isOpen, onClose, onStudentAdded }) => {
               color: 'var(--color-text-primary)',
               marginBottom: '0.5rem'
             }}>
-              Nombre *
+              Nombre completo *
             </label>
             <input
               type="text"
-              value={formData.firstName}
-              onChange={(e) => handleChange('firstName', e.target.value)}
+              value={formData.name}
+              onChange={(e) => handleChange('name', e.target.value)}
+              placeholder="Ej: Juan Pérez"
               style={{
                 width: '100%',
                 height: '44px',
                 padding: '0 1rem',
-                border: `1px solid ${errors.firstName ? '#D32F2F' : 'var(--color-border)'}`,
+                border: `1px solid ${errors.name ? '#D32F2F' : 'var(--color-border)'}`,
                 borderRadius: 'var(--radius-md)',
                 fontSize: '0.875rem',
                 backgroundColor: 'var(--color-card-bg)',
@@ -205,75 +230,25 @@ const StudentFormModal = ({ isOpen, onClose, onStudentAdded }) => {
                 transition: 'all var(--transition-fast)'
               }}
               onFocus={(e) => {
-                if (!errors.firstName) {
+                if (!errors.name) {
                   e.target.style.borderColor = 'var(--color-primary)';
                   e.target.style.boxShadow = '0 0 0 3px rgba(46, 125, 50, 0.1)';
                 }
               }}
               onBlur={(e) => {
-                if (!errors.firstName) {
+                if (!errors.name) {
                   e.target.style.borderColor = 'var(--color-border)';
                   e.target.style.boxShadow = 'none';
                 }
               }}
             />
-            {errors.firstName && (
+            {errors.name && (
               <p style={{
                 fontSize: '0.75rem',
                 color: '#D32F2F',
                 margin: '0.25rem 0 0 0'
               }}>
-                {errors.firstName}
-              </p>
-            )}
-          </div>
-
-          {/* Apellido */}
-          <div style={{ marginBottom: '1.25rem' }}>
-            <label style={{
-              display: 'block',
-              fontSize: '0.875rem',
-              fontWeight: 600,
-              color: 'var(--color-text-primary)',
-              marginBottom: '0.5rem'
-            }}>
-              Apellido *
-            </label>
-            <input
-              type="text"
-              value={formData.lastName}
-              onChange={(e) => handleChange('lastName', e.target.value)}
-              style={{
-                width: '100%',
-                height: '44px',
-                padding: '0 1rem',
-                border: `1px solid ${errors.lastName ? '#D32F2F' : 'var(--color-border)'}`,
-                borderRadius: 'var(--radius-md)',
-                fontSize: '0.875rem',
-                backgroundColor: 'var(--color-card-bg)',
-                color: 'var(--color-text-primary)',
-                transition: 'all var(--transition-fast)'
-              }}
-              onFocus={(e) => {
-                if (!errors.lastName) {
-                  e.target.style.borderColor = 'var(--color-primary)';
-                  e.target.style.boxShadow = '0 0 0 3px rgba(46, 125, 50, 0.1)';
-                }
-              }}
-              onBlur={(e) => {
-                if (!errors.lastName) {
-                  e.target.style.borderColor = 'var(--color-border)';
-                  e.target.style.boxShadow = 'none';
-                }
-              }}
-            />
-            {errors.lastName && (
-              <p style={{
-                fontSize: '0.75rem',
-                color: '#D32F2F',
-                margin: '0.25rem 0 0 0'
-              }}>
-                {errors.lastName}
+                {errors.name}
               </p>
             )}
           </div>
@@ -287,12 +262,13 @@ const StudentFormModal = ({ isOpen, onClose, onStudentAdded }) => {
               color: 'var(--color-text-primary)',
               marginBottom: '0.5rem'
             }}>
-              Correo *
+              Correo electrónico *
             </label>
             <input
               type="email"
               value={formData.email}
               onChange={(e) => handleChange('email', e.target.value)}
+              placeholder="Ej: alumno@ejemplo.com"
               style={{
                 width: '100%',
                 height: '44px',
@@ -328,8 +304,8 @@ const StudentFormModal = ({ isOpen, onClose, onStudentAdded }) => {
             )}
           </div>
 
-          {/* Contraseña */}
-          <div style={{ marginBottom: '1.5rem' }}>
+          {/* ✅ Contraseña */}
+          <div style={{ marginBottom: '1.25rem' }}>
             <label style={{
               display: 'block',
               fontSize: '0.875rem',
@@ -337,10 +313,10 @@ const StudentFormModal = ({ isOpen, onClose, onStudentAdded }) => {
               color: 'var(--color-text-primary)',
               marginBottom: '0.5rem'
             }}>
-              Contraseña asignada *
+              Contraseña *
             </label>
             <input
-              type="text"
+              type="password"
               value={formData.password}
               onChange={(e) => handleChange('password', e.target.value)}
               placeholder="Mínimo 6 caracteres"
@@ -377,13 +353,117 @@ const StudentFormModal = ({ isOpen, onClose, onStudentAdded }) => {
                 {errors.password}
               </p>
             )}
-            <p style={{
-              fontSize: '0.75rem',
-              color: 'var(--color-text-secondary)',
-              margin: '0.5rem 0 0 0'
+          </div>
+
+          {/* Edad */}
+          <div style={{ marginBottom: '1.25rem' }}>
+            <label style={{
+              display: 'block',
+              fontSize: '0.875rem',
+              fontWeight: 600,
+              color: 'var(--color-text-primary)',
+              marginBottom: '0.5rem'
             }}>
-              Se enviará un email de invitación al correo proporcionado
-            </p>
+              Edad *
+            </label>
+            <input
+              type="number"
+              min="1"
+              max="100"
+              value={formData.age}
+              onChange={(e) => handleChange('age', e.target.value)}
+              placeholder="Ej: 10"
+              style={{
+                width: '100%',
+                height: '44px',
+                padding: '0 1rem',
+                border: `1px solid ${errors.age ? '#D32F2F' : 'var(--color-border)'}`,
+                borderRadius: 'var(--radius-md)',
+                fontSize: '0.875rem',
+                backgroundColor: 'var(--color-card-bg)',
+                color: 'var(--color-text-primary)',
+                transition: 'all var(--transition-fast)'
+              }}
+              onFocus={(e) => {
+                if (!errors.age) {
+                  e.target.style.borderColor = 'var(--color-primary)';
+                  e.target.style.boxShadow = '0 0 0 3px rgba(46, 125, 50, 0.1)';
+                }
+              }}
+              onBlur={(e) => {
+                if (!errors.age) {
+                  e.target.style.borderColor = 'var(--color-border)';
+                  e.target.style.boxShadow = 'none';
+                }
+              }}
+            />
+            {errors.age && (
+              <p style={{
+                fontSize: '0.75rem',
+                color: '#D32F2F',
+                margin: '0.25rem 0 0 0'
+              }}>
+                {errors.age}
+              </p>
+            )}
+          </div>
+
+          {/* Grado */}
+          <div style={{ marginBottom: '1.5rem' }}>
+            <label style={{
+              display: 'block',
+              fontSize: '0.875rem',
+              fontWeight: 600,
+              color: 'var(--color-text-primary)',
+              marginBottom: '0.5rem'
+            }}>
+              Grado *
+            </label>
+            <select
+              value={formData.grade}
+              onChange={(e) => handleChange('grade', e.target.value)}
+              style={{
+                width: '100%',
+                height: '44px',
+                padding: '0 1rem',
+                border: `1px solid ${errors.grade ? '#D32F2F' : 'var(--color-border)'}`,
+                borderRadius: 'var(--radius-md)',
+                fontSize: '0.875rem',
+                backgroundColor: 'var(--color-card-bg)',
+                color: 'var(--color-text-primary)',
+                transition: 'all var(--transition-fast)',
+                cursor: 'pointer'
+              }}
+              onFocus={(e) => {
+                if (!errors.grade) {
+                  e.target.style.borderColor = 'var(--color-primary)';
+                  e.target.style.boxShadow = '0 0 0 3px rgba(46, 125, 50, 0.1)';
+                }
+              }}
+              onBlur={(e) => {
+                if (!errors.grade) {
+                  e.target.style.borderColor = 'var(--color-border)';
+                  e.target.style.boxShadow = 'none';
+                }
+              }}
+            >
+              <option value="">Seleccionar grado</option>
+              <option value="1° Primaria">1° Primaria</option>
+              <option value="2° Primaria">2° Primaria</option>
+              <option value="3° Primaria">3° Primaria</option>
+              <option value="4° Primaria">4° Primaria</option>
+              <option value="5° Primaria">5° Primaria</option>
+              <option value="6° Primaria">6° Primaria</option>
+            </select>
+            {errors.grade && (
+              <p style={{
+                fontSize: '0.75rem',
+                color: '#D32F2F',
+                margin: '0.25rem 0 0 0'
+              }}>
+                {errors.grade}
+              </p>
+            )}
           </div>
 
           {/* Botones */}

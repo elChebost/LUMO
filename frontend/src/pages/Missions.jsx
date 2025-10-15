@@ -3,7 +3,8 @@ import { FiPlus, FiFilter, FiSearch } from 'react-icons/fi';
 import MissionCard from '../components/MissionCard';
 import MissionFormModal from '../components/MissionFormModal';
 
-const API_URL = 'http://localhost:4000/api';
+// ⚠️ Cambiado de 4000 a 3000 para coincidir con el backend
+const API_URL = 'http://localhost:3000/api';
 
 const Missions = () => {
   const [missions, setMissions] = useState([]);
@@ -30,7 +31,14 @@ const Missions = () => {
       setLoading(true);
       const response = await fetch(`${API_URL}/missions`);
       const data = await response.json();
-      setMissions(data);
+      
+      // ✅ Mapear status del backend (active/inactive) al frontend (activa/cerrada)
+      const mappedMissions = data.map(mission => ({
+        ...mission,
+        status: mission.status === 'active' ? 'activa' : 'cerrada'
+      }));
+      
+      setMissions(mappedMissions);
     } catch (error) {
       console.error('Error cargando misiones:', error);
     } finally {

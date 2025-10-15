@@ -2,6 +2,7 @@ import {
   createSubject,
   getSubjects,
   getSubjectById,
+  getSubjectsByStudent,
   updateSubject,
   deleteSubject,
 } from '../services/subjectService.js';
@@ -43,6 +44,17 @@ export const getSubjectByIdHandler = async (req, res) => {
     }
 
     res.json(subject);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Obtener por estudiante
+export const getSubjectsByStudentHandler = async (req, res) => {
+  try {
+    const { studentId } = req.params;
+    const subjects = await getSubjectsByStudent(parseInt(studentId));
+    res.json(subjects);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

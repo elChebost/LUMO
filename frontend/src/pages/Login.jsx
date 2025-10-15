@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FiMail, FiLock, FiAlertCircle } from 'react-icons/fi';
+import { isAuthenticated } from '../utils/auth';
 
-const API_URL = 'http://localhost:4000';
+// ✅ Puerto correcto (3000)
+const API_URL = 'http://localhost:3000';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -10,6 +12,13 @@ const Login = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  // ✅ Redirigir al dashboard si ya está autenticado
+  useEffect(() => {
+    if (isAuthenticated()) {
+      navigate('/dashboard', { replace: true });
+    }
+  }, [navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -33,8 +42,9 @@ const Login = () => {
         return;
       }
 
-      // Guardar información del usuario en localStorage
-      localStorage.setItem('user', JSON.stringify(data));
+      // ✅ Guardar token y usuario en localStorage
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
       
       // Redirigir al dashboard
       navigate('/dashboard');

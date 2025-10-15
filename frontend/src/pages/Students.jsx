@@ -3,7 +3,8 @@ import { FiSearch, FiUserPlus } from 'react-icons/fi';
 import StudentRow from '../components/StudentRow';
 import StudentFormModal from '../components/StudentFormModal';
 
-const API_URL = 'http://localhost:4000/api';
+// ⚠️ Cambiado de 4000 a 3000 para coincidir con el backend
+const API_URL = 'http://localhost:3000/api';
 
 const Students = () => {
   const [students, setStudents] = useState([]);
@@ -29,11 +30,11 @@ const Students = () => {
   const loadStudents = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${API_URL}/users`);
+      // ✅ Cambiado de /users a /students para usar el endpoint correcto
+      const response = await fetch(`${API_URL}/students`);
       const data = await response.json();
-      // Filtrar solo alumnos
-      const studentsOnly = data.filter(user => user.role === 'alumno');
-      setStudents(studentsOnly);
+      // ✅ Ya no necesitamos filtrar por rol, todos son estudiantes
+      setStudents(data);
     } catch (error) {
       console.error('Error cargando alumnos:', error);
     } finally {

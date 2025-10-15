@@ -35,6 +35,17 @@ export const getSubjectById = async (id) => {
   }
 };
 
+// Obtener asignaturas por estudiante
+export const getSubjectsByStudent = async (studentId) => {
+  try {
+    return await prisma.subject.findMany({
+      where: { studentId: Number(studentId) },
+    });
+  } catch (error) {
+    throw error;
+  }
+};
+
 // Actualizar una asignatura
 export const updateSubject = async (id, data) => {
   try {

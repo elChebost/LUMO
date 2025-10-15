@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+// ✅ Todas las rutas ahora están disponibles
 import authRoutes from './routes/authRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import schoolRoutes from './routes/schoolRoutes.js';
@@ -28,22 +29,22 @@ app.use(cors({
 
 app.use(express.json());
 
-// Rutas
-app.use('/api/auth', authRoutes);
-app.use('/api/users', userRoutes);
-app.use('/api/schools', schoolRoutes);
-app.use('/api/classrooms', classroomRoutes);
-app.use('/api/teachers', teacherRoutes);
-app.use('/api/students', studentRoutes);
-app.use('/api/skillTrees', skillTreeRoutes);
-app.use('/api/subjects', subjectRoutes);
-app.use('/api/missions', missionRoutes);
+// ✅ Todas las rutas activas
+app.use('/api/auth', authRoutes); // ✅ Login
+app.use('/api/users', userRoutes); // ✅ Registro y perfil
+app.use('/api/schools', schoolRoutes); // ✅ CRUD Escuelas
+app.use('/api/classrooms', classroomRoutes); // ✅ CRUD Aulas
+app.use('/api/teachers', teacherRoutes); // ✅ CRUD Profesores
+app.use('/api/students', studentRoutes); // ✅ CRUD Estudiantes
+app.use('/api/skillTrees', skillTreeRoutes); // ✅ Árboles de habilidad
+app.use('/api/subjects', subjectRoutes); // ✅ CRUD Asignaturas
+app.use('/api/missions', missionRoutes); // ✅ CRUD Misiones
 
 // Rutas de perfiles separados
-app.use('/api/studentProfiles', studentProfileRoutes);
-app.use('/api/teacherProfiles', teacherProfileRoutes);
+app.use('/api/studentProfiles', studentProfileRoutes); // ✅ Perfiles estudiantes
+app.use('/api/teacherProfiles', teacherProfileRoutes); // ✅ Perfiles profesores
 
-app.use('/api/contacts', contactRoutes);
+app.use('/api/contacts', contactRoutes); // ✅ Formulario de contacto
 
 // Conexión a la base de datos
 connectDB();

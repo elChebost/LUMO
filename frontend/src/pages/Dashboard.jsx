@@ -4,7 +4,8 @@ import { FiTrendingUp, FiTarget, FiCheckCircle } from 'react-icons/fi';
 import StatCard from '../components/StatCard';
 import MissionCard from '../components/MissionCard';
 
-const API_URL = 'http://localhost:4000/api';
+// ⚠️ Cambiado de 4000 a 3000 para coincidir con el backend
+const API_URL = 'http://localhost:3000/api';
 
 const Dashboard = () => {
   const [stats, setStats] = useState(null);
@@ -29,16 +30,37 @@ const Dashboard = () => {
     try {
       setLoading(true);
       
-      // Cargar estadísticas generales
-      const statsRes = await fetch(`${API_URL}/stats`);
-      const statsData = await statsRes.json();
+      // ✅ Construir estadísticas desde múltiples endpoints ya que /stats no existe
+      const [xpRes, missionsRes, studentsRes] = await Promise.all([
+        fetch(`${API_URL}/skillTrees/average-xp`),
+        fetch(`${API_URL}/missions/total-active`),
+        fetch(`${API_URL}/students/total`)
+      ]);
+
+      const xpData = await xpRes.json();
+      const missionsData = await missionsRes.json();
+      const studentsData = await studentsRes.json();
+
+      // Construir el objeto stats con los datos obtenidos
+      const statsData = {
+        avgXP: Math.round(xpData.averageXp * 10) / 10, // Redondear a 1 decimal
+        activeMissions: missionsData.totalActiveMissions,
+        totalStudents: studentsData.totalStudents
+      };
+      
       setStats(statsData);
 
       // Cargar misiones activas
-      const missionsRes = await fetch(`${API_URL}/missions`);
-      const missionsData = await missionsRes.json();
-      const active = missionsData.filter(m => m.status === 'activa').slice(0, 3);
-      setActiveMissions(active);
+      const missionsActiveRes = await fetch(`${API_URL}/missions/active`);
+      const missionsActiveData = await missionsActiveRes.json();
+      
+      // ✅ Mapear status de "active" a "activa" para el frontend
+      const activeMissionsWithStatus = missionsActiveData.map(m => ({
+        ...m,
+        status: m.status === 'active' ? 'activa' : 'cerrada'
+      })).slice(0, 3);
+      
+      setActiveMissions(activeMissionsWithStatus);
 
     } catch (error) {
       console.error('Error cargando datos del dashboard:', error);

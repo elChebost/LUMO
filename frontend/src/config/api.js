@@ -1,7 +1,8 @@
 // Configuración de la API
 // ======================
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+// ⚠️ Cambiado de 4000 a 3000 para coincidir con el backend
+export const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 export const config = {
   apiUrl: API_URL,

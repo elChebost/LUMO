@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { FiSearch, FiChevronDown, FiUser, FiClipboard } from 'react-icons/fi';
+import { clearAuth, getUser } from '../utils/auth';
 
 const pageTitle = {
   '/dashboard': { title: 'Panel principal', subtitle: 'Resumen general del curso y accesos rápidos' },
@@ -10,7 +11,8 @@ const pageTitle = {
   '/settings': { title: 'Configuración', subtitle: 'Ajustes y preferencias' },
 };
 
-const API_URL = 'http://localhost:4000';
+// ⚠️ Cambiado de 4000 a 3000 para coincidir con el backend
+const API_URL = 'http://localhost:3000';
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -23,6 +25,9 @@ const Navbar = () => {
   const navigate = useNavigate();
 
   const currentPage = pageTitle[location.pathname] || { title: 'LUMO', subtitle: '' };
+  
+  // ✅ Obtener usuario autenticado
+  const user = getUser();
 
   // Cerrar menú al hacer click fuera
   useEffect(() => {
@@ -40,7 +45,25 @@ const Navbar = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [menuOpen, searchFocused]);
 
-  // Búsqueda inteligente
+  // ✅ Búsqueda desactivada temporalmente - endpoint /api/search no existe aún
+  // Mostrar mensaje informativo cuando el usuario escribe
+  useEffect(() => {
+    if (searchValue.length >= 2) {
+      setSearchResults([
+        {
+          id: 'info-1',
+          type: 'info',
+          title: 'Búsqueda no disponible',
+          subtitle: 'Esta funcionalidad estará disponible próximamente',
+          url: '#'
+        }
+      ]);
+    } else {
+      setSearchResults([]);
+    }
+  }, [searchValue]);
+
+  /* ⚠️ Código original - se reactiva cuando se implemente /api/search
   useEffect(() => {
     const searchTimeout = setTimeout(async () => {
       if (searchValue.length >= 2) {
@@ -59,8 +82,13 @@ const Navbar = () => {
 
     return () => clearTimeout(searchTimeout);
   }, [searchValue]);
+  */
 
   const handleSearchSelect = (result) => {
+    // Ignorar clicks en el mensaje informativo
+    if (result.type === 'info') {
+      return;
+    }
     navigate(result.url);
     setSearchValue('');
     setSearchResults([]);
@@ -276,14 +304,14 @@ const Navbar = () => {
                   color: 'var(--color-text-primary)',
                   margin: 0
                 }}>
-                  Elias Diaz
+                  {user?.name || 'Usuario'}
                 </p>
                 <p style={{
                   fontSize: '0.75rem',
                   color: 'var(--color-text-secondary)',
                   margin: '0.125rem 0 0 0'
                 }}>
-                  remindevelopment@gmail.com
+                  {user?.email || 'usuario@email.com'}
                 </p>
               </div>
               
@@ -323,7 +351,8 @@ const Navbar = () => {
               <button
                 onClick={() => {
                   setMenuOpen(false);
-                  // Aquí iría la lógica de logout cuando implementemos auth
+                  // ✅ Limpiar sesión y redirigir al login
+                  clearAuth();
                   navigate('/login');
                 }}
                 style={{

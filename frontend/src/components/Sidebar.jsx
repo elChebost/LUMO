@@ -18,22 +18,14 @@ const Sidebar = () => {
       height: '100%',
       padding: '1.5rem 1rem'
     }}>
-      {/* Logo LUMO */}
+      {/* Logo LUMO imagen */}
       <div style={{
         textAlign: 'center',
         marginBottom: '2.5rem',
         paddingBottom: '1.5rem',
         borderBottom: '1px solid var(--color-border)'
       }}>
-        <h1 style={{
-          fontSize: '1.5rem',
-          fontWeight: 700,
-          color: 'var(--color-primary)',
-          letterSpacing: '0.05em',
-          margin: 0
-        }}>
-          LUMO
-        </h1>
+        <img src={'/src/assets/icon_text.png'} alt="LUMO" style={{ width: 120, margin: '0 auto' }} />
       </div>
 
       {/* Navegación */}

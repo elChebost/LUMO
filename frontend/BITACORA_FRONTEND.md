@@ -297,21 +297,20 @@
 - ✅ Componentes: StudentCard, PageHeader, TreePreview
 - ✅ Limpieza de código y console.logs
 - ✅ Testing manual completo
-- ✅ Fixes: modales no cierran, búsqueda case sensitive, loading infinito
+- ✅ Fixes: modales no cierran, búsqueda case sensitive
 - ✅ Responsive básico con media queries
 - ✅ Animaciones y transiciones (pulse, fade-in)
 - ✅ Refinamiento de colores y contraste
 - ✅ Accesibilidad básica (labels, focus visible)
 - ✅ Documentación README.md
-- ✅ Creación de esta bitácora técnica
-- ⏱️ **Tiempo:** 12 horas
+- ⏱️ **Tiempo:** 10 horas
 
 ---
 
 ## 📊 Resumen de Desarrollo
 
 **Duración total:** 8 de Septiembre - 17 de Octubre de 2025 (6 semanas)  
-**Horas invertidas:** ~238 horas
+**Horas invertidas:** ~236 horas
 
 ### Componentes Creados (22)
 Sidebar, Navbar, MainLayout, StatCard, MissionCard, StudentRow, StudentCard, StudentFormModal, MissionFormModal, NotificationFAB, NotificationPanel, PageHeader, TreePreview

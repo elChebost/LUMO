@@ -12,9 +12,18 @@ const Students = () => {
   const [filterStatus, setFilterStatus] = useState('all'); // all, submitted, pending
   const [sortBy, setSortBy] = useState('name-asc'); // name-asc, name-desc, activity-recent, activity-old
   const [modalOpen, setModalOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     loadStudents();
+    
+    // Detectar móvil
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
   const loadStudents = async () => {
@@ -70,38 +79,42 @@ const Students = () => {
   return (
     <div style={{ padding: '0' }}>
       {/* Header */}
-      <div style={{ marginBottom: '2rem' }}>
+      <div className={isMobile ? 'mobile-page-header' : ''} style={{ marginBottom: isMobile ? '1.5rem' : '2rem' }}>
         <h1 style={{
-          fontSize: '2rem',
+          fontSize: isMobile ? '1.5rem' : '2rem',
           fontWeight: 700,
           color: 'var(--color-text-primary)',
           margin: '0 0 0.5rem 0'
         }}>
           Alumnos
         </h1>
-        <p style={{
-          fontSize: '0.875rem',
-          color: 'var(--color-text-secondary)',
-          margin: 0
-        }}>
-          Gestión y seguimiento de estudiantes
-        </p>
+        {!isMobile && (
+          <p style={{
+            fontSize: '0.875rem',
+            color: 'var(--color-text-secondary)',
+            margin: 0
+          }}>
+            Gestión y seguimiento de estudiantes
+          </p>
+        )}
       </div>
 
       {/* Barra de acciones */}
-      <div style={{
+      <div className={isMobile ? 'mobile-actions' : ''} style={{
         display: 'flex',
         gap: '1rem',
         marginBottom: '1.5rem',
         flexWrap: 'wrap',
-        alignItems: 'center'
+        alignItems: 'center',
+        flexDirection: isMobile ? 'column' : 'row'
       }}>
         {/* Buscador */}
-        <div style={{
+        <div className={isMobile ? 'mobile-search' : ''} style={{
           position: 'relative',
-          flex: '1',
-          minWidth: '300px',
-          maxWidth: '520px'
+          flex: isMobile ? 'none' : '1',
+          minWidth: isMobile ? '100%' : '300px',
+          maxWidth: isMobile ? '100%' : '520px',
+          width: isMobile ? '100%' : 'auto'
         }}>
           <FiSearch 
             size={18} 
@@ -141,66 +154,127 @@ const Students = () => {
           />
         </div>
 
-        {/* Filtro por estado de entrega */}
-        <div style={{ position: 'relative' }}>
-          <select
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
-            style={{
-              height: '44px',
-              padding: '0 2.5rem 0 1rem',
-              border: '1px solid var(--color-border)',
-              borderRadius: 'var(--radius-md)',
-              fontSize: '0.875rem',
-              backgroundColor: 'var(--color-card-bg)',
-              color: 'var(--color-text-primary)',
-              cursor: 'pointer',
-              appearance: 'none',
-              backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23757575' d='M6 9L1 4h10z'/%3E%3C/svg%3E")`,
-              backgroundRepeat: 'no-repeat',
-              backgroundPosition: 'right 1rem center',
-              minWidth: '150px'
-            }}
-          >
-            <option value="all">Todos</option>
-            <option value="submitted">Entregados</option>
-            <option value="pending">Sin entregar</option>
-          </select>
-        </div>
+        {/* Filtros en fila para móvil */}
+        {isMobile ? (
+          <div style={{ display: 'flex', gap: '0.75rem', width: '100%' }}>
+            <div style={{ position: 'relative', flex: 1 }}>
+              <select
+                value={filterStatus}
+                onChange={(e) => setFilterStatus(e.target.value)}
+                style={{
+                  height: '44px',
+                  width: '100%',
+                  padding: '0 2.5rem 0 1rem',
+                  border: '1px solid var(--color-border)',
+                  borderRadius: 'var(--radius-md)',
+                  fontSize: '0.875rem',
+                  backgroundColor: 'var(--color-card-bg)',
+                  color: 'var(--color-text-primary)',
+                  cursor: 'pointer',
+                  appearance: 'none',
+                  backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23757575' d='M6 9L1 4h10z'/%3E%3C/svg%3E")`,
+                  backgroundRepeat: 'no-repeat',
+                  backgroundPosition: 'right 1rem center'
+                }}
+              >
+                <option value="all">Todos</option>
+                <option value="submitted">Entregados</option>
+                <option value="pending">Sin entregar</option>
+              </select>
+            </div>
 
-        {/* Ordenar por */}
-        <div style={{ position: 'relative' }}>
-          <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value)}
-            style={{
-              height: '44px',
-              padding: '0 2.5rem 0 1rem',
-              border: '1px solid var(--color-border)',
-              borderRadius: 'var(--radius-md)',
-              fontSize: '0.875rem',
-              backgroundColor: 'var(--color-card-bg)',
-              color: 'var(--color-text-primary)',
-              cursor: 'pointer',
-              appearance: 'none',
-              backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23757575' d='M6 9L1 4h10z'/%3E%3C/svg%3E")`,
-              backgroundRepeat: 'no-repeat',
-              backgroundPosition: 'right 1rem center',
-              minWidth: '180px'
-            }}
-          >
-            <option value="name-asc">A - Z</option>
-            <option value="name-desc">Z - A</option>
-            <option value="activity-recent">Actividad reciente</option>
-            <option value="activity-old">Actividad antigua</option>
-          </select>
-        </div>
+            <div style={{ position: 'relative', flex: 1 }}>
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                style={{
+                  height: '44px',
+                  width: '100%',
+                  padding: '0 2.5rem 0 1rem',
+                  border: '1px solid var(--color-border)',
+                  borderRadius: 'var(--radius-md)',
+                  fontSize: '0.875rem',
+                  backgroundColor: 'var(--color-card-bg)',
+                  color: 'var(--color-text-primary)',
+                  cursor: 'pointer',
+                  appearance: 'none',
+                  backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23757575' d='M6 9L1 4h10z'/%3E%3C/svg%3E")`,
+                  backgroundRepeat: 'no-repeat',
+                  backgroundPosition: 'right 1rem center'
+                }}
+              >
+                <option value="name-asc">A - Z</option>
+                <option value="name-desc">Z - A</option>
+                <option value="activity-recent">Reciente</option>
+                <option value="activity-old">Antigua</option>
+              </select>
+            </div>
+          </div>
+        ) : (
+          <>
+            {/* Filtro por estado de entrega */}
+            <div style={{ position: 'relative' }}>
+              <select
+                value={filterStatus}
+                onChange={(e) => setFilterStatus(e.target.value)}
+                style={{
+                  height: '44px',
+                  padding: '0 2.5rem 0 1rem',
+                  border: '1px solid var(--color-border)',
+                  borderRadius: 'var(--radius-md)',
+                  fontSize: '0.875rem',
+                  backgroundColor: 'var(--color-card-bg)',
+                  color: 'var(--color-text-primary)',
+                  cursor: 'pointer',
+                  appearance: 'none',
+                  backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23757575' d='M6 9L1 4h10z'/%3E%3C/svg%3E")`,
+                  backgroundRepeat: 'no-repeat',
+                  backgroundPosition: 'right 1rem center',
+                  minWidth: '150px'
+                }}
+              >
+                <option value="all">Todos</option>
+                <option value="submitted">Entregados</option>
+                <option value="pending">Sin entregar</option>
+              </select>
+            </div>
+
+            {/* Ordenar por */}
+            <div style={{ position: 'relative' }}>
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                style={{
+                  height: '44px',
+                  padding: '0 2.5rem 0 1rem',
+                  border: '1px solid var(--color-border)',
+                  borderRadius: 'var(--radius-md)',
+                  fontSize: '0.875rem',
+                  backgroundColor: 'var(--color-card-bg)',
+                  color: 'var(--color-text-primary)',
+                  cursor: 'pointer',
+                  appearance: 'none',
+                  backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23757575' d='M6 9L1 4h10z'/%3E%3C/svg%3E")`,
+                  backgroundRepeat: 'no-repeat',
+                  backgroundPosition: 'right 1rem center',
+                  minWidth: '180px'
+                }}
+              >
+                <option value="name-asc">A - Z</option>
+                <option value="name-desc">Z - A</option>
+                <option value="activity-recent">Actividad reciente</option>
+                <option value="activity-old">Actividad antigua</option>
+              </select>
+            </div>
+          </>
+        )}
 
         {/* Botón Agregar Alumno */}
         <button
           onClick={() => setModalOpen(true)}
           style={{
             height: '44px',
+            width: isMobile ? '100%' : 'auto',
             padding: '0 1.5rem',
             backgroundColor: 'var(--color-primary)',
             color: 'white',
@@ -211,6 +285,7 @@ const Students = () => {
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
+            justifyContent: 'center',
             gap: '0.5rem',
             transition: 'all var(--transition-fast)',
             whiteSpace: 'nowrap'
@@ -232,42 +307,45 @@ const Students = () => {
       </div>
 
       {/* Tabla de alumnos */}
-      <div style={{
+      <div className={isMobile ? 'mobile-table-responsive' : ''} style={{
         backgroundColor: 'var(--color-card-bg)',
         borderRadius: 'var(--radius-lg)',
         border: '1px solid var(--color-border)',
         boxShadow: 'var(--shadow-sm)',
-        overflow: 'hidden'
+        overflow: isMobile ? 'hidden' : 'hidden'
       }}>
-        {/* Header de tabla */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: '2fr 1.5fr 1fr 1fr 0.5fr',
-          padding: '1rem 1.5rem',
-          backgroundColor: 'var(--color-bg)',
-          borderBottom: '1px solid var(--color-border)',
-          fontSize: '0.75rem',
-          fontWeight: 600,
-          color: 'var(--color-text-secondary)',
-          textTransform: 'uppercase',
-          letterSpacing: '0.05em'
-        }}>
-          <div>Alumno</div>
-          <div>Email</div>
-          <div>Nivel</div>
-          <div>XP</div>
-          <div></div>
-        </div>
+        {/* Header de tabla (oculto en móvil) */}
+        {!isMobile && (
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '2fr 1.5fr 1fr 1fr 0.5fr',
+            padding: '1rem 1.5rem',
+            backgroundColor: 'var(--color-bg)',
+            borderBottom: '1px solid var(--color-border)',
+            fontSize: '0.75rem',
+            fontWeight: 600,
+            color: 'var(--color-text-secondary)',
+            textTransform: 'uppercase',
+            letterSpacing: '0.05em'
+          }}>
+            <div>Alumno</div>
+            <div>Email</div>
+            <div>Nivel</div>
+            <div>XP</div>
+            <div></div>
+          </div>
+        )}
 
         {/* Contenido de tabla */}
         <div style={{
-          minHeight: '300px'
+          minHeight: isMobile ? '200px' : '300px'
         }}>
           {loading ? (
             <div style={{
-              padding: '3rem',
+              padding: isMobile ? '2rem 1rem' : '3rem',
               textAlign: 'center',
-              color: 'var(--color-text-secondary)'
+              color: 'var(--color-text-secondary)',
+              fontSize: isMobile ? '0.8rem' : '0.875rem'
             }}>
               Cargando alumnos...
             </div>
@@ -277,9 +355,10 @@ const Students = () => {
             ))
           ) : (
             <div style={{
-              padding: '3rem',
+              padding: isMobile ? '2rem 1rem' : '3rem',
               textAlign: 'center',
-              color: 'var(--color-text-secondary)'
+              color: 'var(--color-text-secondary)',
+              fontSize: isMobile ? '0.8rem' : '0.875rem'
             }}>
               {searchTerm || filterStatus !== 'all' 
                 ? 'No se encontraron alumnos con los filtros aplicados' 
@@ -292,7 +371,7 @@ const Students = () => {
       {/* Resumen */}
       <div style={{
         marginTop: '1rem',
-        fontSize: '0.875rem',
+        fontSize: isMobile ? '0.75rem' : '0.875rem',
         color: 'var(--color-text-secondary)'
       }}>
         Mostrando {filteredAndSortedStudents.length} de {students.length} alumnos

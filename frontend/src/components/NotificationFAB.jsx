@@ -50,9 +50,19 @@ const formatTimeAgo = (date) => {
 
 const NotificationFAB = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const { notifications, markAsRead, markAllAsRead, unreadCount } = useNotifications();
   const panelRef = useRef(null);
   const fabRef = useRef(null);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // Cerrar panel al hacer click fuera
   useEffect(() => {
@@ -79,12 +89,13 @@ const NotificationFAB = () => {
       <button
         ref={fabRef}
         onClick={() => setIsOpen(!isOpen)}
+        className="notification-fab"
         style={{
           position: 'fixed',
-          bottom: '24px',
-          right: '24px',
-          width: '56px',
-          height: '56px',
+          bottom: isMobile ? 'calc(70px + 1rem)' : '24px',
+          right: isMobile ? '16px' : '24px',
+          width: isMobile ? '48px' : '56px',
+          height: isMobile ? '48px' : '56px',
           borderRadius: '50%',
           backgroundColor: 'var(--color-primary)',
           color: 'white',
@@ -106,14 +117,14 @@ const NotificationFAB = () => {
           e.currentTarget.style.transform = 'scale(1)';
         }}
       >
-        <FiBell size={24} />
+        <FiBell size={isMobile ? 20 : 24} />
         
         {/* Badge con contador */}
         {unreadCount > 0 && (
           <span style={{
             position: 'absolute',
-            top: '4px',
-            right: '4px',
+            top: isMobile ? '2px' : '4px',
+            right: isMobile ? '2px' : '4px',
             width: '20px',
             height: '20px',
             borderRadius: '50%',
@@ -138,10 +149,11 @@ const NotificationFAB = () => {
           className="fade-in"
           style={{
             position: 'fixed',
-            bottom: '90px',
-            right: '24px',
-            width: '360px',
-            maxHeight: '420px',
+            bottom: isMobile ? 'calc(70px + 3.5rem)' : '90px',
+            right: isMobile ? '8px' : '24px',
+            left: isMobile ? '8px' : 'auto',
+            width: isMobile ? 'auto' : '360px',
+            maxHeight: isMobile ? '60vh' : '420px',
             backgroundColor: 'var(--color-card-bg)',
             borderRadius: 'var(--radius-lg)',
             boxShadow: 'var(--shadow-lg)',
@@ -154,7 +166,7 @@ const NotificationFAB = () => {
         >
           {/* Header del panel */}
           <div style={{
-            padding: '1rem 1.25rem',
+            padding: isMobile ? '0.875rem 1rem' : '1rem 1.25rem',
             borderBottom: '1px solid var(--color-border)',
             display: 'flex',
             alignItems: 'center',
@@ -163,7 +175,7 @@ const NotificationFAB = () => {
           }}>
             <div>
               <h3 style={{
-                fontSize: '1rem',
+                fontSize: isMobile ? '0.95rem' : '1rem',
                 fontWeight: 600,
                 color: 'var(--color-text-primary)',
                 margin: 0
@@ -172,7 +184,7 @@ const NotificationFAB = () => {
               </h3>
               {unreadCount > 0 && (
                 <p style={{
-                  fontSize: '0.75rem',
+                  fontSize: isMobile ? '0.7rem' : '0.75rem',
                   color: 'var(--color-text-secondary)',
                   margin: '0.125rem 0 0 0'
                 }}>
@@ -253,7 +265,7 @@ const NotificationFAB = () => {
                 color: 'var(--color-text-secondary)'
               }}>
                 <FiBell size={32} style={{ margin: '0 auto 0.5rem', opacity: 0.3 }} />
-                <p style={{ margin: 0, fontSize: '0.875rem' }}>
+                <p style={{ margin: 0, fontSize: isMobile ? '0.8rem' : '0.875rem' }}>
                   No hay notificaciones
                 </p>
               </div>
@@ -263,7 +275,7 @@ const NotificationFAB = () => {
                   key={notification.id}
                   onClick={() => !notification.read && markAsRead(notification.id)}
                   style={{
-                    padding: '0.875rem',
+                    padding: isMobile ? '0.75rem' : '0.875rem',
                     borderRadius: 'var(--radius-md)',
                     marginBottom: '0.5rem',
                     backgroundColor: notification.read ? 'transparent' : 'rgba(46, 125, 50, 0.05)',
@@ -302,7 +314,7 @@ const NotificationFAB = () => {
                     
                     <div style={{ flex: 1 }}>
                       <p style={{
-                        fontSize: '0.875rem',
+                        fontSize: isMobile ? '0.8rem' : '0.875rem',
                         color: 'var(--color-text-primary)',
                         margin: 0,
                         fontWeight: notification.read ? 400 : 600,
@@ -311,7 +323,7 @@ const NotificationFAB = () => {
                         {notification.message}
                       </p>
                       <p style={{
-                        fontSize: '0.75rem',
+                        fontSize: isMobile ? '0.7rem' : '0.75rem',
                         color: 'var(--color-text-secondary)',
                         margin: '0.25rem 0 0 0'
                       }}>

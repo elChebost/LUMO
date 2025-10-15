@@ -10,10 +10,19 @@ const Dashboard = () => {
   const [stats, setStats] = useState(null);
   const [activeMissions, setActiveMissions] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isMobile, setIsMobile] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     loadDashboardData();
+    
+    // Detectar móvil
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
   const loadDashboardData = async () => {
@@ -41,30 +50,32 @@ const Dashboard = () => {
   return (
     <div style={{ padding: '0' }}>
       {/* Header de la página */}
-      <div style={{ marginBottom: '2rem' }}>
+      <div className={isMobile ? 'mobile-page-header' : ''} style={{ marginBottom: isMobile ? '1.5rem' : '2rem' }}>
         <h1 style={{
-          fontSize: '2rem',
+          fontSize: isMobile ? '1.5rem' : '2rem',
           fontWeight: 700,
           color: 'var(--color-text-primary)',
           margin: '0 0 0.5rem 0'
         }}>
           Panel principal
         </h1>
-        <p style={{
-          fontSize: '0.875rem',
-          color: 'var(--color-text-secondary)',
-          margin: 0
-        }}>
-          Resumen general del curso y accesos rápidos
-        </p>
+        {!isMobile && (
+          <p style={{
+            fontSize: '0.875rem',
+            color: 'var(--color-text-secondary)',
+            margin: 0
+          }}>
+            Resumen general del curso y accesos rápidos
+          </p>
+        )}
       </div>
 
       {/* Fila de estadísticas (StatCards) */}
-      <div style={{
+      <div className={isMobile ? 'mobile-stats-grid' : ''} style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
-        gap: '1rem',
-        marginBottom: '2rem'
+        gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(240px, 1fr))',
+        gap: isMobile ? '0.75rem' : '1rem',
+        marginBottom: isMobile ? '1.5rem' : '2rem'
       }}>
         <StatCard
           icon={FiTrendingUp}
@@ -87,9 +98,9 @@ const Dashboard = () => {
       </div>
 
       {/* Sección: Accesos rápidos */}
-      <section style={{ marginBottom: '2rem' }}>
+      <section style={{ marginBottom: isMobile ? '1.5rem' : '2rem' }}>
         <h2 style={{
-          fontSize: '1.25rem',
+          fontSize: isMobile ? '1.125rem' : '1.25rem',
           fontWeight: 600,
           color: 'var(--color-text-primary)',
           margin: '0 0 1rem 0'
@@ -99,13 +110,13 @@ const Dashboard = () => {
 
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-          gap: '1rem'
+          gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(200px, 1fr))',
+          gap: isMobile ? '0.75rem' : '1rem'
         }}>
           <button
             onClick={() => navigate('/students')}
             style={{
-              padding: '1.5rem',
+              padding: isMobile ? '1.25rem' : '1.5rem',
               backgroundColor: 'var(--color-card-bg)',
               borderRadius: 'var(--radius-lg)',
               border: '1px solid var(--color-border)',
@@ -125,7 +136,7 @@ const Dashboard = () => {
             }}
           >
             <h3 style={{
-              fontSize: '1rem',
+              fontSize: isMobile ? '0.9rem' : '1rem',
               fontWeight: 600,
               color: 'var(--color-text-primary)',
               margin: '0 0 0.5rem 0'
@@ -133,7 +144,7 @@ const Dashboard = () => {
               Gestionar Alumnos
             </h3>
             <p style={{
-              fontSize: '0.875rem',
+              fontSize: isMobile ? '0.8rem' : '0.875rem',
               color: 'var(--color-text-secondary)',
               margin: 0
             }}>
@@ -144,7 +155,7 @@ const Dashboard = () => {
           <button
             onClick={() => navigate('/missions')}
             style={{
-              padding: '1.5rem',
+              padding: isMobile ? '1.25rem' : '1.5rem',
               backgroundColor: 'var(--color-card-bg)',
               borderRadius: 'var(--radius-lg)',
               border: '1px solid var(--color-border)',
@@ -164,7 +175,7 @@ const Dashboard = () => {
             }}
           >
             <h3 style={{
-              fontSize: '1rem',
+              fontSize: isMobile ? '0.9rem' : '1rem',
               fontWeight: 600,
               color: 'var(--color-text-primary)',
               margin: '0 0 0.5rem 0'
@@ -172,7 +183,7 @@ const Dashboard = () => {
               Crear Misión
             </h3>
             <p style={{
-              fontSize: '0.875rem',
+              fontSize: isMobile ? '0.8rem' : '0.875rem',
               color: 'var(--color-text-secondary)',
               margin: 0
             }}>
@@ -183,7 +194,7 @@ const Dashboard = () => {
           <button
             onClick={() => navigate('/settings')}
             style={{
-              padding: '1.5rem',
+              padding: isMobile ? '1.25rem' : '1.5rem',
               backgroundColor: 'var(--color-card-bg)',
               borderRadius: 'var(--radius-lg)',
               border: '1px solid var(--color-border)',
@@ -203,7 +214,7 @@ const Dashboard = () => {
             }}
           >
             <h3 style={{
-              fontSize: '1rem',
+              fontSize: isMobile ? '0.9rem' : '1rem',
               fontWeight: 600,
               color: 'var(--color-text-primary)',
               margin: '0 0 0.5rem 0'
@@ -211,7 +222,7 @@ const Dashboard = () => {
               Ver Estadísticas
             </h3>
             <p style={{
-              fontSize: '0.875rem',
+              fontSize: isMobile ? '0.8rem' : '0.875rem',
               color: 'var(--color-text-secondary)',
               margin: 0
             }}>
@@ -230,7 +241,7 @@ const Dashboard = () => {
           marginBottom: '1rem'
         }}>
           <h2 style={{
-            fontSize: '1.25rem',
+            fontSize: isMobile ? '1.125rem' : '1.25rem',
             fontWeight: 600,
             color: 'var(--color-text-primary)',
             margin: 0
@@ -240,14 +251,15 @@ const Dashboard = () => {
           <button
             onClick={() => navigate('/missions')}
             style={{
-              fontSize: '0.875rem',
+              fontSize: isMobile ? '0.8rem' : '0.875rem',
               color: 'var(--color-primary)',
               fontWeight: 600,
               textDecoration: 'none',
               transition: 'color var(--transition-fast)',
               background: 'none',
               border: 'none',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              padding: '0.25rem 0.5rem'
             }}
             onMouseEnter={(e) => e.target.style.color = 'var(--color-primary-hover)'}
             onMouseLeave={(e) => e.target.style.color = 'var(--color-primary)'}
@@ -258,14 +270,14 @@ const Dashboard = () => {
 
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-          gap: '1rem'
+          gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(300px, 1fr))',
+          gap: isMobile ? '0.75rem' : '1rem'
         }}>
           {loading ? (
             <>
               <MissionCard loading />
-              <MissionCard loading />
-              <MissionCard loading />
+              {!isMobile && <MissionCard loading />}
+              {!isMobile && <MissionCard loading />}
             </>
           ) : activeMissions.length > 0 ? (
             activeMissions.map(mission => (
@@ -276,8 +288,8 @@ const Dashboard = () => {
               gridColumn: '1 / -1',
               textAlign: 'center',
               color: 'var(--color-text-secondary)',
-              fontSize: '0.875rem',
-              padding: '2rem'
+              fontSize: isMobile ? '0.8rem' : '0.875rem',
+              padding: isMobile ? '1.5rem' : '2rem'
             }}>
               No hay misiones activas en este momento
             </p>
@@ -289,4 +301,3 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
-

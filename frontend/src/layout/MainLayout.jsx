@@ -1,10 +1,43 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import Navbar from '../components/Navbar';
+import BottomNavigation from '../components/BottomNavigation';
 import NotificationFAB from '../components/NotificationFAB';
 
 const MainLayout = () => {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    // Detectar si es móvil
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  if (isMobile) {
+    // Layout para móvil
+    return (
+      <div className="mobile-layout">
+        {/* Contenido principal */}
+        <main className="mobile-main">
+          <Outlet />
+        </main>
+
+        {/* Navegación inferior */}
+        <BottomNavigation />
+
+        {/* FAB de notificaciones */}
+        <NotificationFAB />
+      </div>
+    );
+  }
+
+  // Layout para desktop (original)
   return (
     <div style={{ 
       minHeight: '100vh', 

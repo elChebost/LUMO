@@ -11,9 +11,18 @@ const Missions = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const [showModal, setShowModal] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     loadMissions();
+    
+    // Detectar móvil
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
   const loadMissions = async () => {
@@ -40,38 +49,42 @@ const Missions = () => {
   return (
     <div style={{ padding: '0' }}>
       {/* Header */}
-      <div style={{ marginBottom: '2rem' }}>
+      <div className={isMobile ? 'mobile-page-header' : ''} style={{ marginBottom: isMobile ? '1.5rem' : '2rem' }}>
         <h1 style={{
-          fontSize: '2rem',
+          fontSize: isMobile ? '1.5rem' : '2rem',
           fontWeight: 700,
           color: 'var(--color-text-primary)',
           margin: '0 0 0.5rem 0'
         }}>
           Misiones
         </h1>
-        <p style={{
-          fontSize: '0.875rem',
-          color: 'var(--color-text-secondary)',
-          margin: 0
-        }}>
-          Administra las misiones del curso
-        </p>
+        {!isMobile && (
+          <p style={{
+            fontSize: '0.875rem',
+            color: 'var(--color-text-secondary)',
+            margin: 0
+          }}>
+            Administra las misiones del curso
+          </p>
+        )}
       </div>
 
       {/* Barra de acciones */}
-      <div style={{
+      <div className={isMobile ? 'mobile-actions' : ''} style={{
         display: 'flex',
         gap: '1rem',
         marginBottom: '1.5rem',
         flexWrap: 'wrap',
-        alignItems: 'center'
+        alignItems: 'center',
+        flexDirection: isMobile ? 'column' : 'row'
       }}>
         {/* Buscador */}
-        <div style={{
+        <div className={isMobile ? 'mobile-search' : ''} style={{
           position: 'relative',
-          flex: '1',
-          minWidth: '300px',
-          maxWidth: '400px'
+          flex: isMobile ? 'none' : '1',
+          minWidth: isMobile ? '100%' : '300px',
+          maxWidth: isMobile ? '100%' : '400px',
+          width: isMobile ? '100%' : 'auto'
         }}>
           <FiSearch 
             size={18} 
@@ -115,14 +128,16 @@ const Missions = () => {
         <div style={{
           display: 'flex',
           alignItems: 'center',
-          gap: '0.5rem'
+          gap: '0.5rem',
+          width: isMobile ? '100%' : 'auto'
         }}>
-          <FiFilter size={18} style={{ color: 'var(--color-text-secondary)' }} />
+          {!isMobile && <FiFilter size={18} style={{ color: 'var(--color-text-secondary)' }} />}
           <select
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
             style={{
               height: '44px',
+              width: isMobile ? '100%' : 'auto',
               padding: '0 2.5rem 0 1rem',
               border: '1px solid var(--color-border)',
               borderRadius: 'var(--radius-md)',
@@ -147,6 +162,7 @@ const Missions = () => {
           onClick={() => setShowModal(true)}
           style={{
             height: '44px',
+            width: isMobile ? '100%' : 'auto',
             padding: '0 1.5rem',
             backgroundColor: 'var(--color-primary)',
             color: 'white',
@@ -158,9 +174,10 @@ const Missions = () => {
             transition: 'all var(--transition-fast)',
             display: 'flex',
             alignItems: 'center',
+            justifyContent: 'center',
             gap: '0.5rem',
             whiteSpace: 'nowrap',
-            marginLeft: 'auto'
+            marginLeft: isMobile ? '0' : 'auto'
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.backgroundColor = 'var(--color-primary-hover)';
@@ -181,17 +198,17 @@ const Missions = () => {
       {/* Grid de misiones */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
-        gap: '1rem'
+        gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(320px, 1fr))',
+        gap: isMobile ? '0.75rem' : '1rem'
       }}>
         {loading ? (
           <>
             <MissionCard loading />
-            <MissionCard loading />
-            <MissionCard loading />
-            <MissionCard loading />
-            <MissionCard loading />
-            <MissionCard loading />
+            {!isMobile && <MissionCard loading />}
+            {!isMobile && <MissionCard loading />}
+            {!isMobile && <MissionCard loading />}
+            {!isMobile && <MissionCard loading />}
+            {!isMobile && <MissionCard loading />}
           </>
         ) : filteredMissions.length > 0 ? (
           filteredMissions.map(mission => (
@@ -200,7 +217,7 @@ const Missions = () => {
         ) : (
           <div style={{
             gridColumn: '1 / -1',
-            padding: '3rem',
+            padding: isMobile ? '2rem 1rem' : '3rem',
             textAlign: 'center',
             backgroundColor: 'var(--color-card-bg)',
             borderRadius: 'var(--radius-lg)',
@@ -208,7 +225,7 @@ const Missions = () => {
           }}>
             <p style={{
               color: 'var(--color-text-secondary)',
-              fontSize: '0.875rem',
+              fontSize: isMobile ? '0.8rem' : '0.875rem',
               margin: 0
             }}>
               {searchTerm || filterStatus !== 'all'
@@ -223,13 +240,13 @@ const Missions = () => {
       {!loading && filteredMissions.length > 0 && (
         <div style={{
           marginTop: '1.5rem',
-          padding: '1rem',
+          padding: isMobile ? '0.75rem 0' : '1rem',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center'
         }}>
           <p style={{
-            fontSize: '0.875rem',
+            fontSize: isMobile ? '0.75rem' : '0.875rem',
             color: 'var(--color-text-secondary)',
             margin: 0
           }}>

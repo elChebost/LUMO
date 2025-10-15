@@ -6,7 +6,7 @@ import {
   deleteSchool,
 } from '../services/schoolService.js';
 
-// Crear
+// Crear escuela
 export const createSchoolHandler = async (req, res) => {
   try {
     const { name, address, shift } = req.body;
@@ -28,7 +28,7 @@ export const createSchoolHandler = async (req, res) => {
   }
 };
 
-// Listar todas
+// Listar todas las escuelas
 export const getSchoolsHandler = async (req, res) => {
   try {
     const schools = await getSchools();
@@ -42,7 +42,7 @@ export const getSchoolsHandler = async (req, res) => {
   }
 };
 
-// Obtener por ID
+// Obtener escuela por ID
 export const getSchoolByIdHandler = async (req, res) => {
   try {
     const { id } = req.params;
@@ -59,7 +59,7 @@ export const getSchoolByIdHandler = async (req, res) => {
   }
 };
 
-// Actualizar
+// Actualizar escuela
 export const updateSchoolHandler = async (req, res) => {
   try {
     const { id } = req.params;
@@ -81,7 +81,7 @@ export const updateSchoolHandler = async (req, res) => {
   }
 };
 
-// Eliminar
+// Eliminar escuela
 export const deleteSchoolHandler = async (req, res) => {
   try {
     const { id } = req.params;

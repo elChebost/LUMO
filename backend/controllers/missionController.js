@@ -4,6 +4,10 @@ import {
   getMissionById,
   updateMission,
   deleteMission,
+  getActiveMissions,
+  getInactiveMissions,
+  getMissionsByTitle,
+  getTotalActiveMissions,
 } from '../services/missionService.js';
 
 // Crear
@@ -27,6 +31,62 @@ export const getMissionsHandler = async (req, res) => {
   try {
     const missions = await getMissions();
     res.json(missions);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Buscar misiones por título
+export const getMissionsByTitleHandler = async (req, res) => {
+  try {
+    const { title } = req.query;
+
+    if (!title) {
+      return res.status(400).json({ message: 'El parámetro "title" es requerido' });
+    }
+
+    const missions = await getMissionsByTitle(title);
+    
+    if (missions.length === 0) {
+      return res.status(404).json({ 
+        message: `No se encontraron misiones con el título: ${title}` 
+      });
+    }
+
+    res.json(missions);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Listar misiones activas
+export const getActiveMissionsHandler = async (req, res) => {
+  try {
+    const missions = await getActiveMissions();
+    res.json(missions);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Listar misiones inactivas
+export const getInactiveMissionsHandler = async (req, res) => {
+  try {
+    const missions = await getInactiveMissions();
+    res.json(missions);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Obtener total de misiones activas
+export const getTotalActiveMissionsHandler = async (req, res) => {
+  try {
+    const totalActiveMissions = await getTotalActiveMissions();
+    res.json({ 
+      totalActiveMissions,
+      message: `Total de misiones activas: ${totalActiveMissions}`
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

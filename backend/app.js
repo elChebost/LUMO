@@ -10,7 +10,8 @@ import studentRoutes from './routes/studentRoutes.js';
 import skillTreeRoutes from './routes/skillTreeRoutes.js';
 import subjectRoutes from './routes/subjectRoutes.js';
 import missionRoutes from './routes/missionRoutes.js';
-import profileRoutes from './routes/profileRoutes.js';
+import studentProfileRoutes from './routes/studentProfileRoutes.js';
+import teacherProfileRoutes from './routes/teacherProfileRoutes.js';
 import contactRoutes from './routes/contactRoutes.js';
 import { connectDB } from './config/db.js';
 
@@ -37,7 +38,11 @@ app.use('/api/students', studentRoutes);
 app.use('/api/skillTrees', skillTreeRoutes);
 app.use('/api/subjects', subjectRoutes);
 app.use('/api/missions', missionRoutes);
-app.use('/api/profiles', profileRoutes);
+
+// Rutas de perfiles separados
+app.use('/api/studentProfiles', studentProfileRoutes);
+app.use('/api/teacherProfiles', teacherProfileRoutes);
+
 app.use('/api/contacts', contactRoutes);
 
 // Conexión a la base de datos

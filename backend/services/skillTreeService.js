@@ -7,11 +7,11 @@ export const createSkillTree = async ({ progress, xp, studentId }) => {
       data: {
         progress,
         xp,
-        studentId
+        student: { connect: { id: Number(studentId) } },
       },
     });
   } catch (error) {
-    throw error; // el controller se encarga de responder
+    throw error;
   }
 };
 
@@ -24,15 +24,27 @@ export const getSkillTrees = async () => {
   }
 };
 
+// Calcular XP promedio de todos los estudiantes
+export const getAverageXpAllStudents = async () => {
+  try {
+    const skillTrees = await prisma.skillTree.findMany({
+      select: { xp: true },
+    });
+
+    if (skillTrees.length === 0) return 0;
+
+    const totalXp = skillTrees.reduce((acc, st) => acc + st.xp, 0);
+    return totalXp / skillTrees.length;
+  } catch (error) {
+    throw error;
+  }
+};
+
 // Obtener una skillTree por ID
 export const getSkillTreeById = async (id) => {
-  try {
-    return await prisma.skillTree.findUnique({
-      where: { id: Number(id) },
-    });
-  } catch (error) {
-    throw error; 
-  }
+  return await prisma.skillTree.findUnique({
+    where: { id: Number(id) },
+  });
 };
 
 // Actualizar una skillTree

@@ -9,14 +9,13 @@ import {
 // Crear docente
 export const createTeacherHandler = async (req, res) => {
   try {
-    const { name, email, subjects, grades, schedule, role } = req.body;
+    const { name, email, subjects, grades, schedule, role, schoolId } = req.body;
 
-    // Validaciones básicas
-    if (!name || !email || !role) {
-      return res.status(400).json({ message: 'Faltan datos obligatorios: nombre, email o rol.' });
+    if (!name || !email || !role || !schoolId) {
+      return res.status(400).json({ message: 'Faltan datos obligatorios.' });
     }
 
-    const teacher = await createTeacher({ name, email, subjects, grades, schedule, role });
+    const teacher = await createTeacher({ name, email, subjects, grades, schedule, role, schoolId });
     res.status(201).json(teacher);
   } catch (error) {
     console.error('Error al crear docente:', error);

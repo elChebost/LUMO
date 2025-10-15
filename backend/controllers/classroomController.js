@@ -9,14 +9,11 @@ import {
 // Crear aula
 export const createClassroomHandler = async (req, res) => {
   try {
-    const { name, grade } = req.body;
+    const { name, grade, schoolId, teacherId } = req.body;
+    if (!name || !grade || !schoolId || !teacherId)
+      return res.status(400).json({ message: 'Faltan datos obligatorios.' });
 
-    // Validaciones básicas
-    if (!name || !grade) {
-      return res.status(400).json({ message: 'Faltan datos obligatorios: nombre o grado.' });
-    }
-
-    const classroom = await createClassroom({ name, grade });
+    const classroom = await createClassroom({ name, grade, schoolId, teacherId });
     res.status(201).json(classroom);
   } catch (error) {
     console.error('Error al crear aula:', error);

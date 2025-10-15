@@ -1,21 +1,21 @@
 import prisma from '../config/db.js';
 
 // Crear un docente
-export const createTeacher = async ({ name, email, classes, grades, schedule, role, schoolId }) => {
+export const createTeacher = async ({ name, email, subjects, grades, schedule, role, schoolId }) => {
   try {
     return await prisma.teacher.create({
       data: {
         name,
         email,
-        classes,
+        subjects,
         grades,
         schedule,
         role,
-        schoolId
-      },
+        school: { connect: { id: Number(schoolId) } }
+      }
     });
   } catch (error) {
-    throw error; // el controller se encarga de responderS
+    throw error;
   }
 };
 

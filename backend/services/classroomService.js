@@ -1,17 +1,18 @@
 import prisma from '../config/db.js';
 
 // Crear un aula
-export const createClassroom = async ({ name, grade, schoolId }) => {
+export const createClassroom = async ({ name, grade, schoolId, teacherId }) => {
   try {
-  return await prisma.classroom.create({
-    data: {
-      name,
-      grade,
-      schoolId,
-    },
-  });
+    return await prisma.classroom.create({
+      data: {
+        name,
+        grade,
+        school: { connect: { id: Number(schoolId) } },
+        teacher: { connect: { id: Number(teacherId) } }
+      }
+    });
   } catch (error) {
-    throw error; // el controller se encarga de responder
+    throw error;
   }
 };
 

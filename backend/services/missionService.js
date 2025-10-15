@@ -9,11 +9,11 @@ export const createMission = async ({ title, description, status, grade, teacher
         description,
         status,
         grade,
-        teacherId
+        teacher: { connect: { id: Number(teacherId) } },
       },
     });
   } catch (error) {
-    throw error; // el controller se encarga de responder
+    throw error;
   }
 };
 
@@ -23,6 +23,52 @@ export const getMissions = async () => {
     return await prisma.mission.findMany();
   } catch (error) {
     throw error; 
+  }
+};
+
+// Obtener misiones por título (búsqueda)
+export const getMissionsByTitle = async (title) => {
+  try {
+    const allMissions = await prisma.mission.findMany();
+    
+    return allMissions.filter(mission => 
+      mission.title.toLowerCase().includes(title.toLowerCase())
+    );
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Obtener misiones activas
+export const getActiveMissions = async () => {
+  try {
+    return await prisma.mission.findMany({
+      where: { status: 'active' },
+    });
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Obtener misiones inactivas
+export const getInactiveMissions = async () => {
+  try {
+    return await prisma.mission.findMany({
+      where: { status: 'inactive' },
+    });
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Contar total de misiones activas
+export const getTotalActiveMissions = async () => {
+  try {
+    return await prisma.mission.count({
+      where: { status: 'active' },
+    });
+  } catch (error) {
+    throw error;
   }
 };
 

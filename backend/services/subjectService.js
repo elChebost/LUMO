@@ -7,7 +7,7 @@ export const createSubject = async ({ name, description, studentId }) => {
       data: {
         name,
         description,
-        studentId
+        student: { connect: { id: Number(studentId) } },
       },
     });
   } catch (error) {

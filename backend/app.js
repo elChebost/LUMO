@@ -14,6 +14,7 @@ import missionRoutes from './routes/missionRoutes.js';
 import studentProfileRoutes from './routes/studentProfileRoutes.js';
 import teacherProfileRoutes from './routes/teacherProfileRoutes.js';
 import contactRoutes from './routes/contactRoutes.js';
+import dataRoutes from './routes/dataRoutes.js';
 import { connectDB } from './config/db.js';
 
 dotenv.config();
@@ -45,6 +46,7 @@ app.use('/api/studentProfiles', studentProfileRoutes); // ✅ Perfiles estudiant
 app.use('/api/teacherProfiles', teacherProfileRoutes); // ✅ Perfiles profesores
 
 app.use('/api/contacts', contactRoutes); // ✅ Formulario de contacto
+app.use('/api/data', dataRoutes); // ✅ Datos básicos y consultas especiales
 
 // Conexión a la base de datos
 connectDB();

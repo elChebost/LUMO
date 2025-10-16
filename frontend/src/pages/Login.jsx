@@ -244,39 +244,81 @@ const Login = () => {
             {loading ? 'Ingresando...' : 'Ingresar'}
           </button>
 
-          {/* Credenciales de prueba */}
+          {/* Credenciales de prueba - MEJORADAS */}
           <div style={{
             padding: '1rem',
-            backgroundColor: '#F5F5F5',
+            backgroundColor: '#E8F5E8',
             borderRadius: '8px',
-            border: '1px solid #E0E0E0',
-            marginTop: '0.5rem'
+            border: '2px solid #4CAF50',
+            marginTop: '0.5rem',
+            boxShadow: '0 2px 8px rgba(76,175,80,0.15)'
           }}>
             <p style={{
-              fontSize: '0.75rem',
-              fontWeight: 600,
-              color: '#666',
-              margin: '0 0 0.5rem 0',
+              fontSize: '0.875rem',
+              fontWeight: 700,
+              color: '#2E7D32',
+              margin: '0 0 0.75rem 0',
               textAlign: 'center'
             }}>
-              Credenciales de prueba:
+              🧪 CREDENCIALES DE PRUEBA (VERIFICADAS)
             </p>
-            <p style={{
-              fontSize: '0.75rem',
-              color: '#333',
-              margin: '0.25rem 0',
-              fontFamily: 'monospace'
+            <div style={{
+              backgroundColor: '#ffffff',
+              padding: '0.75rem',
+              borderRadius: '6px',
+              border: '1px solid #C8E6C9',
+              marginBottom: '0.75rem'
             }}>
-              📧 Email: <strong>admin@test.com</strong>
-            </p>
-            <p style={{
-              fontSize: '0.75rem',
-              color: '#333',
-              margin: '0.25rem 0',
-              fontFamily: 'monospace'
-            }}>
-              🔑 Password: <strong>123456</strong>
-            </p>
+              <p style={{
+                fontSize: '0.875rem',
+                color: '#1B5E20',
+                margin: '0.25rem 0',
+                fontFamily: 'monospace',
+                fontWeight: 600
+              }}>
+                📧 Email: <strong style={{ color: '#2E7D32' }}>admin@test.com</strong>
+              </p>
+              <p style={{
+                fontSize: '0.875rem',
+                color: '#1B5E20',
+                margin: '0.25rem 0',
+                fontFamily: 'monospace',
+                fontWeight: 600
+              }}>
+                🔑 Password: <strong style={{ color: '#2E7D32' }}>123456</strong>
+              </p>
+            </div>
+            
+            {/* Botón para autocompletar */}
+            <button
+              type="button"
+              onClick={() => {
+                setEmail('admin@test.com');
+                setPassword('123456');
+              }}
+              style={{
+                width: '100%',
+                padding: '0.5rem',
+                fontSize: '0.75rem',
+                fontWeight: 600,
+                color: '#2E7D32',
+                backgroundColor: '#ffffff',
+                border: '1px solid #4CAF50',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                transition: 'all 0.2s'
+              }}
+              onMouseOver={(e) => {
+                e.target.style.backgroundColor = '#F1F8E9';
+                e.target.style.borderColor = '#2E7D32';
+              }}
+              onMouseOut={(e) => {
+                e.target.style.backgroundColor = '#ffffff';
+                e.target.style.borderColor = '#4CAF50';
+              }}
+            >
+              ⚡ Llenar automáticamente
+            </button>
           </div>
 
         </form>

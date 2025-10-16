@@ -13,16 +13,32 @@ import {
 // Crear
 export const createMissionHandler = async (req, res) => {
   try {
-    const { title, description, status, grade, teacherId } = req.body;
+    const { title, description, status, activationDate, dueDate, dueTime, teacherId } = req.body;
 
-    if (!title || !description || !status || !grade || !teacherId) {
-      return res.status(400).json({ message: 'Faltan campos obligatorios' });
+    if (!title || !description || !teacherId) {
+      return res.status(400).json({ message: 'Faltan campos obligatorios: title, description, teacherId' });
     }
 
-    const mission = await createMission({ title, description, status, grade, teacherId });
-    res.status(201).json(mission);
+    const mission = await createMission({ 
+      title, 
+      description, 
+      status: status || 'Borrador', 
+      activationDate, 
+      dueDate, 
+      dueTime, 
+      teacherId 
+    });
+    
+    res.status(201).json({ 
+      message: 'Misión creada exitosamente', 
+      mission 
+    });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error al crear misión:', error);
+    res.status(500).json({ 
+      message: 'Error al crear misión', 
+      error: error.message 
+    });
   }
 };
 

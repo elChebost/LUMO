@@ -1,533 +1,192 @@
-import React, { useState } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { FiX, FiAlertCircle } from 'react-icons/fi';
-import { API_URL } from '../config/api';
-import { getAuthHeaders } from '../utils/auth';
+
+const API_URL = 'http://localhost:3000/api';
 
 const StudentFormModal = ({ isOpen, onClose, onStudentAdded }) => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    password: '', // ✅ Campo para el registro de usuario
+    password: '123456',
     age: '',
-    grade: ''
+    level: 1,
+    xp: 0,
+    schedule: 'Mañana'
   });
+
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
 
-  if (!isOpen) return null;
+  useEffect(() => {
+    if (isOpen) {
+      resetForm();
+    }
+  }, [isOpen]);
+
+  const resetForm = () => {
+    setFormData({
+      name: '',
+      email: '',
+      password: '123456',
+      age: '',
+      level: 1,
+      xp: 0,
+      schedule: 'Mañana'
+    });
+    setErrors({});
+  };
 
   const validateForm = () => {
     const newErrors = {};
-
     if (!formData.name.trim()) {
       newErrors.name = 'El nombre es requerido';
     }
-
     if (!formData.email.trim()) {
-      newErrors.email = 'El correo es requerido';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = 'El correo no es válido';
+      newErrors.email = 'El email es requerido';
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = 'Email inválido';
     }
-
-    if (!formData.password || formData.password.length < 6) {
-      newErrors.password = 'La contraseña debe tener al menos 6 caracteres';
+    if (!formData.age || formData.age < 1 || formData.age > 120) {
+      newErrors.age = 'La edad debe estar entre 1 y 120 años';
     }
-
-    if (!formData.age || formData.age < 1 || formData.age > 100) {
-      newErrors.age = 'La edad debe ser válida';
-    }
-
-    if (!formData.grade.trim()) {
-      newErrors.grade = 'El grado es requerido';
-    }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: '' }));
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
     if (!validateForm()) return;
-
     setLoading(true);
     try {
-      // ✅ Primero crear usuario con /api/users/register
-      const userResponse = await fetch(`${API_URL}/api/users/register`, {
+      const response = await fetch(`${API_URL}/students`, {
         method: 'POST',
-        headers: getAuthHeaders(),
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          name: formData.name,
-          email: formData.email,
-          password: formData.password,
-          role: 'student'
+          ...formData,
+          age: parseInt(formData.age),
+          level: parseInt(formData.level),
+          xp: parseInt(formData.xp)
         }),
       });
-
-      const userData = await userResponse.json();
-
-      if (!userResponse.ok) {
-        if (userData.error && userData.error.includes('email')) {
-          setErrors({ email: 'Este correo ya está registrado' });
-        } else {
-          setErrors({ general: userData.error || 'Error al crear el usuario' });
-        }
-        setLoading(false);
-        return;
+      if (response.ok) {
+        const newStudent = await response.json();
+        onStudentAdded(newStudent);
+        onClose();
+        resetForm();
+      } else {
+        const errorData = await response.json();
+        setErrors({ general: errorData.message || 'Error al crear el estudiante' });
       }
-
-      // ✅ Luego crear el alumno con el userId obtenido
-      const studentResponse = await fetch(`${API_URL}/api/students`, {
-        method: 'POST',
-        headers: getAuthHeaders(),
-        body: JSON.stringify({
-          name: formData.name,
-          email: formData.email,
-          age: Number(formData.age),
-          grade: formData.grade,
-          level: 1,
-          schedule: 'Matutino',
-          schoolId: 1,
-          teacherId: 1,
-          classroomId: 1,
-          userId: userData.id // ✅ Asociar usuario creado con el alumno
-        }),
-      });
-
-      const studentData = await studentResponse.json();
-
-      if (!studentResponse.ok) {
-        setErrors({ general: studentData.error || 'Error al crear el alumno' });
-        setLoading(false);
-        return;
-      }
-
-      // Limpiar formulario y cerrar modal
-      setFormData({ name: '', email: '', password: '', age: '', grade: '' });
-      setErrors({});
-      onStudentAdded();
-      onClose();
     } catch (error) {
-      setErrors({ general: 'Error de conexión. Por favor, intenta de nuevo.' });
+      setErrors({ general: 'Error de conexión. Intenta nuevamente.' });
     } finally {
       setLoading(false);
     }
   };
 
-  const handleChange = (field, value) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-    // Limpiar error del campo cuando el usuario empieza a escribir
-    if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: '' }));
-    }
-  };
+  if (!isOpen) return null;
 
   return (
-    <div style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      backgroundColor: 'rgba(0, 0, 0, 0.5)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      zIndex: 1000,
-      padding: '1rem'
-    }}>
-      <div className="fade-in" style={{
-        backgroundColor: 'var(--color-card-bg)',
-        borderRadius: 'var(--radius-lg)',
-        boxShadow: 'var(--shadow-xl)',
-        width: '100%',
-        maxWidth: '500px',
-        maxHeight: '90vh',
-        overflow: 'auto'
-      }}>
-        {/* Header */}
-        <div style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          padding: '1.5rem',
-          borderBottom: '1px solid var(--color-border)'
-        }}>
-          <h2 style={{
-            fontSize: '1.25rem',
-            fontWeight: 700,
-            color: 'var(--color-text-primary)',
-            margin: 0
-          }}>
-            Agregar Alumno
-          </h2>
-          <button
-            onClick={onClose}
-            style={{
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-              padding: '0.5rem',
-              color: 'var(--color-text-secondary)',
-              transition: 'color var(--transition-fast)'
-            }}
-            onMouseEnter={(e) => e.target.style.color = 'var(--color-text-primary)'}
-            onMouseLeave={(e) => e.target.style.color = 'var(--color-text-secondary)'}
-          >
-            <FiX size={24} />
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-lg w-full max-w-md max-h-[90vh] overflow-hidden">
+        <div className="flex items-center justify-between p-6 border-b">
+          <h2 className="text-xl font-semibold text-gray-800">Nuevo Estudiante</h2>
+          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+            <FiX size={20} />
           </button>
         </div>
-
-        {/* Formulario */}
-        <form onSubmit={handleSubmit} style={{ padding: '1.5rem' }}>
-          {/* Error general */}
+        <form onSubmit={handleSubmit} className="p-6 space-y-4 overflow-y-auto max-h-[calc(90vh-120px)]">
           {errors.general && (
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.75rem',
-              padding: '0.875rem 1rem',
-              backgroundColor: '#FEE',
-              border: '1px solid #FCC',
-              borderRadius: 'var(--radius-md)',
-              marginBottom: '1.5rem'
-            }}>
-              <FiAlertCircle size={20} color="#D32F2F" />
-              <span style={{
-                fontSize: '0.875rem',
-                color: '#D32F2F'
-              }}>
-                {errors.general}
-              </span>
+            <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700">
+              <FiAlertCircle size={16} />
+              <span className="text-sm">{errors.general}</span>
             </div>
           )}
-
-          {/* Nombre completo */}
-          <div style={{ marginBottom: '1.25rem' }}>
-            <label style={{
-              display: 'block',
-              fontSize: '0.875rem',
-              fontWeight: 600,
-              color: 'var(--color-text-primary)',
-              marginBottom: '0.5rem'
-            }}>
-              Nombre completo *
-            </label>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Nombre Completo *</label>
             <input
               type="text"
+              name="name"
               value={formData.name}
-              onChange={(e) => handleChange('name', e.target.value)}
-              placeholder="Ej: Juan Pérez"
-              style={{
-                width: '100%',
-                height: '44px',
-                padding: '0 1rem',
-                border: `1px solid ${errors.name ? '#D32F2F' : 'var(--color-border)'}`,
-                borderRadius: 'var(--radius-md)',
-                fontSize: '0.875rem',
-                backgroundColor: 'var(--color-card-bg)',
-                color: 'var(--color-text-primary)',
-                transition: 'all var(--transition-fast)'
-              }}
-              onFocus={(e) => {
-                if (!errors.name) {
-                  e.target.style.borderColor = 'var(--color-primary)';
-                  e.target.style.boxShadow = '0 0 0 3px rgba(46, 125, 50, 0.1)';
-                }
-              }}
-              onBlur={(e) => {
-                if (!errors.name) {
-                  e.target.style.borderColor = 'var(--color-border)';
-                  e.target.style.boxShadow = 'none';
-                }
-              }}
+              onChange={handleInputChange}
+              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.name ? 'border-red-300' : 'border-gray-300'}`}
+              placeholder="Ingresa el nombre completo"
             />
-            {errors.name && (
-              <p style={{
-                fontSize: '0.75rem',
-                color: '#D32F2F',
-                margin: '0.25rem 0 0 0'
-              }}>
-                {errors.name}
-              </p>
-            )}
+            {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
           </div>
-
-          {/* Email */}
-          <div style={{ marginBottom: '1.25rem' }}>
-            <label style={{
-              display: 'block',
-              fontSize: '0.875rem',
-              fontWeight: 600,
-              color: 'var(--color-text-primary)',
-              marginBottom: '0.5rem'
-            }}>
-              Correo electrónico *
-            </label>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Email *</label>
             <input
               type="email"
+              name="email"
               value={formData.email}
-              onChange={(e) => handleChange('email', e.target.value)}
-              placeholder="Ej: alumno@ejemplo.com"
-              style={{
-                width: '100%',
-                height: '44px',
-                padding: '0 1rem',
-                border: `1px solid ${errors.email ? '#D32F2F' : 'var(--color-border)'}`,
-                borderRadius: 'var(--radius-md)',
-                fontSize: '0.875rem',
-                backgroundColor: 'var(--color-card-bg)',
-                color: 'var(--color-text-primary)',
-                transition: 'all var(--transition-fast)'
-              }}
-              onFocus={(e) => {
-                if (!errors.email) {
-                  e.target.style.borderColor = 'var(--color-primary)';
-                  e.target.style.boxShadow = '0 0 0 3px rgba(46, 125, 50, 0.1)';
-                }
-              }}
-              onBlur={(e) => {
-                if (!errors.email) {
-                  e.target.style.borderColor = 'var(--color-border)';
-                  e.target.style.boxShadow = 'none';
-                }
-              }}
+              onChange={handleInputChange}
+              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.email ? 'border-red-300' : 'border-gray-300'}`}
+              placeholder="ejemplo@correo.com"
             />
-            {errors.email && (
-              <p style={{
-                fontSize: '0.75rem',
-                color: '#D32F2F',
-                margin: '0.25rem 0 0 0'
-              }}>
-                {errors.email}
-              </p>
-            )}
+            {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
           </div>
-
-          {/* ✅ Contraseña */}
-          <div style={{ marginBottom: '1.25rem' }}>
-            <label style={{
-              display: 'block',
-              fontSize: '0.875rem',
-              fontWeight: 600,
-              color: 'var(--color-text-primary)',
-              marginBottom: '0.5rem'
-            }}>
-              Contraseña *
-            </label>
-            <input
-              type="password"
-              value={formData.password}
-              onChange={(e) => handleChange('password', e.target.value)}
-              placeholder="Mínimo 6 caracteres"
-              style={{
-                width: '100%',
-                height: '44px',
-                padding: '0 1rem',
-                border: `1px solid ${errors.password ? '#D32F2F' : 'var(--color-border)'}`,
-                borderRadius: 'var(--radius-md)',
-                fontSize: '0.875rem',
-                backgroundColor: 'var(--color-card-bg)',
-                color: 'var(--color-text-primary)',
-                transition: 'all var(--transition-fast)'
-              }}
-              onFocus={(e) => {
-                if (!errors.password) {
-                  e.target.style.borderColor = 'var(--color-primary)';
-                  e.target.style.boxShadow = '0 0 0 3px rgba(46, 125, 50, 0.1)';
-                }
-              }}
-              onBlur={(e) => {
-                if (!errors.password) {
-                  e.target.style.borderColor = 'var(--color-border)';
-                  e.target.style.boxShadow = 'none';
-                }
-              }}
-            />
-            {errors.password && (
-              <p style={{
-                fontSize: '0.75rem',
-                color: '#D32F2F',
-                margin: '0.25rem 0 0 0'
-              }}>
-                {errors.password}
-              </p>
-            )}
-          </div>
-
-          {/* Edad */}
-          <div style={{ marginBottom: '1.25rem' }}>
-            <label style={{
-              display: 'block',
-              fontSize: '0.875rem',
-              fontWeight: 600,
-              color: 'var(--color-text-primary)',
-              marginBottom: '0.5rem'
-            }}>
-              Edad *
-            </label>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Edad *</label>
             <input
               type="number"
-              min="1"
-              max="100"
+              name="age"
               value={formData.age}
-              onChange={(e) => handleChange('age', e.target.value)}
-              placeholder="Ej: 10"
-              style={{
-                width: '100%',
-                height: '44px',
-                padding: '0 1rem',
-                border: `1px solid ${errors.age ? '#D32F2F' : 'var(--color-border)'}`,
-                borderRadius: 'var(--radius-md)',
-                fontSize: '0.875rem',
-                backgroundColor: 'var(--color-card-bg)',
-                color: 'var(--color-text-primary)',
-                transition: 'all var(--transition-fast)'
-              }}
-              onFocus={(e) => {
-                if (!errors.age) {
-                  e.target.style.borderColor = 'var(--color-primary)';
-                  e.target.style.boxShadow = '0 0 0 3px rgba(46, 125, 50, 0.1)';
-                }
-              }}
-              onBlur={(e) => {
-                if (!errors.age) {
-                  e.target.style.borderColor = 'var(--color-border)';
-                  e.target.style.boxShadow = 'none';
-                }
-              }}
+              onChange={handleInputChange}
+              min="1"
+              max="120"
+              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.age ? 'border-red-300' : 'border-gray-300'}`}
+              placeholder="Edad del estudiante"
             />
-            {errors.age && (
-              <p style={{
-                fontSize: '0.75rem',
-                color: '#D32F2F',
-                margin: '0.25rem 0 0 0'
-              }}>
-                {errors.age}
-              </p>
-            )}
+            {errors.age && <p className="text-red-500 text-xs mt-1">{errors.age}</p>}
           </div>
-
-          {/* Grado */}
-          <div style={{ marginBottom: '1.5rem' }}>
-            <label style={{
-              display: 'block',
-              fontSize: '0.875rem',
-              fontWeight: 600,
-              color: 'var(--color-text-primary)',
-              marginBottom: '0.5rem'
-            }}>
-              Grado *
-            </label>
-            <select
-              value={formData.grade}
-              onChange={(e) => handleChange('grade', e.target.value)}
-              style={{
-                width: '100%',
-                height: '44px',
-                padding: '0 1rem',
-                border: `1px solid ${errors.grade ? '#D32F2F' : 'var(--color-border)'}`,
-                borderRadius: 'var(--radius-md)',
-                fontSize: '0.875rem',
-                backgroundColor: 'var(--color-card-bg)',
-                color: 'var(--color-text-primary)',
-                transition: 'all var(--transition-fast)',
-                cursor: 'pointer'
-              }}
-              onFocus={(e) => {
-                if (!errors.grade) {
-                  e.target.style.borderColor = 'var(--color-primary)';
-                  e.target.style.boxShadow = '0 0 0 3px rgba(46, 125, 50, 0.1)';
-                }
-              }}
-              onBlur={(e) => {
-                if (!errors.grade) {
-                  e.target.style.borderColor = 'var(--color-border)';
-                  e.target.style.boxShadow = 'none';
-                }
-              }}
-            >
-              <option value="">Seleccionar grado</option>
-              <option value="1° Primaria">1° Primaria</option>
-              <option value="2° Primaria">2° Primaria</option>
-              <option value="3° Primaria">3° Primaria</option>
-              <option value="4° Primaria">4° Primaria</option>
-              <option value="5° Primaria">5° Primaria</option>
-              <option value="6° Primaria">6° Primaria</option>
-            </select>
-            {errors.grade && (
-              <p style={{
-                fontSize: '0.75rem',
-                color: '#D32F2F',
-                margin: '0.25rem 0 0 0'
-              }}>
-                {errors.grade}
-              </p>
-            )}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Nivel</label>
+            <input
+              type="number"
+              name="level"
+              value={formData.level}
+              onChange={handleInputChange}
+              min="1"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Nivel del estudiante"
+            />
           </div>
-
-          {/* Botones */}
-          <div style={{
-            display: 'flex',
-            gap: '1rem',
-            justifyContent: 'flex-end'
-          }}>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">XP</label>
+            <input
+              type="number"
+              name="xp"
+              value={formData.xp}
+              onChange={handleInputChange}
+              min="0"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Puntos de experiencia iniciales"
+            />
+          </div>
+          <div className="flex gap-3 pt-4">
             <button
               type="button"
               onClick={onClose}
+              className="flex-1 px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
               disabled={loading}
-              style={{
-                height: '44px',
-                padding: '0 1.5rem',
-                backgroundColor: 'transparent',
-                color: 'var(--color-text-secondary)',
-                border: '1px solid var(--color-border)',
-                borderRadius: 'var(--radius-md)',
-                fontSize: '0.875rem',
-                fontWeight: 600,
-                cursor: loading ? 'not-allowed' : 'pointer',
-                transition: 'all var(--transition-fast)'
-              }}
-              onMouseEnter={(e) => {
-                if (!loading) {
-                  e.currentTarget.style.backgroundColor = 'var(--color-bg)';
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (!loading) {
-                  e.currentTarget.style.backgroundColor = 'transparent';
-                }
-              }}
             >
               Cancelar
             </button>
             <button
               type="submit"
               disabled={loading}
-              style={{
-                height: '44px',
-                padding: '0 1.5rem',
-                backgroundColor: loading ? '#ccc' : 'var(--color-primary)',
-                color: 'white',
-                border: 'none',
-                borderRadius: 'var(--radius-md)',
-                fontSize: '0.875rem',
-                fontWeight: 600,
-                cursor: loading ? 'not-allowed' : 'pointer',
-                transition: 'all var(--transition-fast)'
-              }}
-              onMouseEnter={(e) => {
-                if (!loading) {
-                  e.currentTarget.style.backgroundColor = 'var(--color-primary-hover)';
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (!loading) {
-                  e.currentTarget.style.backgroundColor = 'var(--color-primary)';
-                }
-              }}
+              className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-blue-400"
             >
-              {loading ? 'Creando...' : 'Agregar Alumno'}
+              {loading ? 'Creando...' : 'Crear Estudiante'}
             </button>
           </div>
         </form>

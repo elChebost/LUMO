@@ -1,21 +1,37 @@
 import prisma from '../config/db.js';
+import bcrypt from 'bcryptjs';
 
 // Crear un estudiante
-export const createStudent = async ({ name, email, age, grade, level, schedule, schoolId, teacherId, classroomId }) => {
+export const createStudent = async ({ name, email, password, age, level, xp, schedule, schoolId, teacherId, classroomId }) => {
   try {
-    return await prisma.student.create({
+    const hashedPassword = await bcrypt.hash(password || '123456', 10);
+    
+    const student = await prisma.student.create({
       data: {
         name,
         email,
+        password: hashedPassword,
         age: Number(age),
-        grade,
-        level: Number(level),
+        level: Number(level) || 1,
+        xp: Number(xp) || 0,
         schedule,
         school: { connect: { id: Number(schoolId) } },
         teacher: { connect: { id: Number(teacherId) } },
         classroom: { connect: { id: Number(classroomId) } }
       },
     });
+
+    // Crear perfil del estudiante automáticamente
+    await prisma.studentProfile.create({
+      data: {
+        avatar: '/src/assets/avatar.png',
+        exp: Number(xp) || 0,
+        coins: Math.floor((Number(xp) || 0) / 10),
+        studentId: student.id
+      }
+    });
+
+    return student;
   } catch (error) {
     throw error;
   }
@@ -24,7 +40,14 @@ export const createStudent = async ({ name, email, age, grade, level, schedule, 
 // Obtener todos los estudiantes
 export const getStudents = async () => {
   try {
-    return await prisma.student.findMany();
+    return await prisma.student.findMany({
+      include: {
+        profile: true,
+        school: true,
+        teacher: true,
+        classroom: true
+      }
+    });
   } catch (error) {
     throw error;
   }

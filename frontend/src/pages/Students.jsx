@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { FiSearch, FiUserPlus } from 'react-icons/fi';
 import StudentRow from '../components/StudentRow';
 import StudentFormModal from '../components/StudentFormModal';
+import StudentDetailModal from '../components/StudentDetailModal';
 
 // ⚠️ Cambiado de 4000 a 3000 para coincidir con el backend
 const API_URL = 'http://localhost:3000/api';
@@ -13,6 +14,8 @@ const Students = () => {
   const [filterStatus, setFilterStatus] = useState('all'); // all, submitted, pending
   const [sortBy, setSortBy] = useState('name-asc'); // name-asc, name-desc, activity-recent, activity-old
   const [modalOpen, setModalOpen] = useState(false);
+  const [selectedStudent, setSelectedStudent] = useState(null);
+  const [detailModalOpen, setDetailModalOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -64,18 +67,22 @@ const Students = () => {
   const filteredAndSortedStudents = getSortedStudents(
     students.filter(student => {
       const matchesSearch = student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           student.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           (student.firstName && student.firstName.toLowerCase().includes(searchTerm.toLowerCase())) ||
-                           (student.lastName && student.lastName.toLowerCase().includes(searchTerm.toLowerCase()));
+                           student.email.toLowerCase().includes(searchTerm.toLowerCase());
       
-      // Por ahora, todos los alumnos se consideran "sin entregar" ya que no hay sistema de entregas
-      const matchesStatus = filterStatus === 'all' || 
-                           (filterStatus === 'pending' && true) || 
-                           (filterStatus === 'submitted' && false);
-      
-      return matchesSearch && matchesStatus;
+      return matchesSearch;
     })
   );
+
+  const handleStudentClick = async (studentId) => {
+    try {
+      const response = await fetch(`${API_URL}/data/student/${studentId}`);
+      const studentData = await response.json();
+      setSelectedStudent(studentData);
+      setDetailModalOpen(true);
+    } catch (error) {
+      console.error('Error obteniendo datos del estudiante:', error);
+    }
+  };
 
   return (
     <div style={{ padding: '0' }}>
@@ -352,7 +359,11 @@ const Students = () => {
             </div>
           ) : filteredAndSortedStudents.length > 0 ? (
             filteredAndSortedStudents.map(student => (
-              <StudentRow key={student.id} student={student} />
+              <StudentRow 
+                key={student.id} 
+                student={student} 
+                onClick={() => handleStudentClick(student.id)}
+              />
             ))
           ) : (
             <div style={{
@@ -383,6 +394,16 @@ const Students = () => {
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
         onStudentAdded={loadStudents}
+      />
+
+      {/* Modal de detalle del alumno */}
+      <StudentDetailModal
+        student={selectedStudent}
+        isOpen={detailModalOpen}
+        onClose={() => {
+          setDetailModalOpen(false);
+          setSelectedStudent(null);
+        }}
       />
     </div>
   );

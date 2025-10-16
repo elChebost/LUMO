@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const StudentRow = ({ student, loading = false }) => {
+const StudentRow = ({ student, loading = false, onClick }) => {
   const navigate = useNavigate();
   const [isMobile, setIsMobile] = useState(false);
 
@@ -58,7 +58,9 @@ const StudentRow = ({ student, loading = false }) => {
   const missionsCompleted = missions.length;
 
   const handleClick = () => {
-    if (id) {
+    if (onClick) {
+      onClick();
+    } else if (id) {
       navigate(`/students/${id}`);
     }
   };
@@ -90,7 +92,7 @@ const StudentRow = ({ student, loading = false }) => {
           marginBottom: '0.5rem'
         }}>
           <img
-            src="/avatar.png"
+            src={student?.profile?.avatar || "/src/assets/avatar.png"}
             alt={name}
             style={{
               width: '40px',
@@ -182,7 +184,7 @@ const StudentRow = ({ student, loading = false }) => {
         gap: '0.75rem'
       }}>
         <img
-          src="/avatar.png"
+          src={student?.profile?.avatar || "/src/assets/avatar.png"}
           alt={name}
           style={{
             width: '40px',

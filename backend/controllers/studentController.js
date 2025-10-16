@@ -19,10 +19,10 @@ const validateLevel = (level) => {
 // Crear estudiante
 export const createStudentHandler = async (req, res) => {
   try {
-    const { name, email, age, grade, level, schedule, schoolId, teacherId, classroomId } = req.body;
+    const { name, email, password, age, level, xp, schedule, schoolId, teacherId, classroomId } = req.body;
 
-    if (!name || !email || !age || !grade || !schedule || !schoolId || !teacherId || !classroomId) {
-      return res.status(400).json({ message: 'Faltan datos obligatorios.' });
+    if (!name || !email || !age || !schedule || !schoolId || !teacherId || !classroomId) {
+      return res.status(400).json({ message: 'Faltan datos obligatorios: name, email, age, schedule, schoolId, teacherId, classroomId' });
     }
 
     // Validar nivel si se proporciona
@@ -30,11 +30,29 @@ export const createStudentHandler = async (req, res) => {
       return res.status(400).json({ message: 'El nivel debe ser un número entre 1 y 5.' });
     }
 
-    const student = await createStudent({ name, email, age, grade, level, schedule, schoolId, teacherId, classroomId });
-    res.status(201).json(student);
+    const student = await createStudent({ 
+      name, 
+      email, 
+      password: password || '123456', 
+      age, 
+      level: level || 1, 
+      xp: xp || 0, 
+      schedule, 
+      schoolId, 
+      teacherId, 
+      classroomId 
+    });
+    
+    res.status(201).json({ 
+      message: 'Estudiante creado exitosamente', 
+      student 
+    });
   } catch (error) {
     console.error('Error al crear estudiante:', error);
-    res.status(500).json({ message: 'Error interno del servidor.' });
+    res.status(500).json({ 
+      message: 'Error al crear estudiante', 
+      error: error.message 
+    });
   }
 };
 

@@ -21,7 +21,6 @@ model School {
 model Classroom {
   id         Int        @id @default(autoincrement())
   name       String
-  grade      String
   schoolId   Int
   school     School     @relation(fields: [schoolId], references: [id])
   teacherId  Int
@@ -34,7 +33,6 @@ model Teacher {
   name        String
   email       String           @unique
   subjects    String
-  grades      String
   schedule    String
   role        String
   schoolId    Int
@@ -49,9 +47,10 @@ model Student {
   id           Int              @id @default(autoincrement())
   name         String
   email        String           @unique
+  password     String
   age          Int
-  grade        String
   level        Int              @default(1)
+  xp           Int              @default(0)
   schedule     String
   schoolId     Int
   school       School           @relation(fields: [schoolId], references: [id])
@@ -81,14 +80,17 @@ model Subject {
 }
 
 model Mission {
-  id          Int       @id @default(autoincrement())
-  title       String
-  description String
-  status      String
-  grade       String
-  dueDate     DateTime?
-  teacherId   Int
-  teacher     Teacher   @relation(fields: [teacherId], references: [id])
+  id               Int       @id @default(autoincrement())
+  title            String
+  description      String
+  status           String    // "Activa", "Borrador"
+  activationDate   DateTime?
+  dueDate          DateTime?
+  dueTime          String?   // Hora de entrega
+  teacherId        Int
+  teacher          Teacher   @relation(fields: [teacherId], references: [id])
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
 }
 
 model StudentProfile {

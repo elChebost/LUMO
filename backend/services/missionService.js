@@ -1,14 +1,25 @@
 import prisma from '../config/db.js';
 
 // Crear una mision
-export const createMission = async ({ title, description, status, grade, teacherId }) => {
+export const createMission = async ({ title, description, status, activationDate, dueDate, dueTime, teacherId }) => {
   try {
+    // Verificar que el profesor existe
+    const teacher = await prisma.teacher.findUnique({
+      where: { id: Number(teacherId) }
+    });
+    
+    if (!teacher) {
+      throw new Error('Profesor no encontrado. Debe crear un profesor primero.');
+    }
+
     return await prisma.mission.create({
       data: {
         title,
         description,
-        status,
-        grade,
+        status: status || 'Borrador',
+        activationDate: activationDate ? new Date(activationDate) : null,
+        dueDate: dueDate ? new Date(dueDate) : null,
+        dueTime: dueTime || null,
         teacher: { connect: { id: Number(teacherId) } },
       },
     });
@@ -20,7 +31,14 @@ export const createMission = async ({ title, description, status, grade, teacher
 // Obtener todas las misiones
 export const getMissions = async () => {
   try {
-    return await prisma.mission.findMany();
+    return await prisma.mission.findMany({
+      include: {
+        teacher: true
+      },
+      orderBy: {
+        createdAt: 'desc'
+      }
+    });
   } catch (error) {
     throw error; 
   }

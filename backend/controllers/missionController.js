@@ -42,11 +42,18 @@ export const createMissionHandler = async (req, res) => {
   }
 };
 
-// Listar todas
+// Listar todas (con narrativas parseadas)
 export const getMissionsHandler = async (req, res) => {
   try {
     const missions = await getMissions();
-    res.json(missions);
+    
+    // Parsear las narrativas JSON
+    const missionsWithNarratives = missions.map(mission => ({
+      ...mission,
+      narrative: mission.narrative ? JSON.parse(mission.narrative) : null,
+    }));
+    
+    res.json(missionsWithNarratives);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -108,7 +115,7 @@ export const getTotalActiveMissionsHandler = async (req, res) => {
   }
 };
 
-// Obtener por ID
+// Obtener por ID (con narrativas parseadas)
 export const getMissionByIdHandler = async (req, res) => {
   try {
     const { id } = req.params;
@@ -118,7 +125,13 @@ export const getMissionByIdHandler = async (req, res) => {
       return res.status(404).json({ message: 'Misión no encontrada' });
     }
 
-    res.json(mission);
+    // Parsear la narrativa JSON
+    const missionWithNarrative = {
+      ...mission,
+      narrative: mission.narrative ? JSON.parse(mission.narrative) : null,
+    };
+
+    res.json(missionWithNarrative);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

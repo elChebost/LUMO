@@ -10,17 +10,14 @@ const API_URL = 'http://localhost:3000/api';
 const Students = () => {
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterStatus, setFilterStatus] = useState('all'); // all, submitted, pending
-  const [sortBy, setSortBy] = useState('name-asc'); // name-asc, name-desc, activity-recent, activity-old
+  const [searchTerm, setSearchTerm] = useState(''); // Búsqueda por CI
+  const [filterLetter, setFilterLetter] = useState(''); // Filtro A-Z
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [detailModalOpen, setDetailModalOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    loadStudents();
-    
     // Detectar móvil
     const checkMobile = () => {
       setIsMobile(window.innerWidth <= 768);
@@ -33,10 +30,23 @@ const Students = () => {
   const loadStudents = async () => {
     try {
       setLoading(true);
-      // ✅ Cambiado de /users a /students para usar el endpoint correcto
-      const response = await fetch(`${API_URL}/students`);
+      // ✅ Usar el nuevo endpoint con filtros query params
+      let url = `${API_URL}/students`;
+      const params = new URLSearchParams();
+      
+      if (filterLetter) {
+        params.append('filter', filterLetter);
+      }
+      if (searchTerm) {
+        params.append('search', searchTerm); // Búsqueda por CI
+      }
+      
+      if (params.toString()) {
+        url += `?${params.toString()}`;
+      }
+      
+      const response = await fetch(url);
       const data = await response.json();
-      // ✅ Ya no necesitamos filtrar por rol, todos son estudiantes
       setStudents(data);
     } catch (error) {
       console.error('Error cargando alumnos:', error);
@@ -45,32 +55,15 @@ const Students = () => {
     }
   };
 
-  // Función de ordenamiento
-  const getSortedStudents = (studentsList) => {
-    const sorted = [...studentsList];
-    
-    switch (sortBy) {
-      case 'name-asc':
-        return sorted.sort((a, b) => a.name.localeCompare(b.name));
-      case 'name-desc':
-        return sorted.sort((a, b) => b.name.localeCompare(a.name));
-      case 'activity-recent':
-        return sorted.sort((a, b) => new Date(b.lastActivity) - new Date(a.lastActivity));
-      case 'activity-old':
-        return sorted.sort((a, b) => new Date(a.lastActivity) - new Date(b.lastActivity));
-      default:
-        return sorted;
-    }
-  };
+  // Recargar cuando cambien los filtros
+  useEffect(() => {
+    loadStudents();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filterLetter, searchTerm]);
 
-  // Filtrar y ordenar estudiantes
-  const filteredAndSortedStudents = getSortedStudents(
-    students.filter(student => {
-      const matchesSearch = student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           student.email.toLowerCase().includes(searchTerm.toLowerCase());
-      
-      return matchesSearch;
-    })
+  // Estudiantes ordenados alfabéticamente (A-Z por defecto)
+  const filteredAndSortedStudents = [...students].sort((a, b) => 
+    a.name.localeCompare(b.name)
   );
 
   const handleStudentClick = async (studentId) => {
@@ -137,7 +130,7 @@ const Students = () => {
           />
           <input
             type="text"
-            placeholder="Buscar por nombre o email..."
+            placeholder="Buscar por CI (ej: 1234567-8)..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             style={{
@@ -162,120 +155,34 @@ const Students = () => {
           />
         </div>
 
-        {/* Filtros en fila para móvil */}
-        {isMobile ? (
-          <div style={{ display: 'flex', gap: '0.75rem', width: '100%' }}>
-            <div style={{ position: 'relative', flex: 1 }}>
-              <select
-                value={filterStatus}
-                onChange={(e) => setFilterStatus(e.target.value)}
-                style={{
-                  height: '44px',
-                  width: '100%',
-                  padding: '0 2.5rem 0 1rem',
-                  border: '1px solid var(--color-border)',
-                  borderRadius: 'var(--radius-md)',
-                  fontSize: '0.875rem',
-                  backgroundColor: 'var(--color-card-bg)',
-                  color: 'var(--color-text-primary)',
-                  cursor: 'pointer',
-                  appearance: 'none',
-                  backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23757575' d='M6 9L1 4h10z'/%3E%3C/svg%3E")`,
-                  backgroundRepeat: 'no-repeat',
-                  backgroundPosition: 'right 1rem center'
-                }}
-              >
-                <option value="all">Todos</option>
-                <option value="submitted">Entregados</option>
-                <option value="pending">Sin entregar</option>
-              </select>
-            </div>
-
-            <div style={{ position: 'relative', flex: 1 }}>
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                style={{
-                  height: '44px',
-                  width: '100%',
-                  padding: '0 2.5rem 0 1rem',
-                  border: '1px solid var(--color-border)',
-                  borderRadius: 'var(--radius-md)',
-                  fontSize: '0.875rem',
-                  backgroundColor: 'var(--color-card-bg)',
-                  color: 'var(--color-text-primary)',
-                  cursor: 'pointer',
-                  appearance: 'none',
-                  backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23757575' d='M6 9L1 4h10z'/%3E%3C/svg%3E")`,
-                  backgroundRepeat: 'no-repeat',
-                  backgroundPosition: 'right 1rem center'
-                }}
-              >
-                <option value="name-asc">A - Z</option>
-                <option value="name-desc">Z - A</option>
-                <option value="activity-recent">Reciente</option>
-                <option value="activity-old">Antigua</option>
-              </select>
-            </div>
-          </div>
-        ) : (
-          <>
-            {/* Filtro por estado de entrega */}
-            <div style={{ position: 'relative' }}>
-              <select
-                value={filterStatus}
-                onChange={(e) => setFilterStatus(e.target.value)}
-                style={{
-                  height: '44px',
-                  padding: '0 2.5rem 0 1rem',
-                  border: '1px solid var(--color-border)',
-                  borderRadius: 'var(--radius-md)',
-                  fontSize: '0.875rem',
-                  backgroundColor: 'var(--color-card-bg)',
-                  color: 'var(--color-text-primary)',
-                  cursor: 'pointer',
-                  appearance: 'none',
-                  backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23757575' d='M6 9L1 4h10z'/%3E%3C/svg%3E")`,
-                  backgroundRepeat: 'no-repeat',
-                  backgroundPosition: 'right 1rem center',
-                  minWidth: '150px'
-                }}
-              >
-                <option value="all">Todos</option>
-                <option value="submitted">Entregados</option>
-                <option value="pending">Sin entregar</option>
-              </select>
-            </div>
-
-            {/* Ordenar por */}
-            <div style={{ position: 'relative' }}>
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                style={{
-                  height: '44px',
-                  padding: '0 2.5rem 0 1rem',
-                  border: '1px solid var(--color-border)',
-                  borderRadius: 'var(--radius-md)',
-                  fontSize: '0.875rem',
-                  backgroundColor: 'var(--color-card-bg)',
-                  color: 'var(--color-text-primary)',
-                  cursor: 'pointer',
-                  appearance: 'none',
-                  backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23757575' d='M6 9L1 4h10z'/%3E%3C/svg%3E")`,
-                  backgroundRepeat: 'no-repeat',
-                  backgroundPosition: 'right 1rem center',
-                  minWidth: '180px'
-                }}
-              >
-                <option value="name-asc">A - Z</option>
-                <option value="name-desc">Z - A</option>
-                <option value="activity-recent">Actividad reciente</option>
-                <option value="activity-old">Actividad antigua</option>
-              </select>
-            </div>
-          </>
-        )}
+        {/* Filtro A-Z */}
+        <div style={{ position: 'relative' }}>
+          <select
+            value={filterLetter}
+            onChange={(e) => setFilterLetter(e.target.value)}
+            style={{
+              height: '44px',
+              padding: '0 2.5rem 0 var(--spacing-md)',
+              border: '1px solid var(--border-color)',
+              borderRadius: 'var(--radius-md)',
+              fontSize: 'var(--text-sm)',
+              backgroundColor: 'var(--panel-bg)',
+              color: 'var(--text-primary)',
+              cursor: 'pointer',
+              appearance: 'none',
+              backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23757575' d='M6 9L1 4h10z'/%3E%3C/svg%3E")`,
+              backgroundRepeat: 'no-repeat',
+              backgroundPosition: 'right 1rem center',
+              minWidth: isMobile ? '100%' : '150px',
+              width: isMobile ? '100%' : 'auto'
+            }}
+          >
+            <option value="">Todas las letras</option>
+            {Array.from('ABCDEFGHIJKLMNOPQRSTUVWXYZ').map(letter => (
+              <option key={letter} value={letter}>{letter}</option>
+            ))}
+          </select>
+        </div>
 
         {/* Botón Agregar Alumno */}
         <button
@@ -326,20 +233,21 @@ const Students = () => {
         {!isMobile && (
           <div style={{
             display: 'grid',
-            gridTemplateColumns: '2fr 1.5fr 1fr 1fr 0.5fr',
-            padding: '1rem 1.5rem',
-            backgroundColor: 'var(--color-bg)',
-            borderBottom: '1px solid var(--color-border)',
-            fontSize: '0.75rem',
+            gridTemplateColumns: '2fr 1.5fr 1fr 1fr 1fr 0.5fr',
+            padding: 'var(--spacing-md) var(--spacing-xl)',
+            backgroundColor: 'var(--bg-page)',
+            borderBottom: '1px solid var(--border-color)',
+            fontSize: 'var(--text-xs)',
             fontWeight: 600,
-            color: 'var(--color-text-secondary)',
+            color: 'var(--text-muted)',
             textTransform: 'uppercase',
             letterSpacing: '0.05em'
           }}>
             <div>Alumno</div>
             <div>Email</div>
+            <div>Estado</div>
+            <div>Progreso</div>
             <div>Nivel</div>
-            <div>XP</div>
             <div></div>
           </div>
         )}
@@ -369,10 +277,10 @@ const Students = () => {
             <div style={{
               padding: isMobile ? '2rem 1rem' : '3rem',
               textAlign: 'center',
-              color: 'var(--color-text-secondary)',
-              fontSize: isMobile ? '0.8rem' : '0.875rem'
+              color: 'var(--text-muted)',
+              fontSize: isMobile ? 'var(--text-xs)' : 'var(--text-sm)'
             }}>
-              {searchTerm || filterStatus !== 'all' 
+              {searchTerm || filterLetter 
                 ? 'No se encontraron alumnos con los filtros aplicados' 
                 : 'No hay alumnos registrados aún'}
             </div>

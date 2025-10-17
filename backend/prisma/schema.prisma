@@ -44,23 +44,34 @@ model Teacher {
 }
 
 model Student {
-  id           Int              @id @default(autoincrement())
-  name         String
-  email        String           @unique
-  password     String
-  age          Int
-  level        Int              @default(1)
-  xp           Int              @default(0)
-  schedule     String
-  schoolId     Int
-  school       School           @relation(fields: [schoolId], references: [id])
-  teacherId    Int
-  teacher      Teacher          @relation(fields: [teacherId], references: [id])
-  classroomId  Int
-  classroom    Classroom        @relation(fields: [classroomId], references: [id])
-  skillTree    SkillTree?
-  subject      Subject?
-  profile      StudentProfile?
+  id                Int                      @id @default(autoincrement())
+  name              String
+  email             String                   @unique
+  password          String
+  ci                String?                  @unique // ✅ Cédula de identidad
+  age               Int
+  level             Int                      @default(1)
+  xp                Int                      @default(0)
+  schedule          String
+  schoolId          Int
+  school            School                   @relation(fields: [schoolId], references: [id])
+  teacherId         Int
+  teacher           Teacher                  @relation(fields: [teacherId], references: [id])
+  classroomId       Int
+  classroom         Classroom                @relation(fields: [classroomId], references: [id])
+  
+  // ✅ Nuevas estadísticas personales
+  statLogic         Int                      @default(0)
+  statCreativity    Int                      @default(0)
+  statWriting       Int                      @default(0)
+  avgTimeMinutes    Int                      @default(0)
+  missionsCompleted Int                      @default(0)
+  isOnline          Boolean                  @default(false)
+  
+  skillTree         SkillTree?
+  subject           Subject?
+  profile           StudentProfile?
+  missionProgress   StudentMissionProgress[]
 }
 
 model SkillTree {
@@ -80,17 +91,21 @@ model Subject {
 }
 
 model Mission {
-  id               Int       @id @default(autoincrement())
+  id               Int                      @id @default(autoincrement())
   title            String
-  description      String
-  status           String    // "Activa", "Borrador"
+  summary          String?                  // ✅ Resumen corto para cards
+  description      String                   // Descripción completa (legacy)
+  previewImage     String?                  // ✅ URL de imagen de preview
+  narrative        String?                  // ✅ JSON con 3 roles narrativos
+  status           String                   // "active", "inactive"
   activationDate   DateTime?
   dueDate          DateTime?
-  dueTime          String?   // Hora de entrega
+  dueTime          String?
   teacherId        Int
-  teacher          Teacher   @relation(fields: [teacherId], references: [id])
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
+  teacher          Teacher                  @relation(fields: [teacherId], references: [id])
+  createdAt        DateTime                 @default(now())
+  updatedAt        DateTime                 @updatedAt
+  studentProgress  StudentMissionProgress[]
 }
 
 model StudentProfile {
@@ -126,4 +141,34 @@ model Contact {
   message   String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+// ✅ Nueva tabla para progreso de misiones por estudiante
+model StudentMissionProgress {
+  id              Int      @id @default(autoincrement())
+  studentId       Int
+  student         Student  @relation(fields: [studentId], references: [id])
+  missionId       Int
+  mission         Mission  @relation(fields: [missionId], references: [id])
+  tasksCompleted  Int      @default(0)
+  selectedRoleId  Int?     // ID del rol seleccionado (1-3)
+  status          String   @default("pending") // pending, in_progress, completed
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@unique([studentId, missionId])
+}
+
+// ✅ Nueva tabla para notificaciones
+model Notification {
+  id              Int      @id @default(autoincrement())
+  title           String
+  body            String
+  senderId        Int
+  targetStudentId Int?     // null = todos
+  targetGroup     String?  // nombre del grupo (opcional)
+  read            Boolean  @default(false)
+  metadata        String?  // JSON con info adicional
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }

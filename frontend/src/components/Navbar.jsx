@@ -102,15 +102,15 @@ const Navbar = () => {
       justifyContent: 'space-between',
       width: '100%',
       height: '100%',
-      padding: '0 2rem',
-      gap: '2rem'
+      padding: '0 var(--spacing-2xl)',
+      gap: 'var(--spacing-2xl)'
     }}>
       {/* Título y subtítulo de la página */}
       <div style={{ flex: '0 0 auto' }}>
         <h2 style={{
-          fontSize: '1.25rem',
+          fontSize: 'var(--text-xl)',
           fontWeight: 700,
-          color: 'var(--color-text-primary)',
+          color: 'var(--text-primary)',
           margin: 0,
           lineHeight: 1.2
         }}>
@@ -118,8 +118,8 @@ const Navbar = () => {
         </h2>
         {currentPage.subtitle && (
           <p style={{
-            fontSize: '0.75rem',
-            color: 'var(--color-text-secondary)',
+            fontSize: 'var(--text-xs)',
+            color: 'var(--text-muted)',
             margin: '0.125rem 0 0 0',
             lineHeight: 1.4
           }}>
@@ -143,10 +143,10 @@ const Navbar = () => {
             size={18} 
             style={{
               position: 'absolute',
-              left: '0.875rem',
+              left: 'var(--spacing-sm)',
               top: '50%',
               transform: 'translateY(-50%)',
-              color: 'var(--color-text-secondary)',
+              color: 'var(--text-muted)',
               pointerEvents: 'none',
               zIndex: 2
             }}
@@ -160,15 +160,15 @@ const Navbar = () => {
             style={{
               width: '100%',
               height: '40px',
-              padding: '0 1rem 0 2.75rem',
-              border: '1px solid var(--color-border)',
+              padding: '0 var(--spacing-md) 0 2.75rem',
+              border: '1px solid var(--border-color)',
               borderRadius: 'var(--radius-md)',
-              fontSize: '0.875rem',
-              backgroundColor: 'var(--color-card-bg)',
-              color: 'var(--color-text-primary)',
-              transition: 'all var(--transition-fast)',
-              borderColor: searchFocused ? 'var(--color-primary)' : 'var(--color-border)',
-              boxShadow: searchFocused ? '0 0 0 3px rgba(46, 125, 50, 0.1)' : 'none'
+              fontSize: 'var(--text-sm)',
+              backgroundColor: 'var(--panel-bg)',
+              color: 'var(--text-primary)',
+              transition: 'all 0.2s ease',
+              borderColor: searchFocused ? 'var(--primary)' : 'var(--border-color)',
+              boxShadow: searchFocused ? '0 0 0 3px rgba(29, 215, 91, 0.1)' : 'none'
             }}
           />
 
@@ -176,13 +176,13 @@ const Navbar = () => {
           {searchFocused && searchResults.length > 0 && (
             <div className="fade-in" style={{
               position: 'absolute',
-              top: 'calc(100% + 0.5rem)',
+              top: 'calc(100% + var(--spacing-sm))',
               left: 0,
               right: 0,
-              backgroundColor: 'var(--color-card-bg)',
-              border: '1px solid var(--color-border)',
+              backgroundColor: 'var(--panel-bg)',
+              border: '1px solid var(--border-color)',
               borderRadius: 'var(--radius-lg)',
-              boxShadow: 'var(--shadow-lg)',
+              boxShadow: 'var(--shadow-md)',
               maxHeight: '300px',
               overflowY: 'auto',
               zIndex: 50
@@ -192,35 +192,37 @@ const Navbar = () => {
                   key={`${result.type}-${result.id}`}
                   onClick={() => handleSearchSelect(result)}
                   style={{
-                    padding: '0.75rem 1rem',
-                    cursor: 'pointer',
-                    borderBottom: '1px solid var(--color-border)',
-                    transition: 'background-color var(--transition-fast)',
+                    padding: 'var(--spacing-md) var(--spacing-md)',
+                    cursor: result.type === 'info' ? 'default' : 'pointer',
+                    borderBottom: '1px solid var(--border-color)',
+                    transition: 'background-color 0.15s ease',
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '0.75rem'
+                    gap: 'var(--spacing-md)'
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = 'var(--color-bg)';
+                    if (result.type !== 'info') {
+                      e.currentTarget.style.backgroundColor = 'var(--bg-page)';
+                    }
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.backgroundColor = 'transparent';
                   }}
                 >
-                  {result.type === 'student' ? <FiUser size={18} color="var(--color-primary)" /> : <FiClipboard size={18} color="var(--color-primary)" />}
+                  {result.type === 'student' ? <FiUser size={18} color="var(--primary)" /> : <FiClipboard size={18} color="var(--primary)" />}
                   <div style={{ flex: 1 }}>
                     <p style={{
                       margin: 0,
-                      fontSize: '0.875rem',
+                      fontSize: 'var(--text-sm)',
                       fontWeight: 600,
-                      color: 'var(--color-text-primary)'
+                      color: 'var(--text-primary)'
                     }}>
                       {result.title}
                     </p>
                     <p style={{
                       margin: '0.125rem 0 0 0',
-                      fontSize: '0.75rem',
-                      color: 'var(--color-text-secondary)'
+                      fontSize: 'var(--text-xs)',
+                      color: 'var(--text-muted)'
                     }}>
                       {result.subtitle}
                     </p>
@@ -237,7 +239,7 @@ const Navbar = () => {
         flex: '0 0 auto',
         display: 'flex',
         alignItems: 'center',
-        gap: '1rem'
+        gap: 'var(--spacing-md)'
       }}>
         <div ref={menuRef} style={{ position: 'relative' }}>
           <div
@@ -245,14 +247,14 @@ const Navbar = () => {
             style={{
               display: 'flex',
               alignItems: 'center',
-              gap: '0.5rem',
+              gap: 'var(--spacing-sm)',
               cursor: 'pointer',
-              padding: '0.25rem',
+              padding: 'var(--spacing-xs)',
               borderRadius: 'var(--radius-md)',
-              transition: 'background-color var(--transition-fast)'
+              transition: 'background-color 0.15s ease'
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = 'var(--color-bg)';
+              e.currentTarget.style.backgroundColor = 'var(--bg-page)';
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.backgroundColor = 'transparent';
@@ -265,15 +267,15 @@ const Navbar = () => {
                 width: '32px',
                 height: '32px',
                 borderRadius: '50%',
-                border: '2px solid var(--color-primary)',
+                border: '2px solid var(--primary)',
                 objectFit: 'cover'
               }}
             />
             <FiChevronDown 
               size={16} 
               style={{ 
-                color: 'var(--color-text-secondary)',
-                transition: 'transform var(--transition-fast)',
+                color: 'var(--text-muted)',
+                transition: 'transform 0.15s ease',
                 transform: menuOpen ? 'rotate(180deg)' : 'rotate(0deg)'
               }} 
             />
@@ -284,31 +286,31 @@ const Navbar = () => {
             <div className="fade-in" style={{
               position: 'absolute',
               right: 0,
-              top: 'calc(100% + 0.5rem)',
+              top: 'calc(100% + var(--spacing-sm))',
               minWidth: '200px',
-              backgroundColor: 'var(--color-card-bg)',
-              border: '1px solid var(--color-border)',
+              backgroundColor: 'var(--panel-bg)',
+              border: '1px solid var(--border-color)',
               borderRadius: 'var(--radius-lg)',
-              boxShadow: 'var(--shadow-lg)',
-              padding: '0.5rem',
+              boxShadow: 'var(--shadow-md)',
+              padding: 'var(--spacing-sm)',
               zIndex: 50
             }}>
               <div style={{
-                padding: '0.75rem 1rem',
-                borderBottom: '1px solid var(--color-border)',
-                marginBottom: '0.5rem'
+                padding: 'var(--spacing-md) var(--spacing-md)',
+                borderBottom: '1px solid var(--border-color)',
+                marginBottom: 'var(--spacing-sm)'
               }}>
                 <p style={{
-                  fontSize: '0.875rem',
+                  fontSize: 'var(--text-sm)',
                   fontWeight: 600,
-                  color: 'var(--color-text-primary)',
+                  color: 'var(--text-primary)',
                   margin: 0
                 }}>
                   {user?.name || 'Usuario'}
                 </p>
                 <p style={{
-                  fontSize: '0.75rem',
-                  color: 'var(--color-text-secondary)',
+                  fontSize: 'var(--text-xs)',
+                  color: 'var(--text-muted)',
                   margin: '0.125rem 0 0 0'
                 }}>
                   {user?.email || 'usuario@email.com'}
@@ -323,17 +325,17 @@ const Navbar = () => {
                 style={{
                   width: '100%',
                   textAlign: 'left',
-                  padding: '0.625rem 1rem',
-                  fontSize: '0.875rem',
-                  color: 'var(--color-text-primary)',
+                  padding: 'var(--spacing-sm) var(--spacing-md)',
+                  fontSize: 'var(--text-sm)',
+                  color: 'var(--text-primary)',
                   backgroundColor: 'transparent',
                   border: 'none',
                   borderRadius: 'var(--radius-sm)',
                   cursor: 'pointer',
-                  transition: 'background-color var(--transition-fast)'
+                  transition: 'background-color 0.15s ease'
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = 'var(--color-bg)';
+                  e.currentTarget.style.backgroundColor = 'var(--bg-page)';
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.backgroundColor = 'transparent';
@@ -344,8 +346,8 @@ const Navbar = () => {
 
               <div style={{
                 height: '1px',
-                backgroundColor: 'var(--color-border)',
-                margin: '0.5rem 0'
+                backgroundColor: 'var(--border-color)',
+                margin: 'var(--spacing-sm) 0'
               }} />
 
               <button
@@ -358,15 +360,15 @@ const Navbar = () => {
                 style={{
                   width: '100%',
                   textAlign: 'left',
-                  padding: '0.625rem 1rem',
-                  fontSize: '0.875rem',
-                  color: 'var(--color-danger)',
+                  padding: 'var(--spacing-sm) var(--spacing-md)',
+                  fontSize: 'var(--text-sm)',
+                  color: 'var(--danger)',
                   backgroundColor: 'transparent',
                   border: 'none',
                   borderRadius: 'var(--radius-sm)',
                   cursor: 'pointer',
                   fontWeight: 600,
-                  transition: 'background-color var(--transition-fast)'
+                  transition: 'background-color 0.15s ease'
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.backgroundColor = 'rgba(211, 47, 47, 0.1)';

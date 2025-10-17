@@ -1,16 +1,26 @@
-import React, { useState, useEffect } from 'react';
-import { FiX, FiAlertCircle } from 'react-icons/fi';
+import React, { useState } from 'react';
+import { FiX, FiAlertCircle, FiImage, FiAward } from 'react-icons/fi';
 
 // ⚠️ Cambiado de 4000 a 3000 para coincidir con el backend
 const API_URL = 'http://localhost:3000';
 
 const MissionFormModal = ({ onClose, onMissionCreated }) => {
-  const [students, setStudents] = useState([]);
   const [formData, setFormData] = useState({
     title: '',
-    description: '',
+    summary: '',
+    previewImage: '',
     grade: '1° Primaria',
-    status: 'activa'
+    status: 'activa',
+    // Roles
+    logicTitle: '',
+    logicStory: '',
+    logicReward: 10,
+    creativityTitle: '',
+    creativityStory: '',
+    creativityReward: 10,
+    writingTitle: '',
+    writingStory: '',
+    writingReward: 10
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -41,6 +51,19 @@ const MissionFormModal = ({ onClose, onMissionCreated }) => {
     setLoading(true);
 
     try {
+      // Construir el objeto narrative con los 3 roles
+      const narrative = {
+        logicTitle: formData.logicTitle,
+        logicStory: formData.logicStory,
+        logicReward: formData.logicReward,
+        creativityTitle: formData.creativityTitle,
+        creativityStory: formData.creativityStory,
+        creativityReward: formData.creativityReward,
+        writingTitle: formData.writingTitle,
+        writingStory: formData.writingStory,
+        writingReward: formData.writingReward
+      };
+
       // ✅ Adaptado al endpoint /api/missions con mapeo de status
       const response = await fetch(`${API_URL}/api/missions`, {
         method: 'POST',
@@ -49,9 +72,12 @@ const MissionFormModal = ({ onClose, onMissionCreated }) => {
         },
         body: JSON.stringify({
           title: formData.title,
-          description: formData.description,
+          summary: formData.summary,
+          previewImage: formData.previewImage || null,
+          description: formData.summary, // Backend espera description
           grade: formData.grade,
-          status: formData.status === 'activa' ? 'active' : 'inactive', // ✅ Mapear status
+          status: formData.status === 'activa' ? 'active' : 'inactive',
+          narrative: JSON.stringify(narrative),
           teacherId: 1  // ⚠️ Valor temporal - cambiar cuando se implemente auth
         }),
       });
@@ -69,7 +95,7 @@ const MissionFormModal = ({ onClose, onMissionCreated }) => {
         onMissionCreated();
       }
       onClose();
-    } catch (err) {
+    } catch {
       setError('Error de conexión. Por favor, intenta de nuevo.');
       setLoading(false);
     }
@@ -96,57 +122,58 @@ const MissionFormModal = ({ onClose, onMissionCreated }) => {
 
   const styles = {
     form: {
-      padding: '1.5rem',
+      padding: 'var(--spacing-lg)',
       overflowY: 'auto',
       maxHeight: 'calc(90vh - 200px)'
     },
     errorBox: {
       display: 'flex',
       alignItems: 'center',
-      gap: '0.5rem',
-      padding: '0.75rem 1rem',
+      gap: 'var(--spacing-sm)',
+      padding: 'var(--spacing-sm) var(--spacing-md)',
       backgroundColor: '#fee',
       border: '1px solid #fcc',
       borderRadius: 'var(--radius-md)',
-      marginBottom: '1rem'
+      marginBottom: 'var(--spacing-md)'
     },
     errorIcon: {
       color: '#c00',
       flexShrink: 0
     },
     formGroup: {
-      marginBottom: '1.25rem'
+      marginBottom: 'var(--spacing-md)'
     },
     formRow: {
       display: 'grid',
-      gridTemplateColumns: '1fr 1fr 1fr',
-      gap: '1rem',
-      marginBottom: '1.25rem'
+      gridTemplateColumns: '1fr 1fr',
+      gap: 'var(--spacing-md)',
+      marginBottom: 'var(--spacing-md)'
     },
     label: {
       display: 'block',
-      marginBottom: '0.5rem',
-      fontSize: '0.875rem',
+      marginBottom: 'var(--spacing-xs)',
+      fontSize: 'var(--text-sm)',
       fontWeight: 600,
-      color: 'var(--color-text-primary)'
+      color: 'var(--text-primary)'
     },
     required: {
       color: '#c00'
     },
     input: {
       width: '100%',
-      padding: '0.625rem 0.875rem',
-      fontSize: '0.875rem',
+      padding: 'var(--spacing-sm) var(--spacing-md)',
+      fontSize: 'var(--text-sm)',
       borderRadius: 'var(--radius-md)',
-      border: '1px solid var(--color-border)',
-      backgroundColor: 'var(--color-bg)',
-      color: 'var(--color-text-primary)',
+      border: '1px solid var(--border-color)',
+      backgroundColor: 'var(--panel-bg)',
+      color: 'var(--text-primary)',
       outline: 'none',
-      transition: 'all var(--transition-fast)'
+      transition: 'all 0.2s ease'
     },
     textarea: {
       resize: 'vertical',
-      minHeight: '100px'
+      minHeight: '100px',
+      fontFamily: 'inherit'
     },
     checkboxGroup: {
       marginBottom: '0.75rem',
@@ -207,11 +234,11 @@ const MissionFormModal = ({ onClose, onMissionCreated }) => {
           onClick={(e) => e.stopPropagation()}
           className="fade-in"
           style={{
-            backgroundColor: 'var(--color-card-bg)',
+            backgroundColor: 'var(--panel-bg)',
             borderRadius: 'var(--radius-lg)',
-            boxShadow: 'var(--shadow-lg)',
+            boxShadow: 'var(--shadow-md)',
             width: '100%',
-            maxWidth: '600px',
+            maxWidth: '800px',
             maxHeight: '90vh',
             overflow: 'hidden',
             display: 'flex',
@@ -220,16 +247,16 @@ const MissionFormModal = ({ onClose, onMissionCreated }) => {
         >
           {/* Header */}
           <div style={{
-            padding: '1.5rem',
-            borderBottom: '1px solid var(--color-border)',
+            padding: 'var(--spacing-lg)',
+            borderBottom: '1px solid var(--border-color)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between'
           }}>
             <h2 style={{
-              fontSize: '1.25rem',
+              fontSize: 'var(--text-xl)',
               fontWeight: 600,
-              color: 'var(--color-text-primary)',
+              color: 'var(--text-primary)',
               margin: 0
             }}>
               Crear Nueva Misión
@@ -237,24 +264,24 @@ const MissionFormModal = ({ onClose, onMissionCreated }) => {
             <button
               onClick={onClose}
               style={{
-                padding: '0.5rem',
+                padding: 'var(--spacing-sm)',
                 backgroundColor: 'transparent',
                 border: 'none',
                 borderRadius: 'var(--radius-sm)',
                 cursor: 'pointer',
-                color: 'var(--color-text-secondary)',
-                transition: 'all var(--transition-fast)',
+                color: 'var(--text-secondary)',
+                transition: 'all 0.2s ease',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center'
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = 'var(--color-bg)';
-                e.currentTarget.style.color = 'var(--color-text-primary)';
+                e.currentTarget.style.backgroundColor = 'var(--bg-page)';
+                e.currentTarget.style.color = 'var(--text-primary)';
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.backgroundColor = 'transparent';
-                e.currentTarget.style.color = 'var(--color-text-secondary)';
+                e.currentTarget.style.color = 'var(--text-secondary)';
               }}
             >
               <FiX size={20} />
@@ -270,6 +297,7 @@ const MissionFormModal = ({ onClose, onMissionCreated }) => {
             </div>
           )}
 
+          {/* Información básica */}
           <div style={styles.formGroup}>
             <label style={styles.label}>
               Título <span style={styles.required}>*</span>
@@ -280,81 +308,309 @@ const MissionFormModal = ({ onClose, onMissionCreated }) => {
               value={formData.title}
               onChange={handleChange}
               style={styles.input}
-              placeholder="Ej: Ejercicios de matemáticas"
+              placeholder="Ej: La Aventura del Reino Matemático"
               required
             />
           </div>
 
           <div style={styles.formGroup}>
             <label style={styles.label}>
-              Descripción <span style={styles.required}>*</span>
+              Resumen <span style={styles.required}>*</span>
             </label>
             <textarea
-              name="description"
-              value={formData.description}
+              name="summary"
+              value={formData.summary}
               onChange={handleChange}
-              style={{ ...styles.input, ...styles.textarea }}
-              placeholder="Describe la misión..."
-              rows="4"
+              style={{ ...styles.input, ...styles.textarea, minHeight: '80px' }}
+              placeholder="Breve descripción de la misión..."
+              rows="3"
               required
             />
           </div>
 
           <div style={styles.formGroup}>
             <label style={styles.label}>
-              Grado <span style={styles.required}>*</span>
+              <FiImage size={14} style={{ marginRight: '0.25rem', verticalAlign: 'text-bottom' }} />
+              URL Imagen de Preview
             </label>
-            <select
-              name="grade"
-              value={formData.grade}
+            <input
+              type="url"
+              name="previewImage"
+              value={formData.previewImage}
               onChange={handleChange}
               style={styles.input}
-              required
-            >
-              <option value="1° Primaria">1° Primaria</option>
-              <option value="2° Primaria">2° Primaria</option>
-              <option value="3° Primaria">3° Primaria</option>
-              <option value="4° Primaria">4° Primaria</option>
-              <option value="5° Primaria">5° Primaria</option>
-              <option value="6° Primaria">6° Primaria</option>
-            </select>
+              placeholder="https://ejemplo.com/imagen.jpg"
+            />
+            {formData.previewImage && (
+              <div style={{ 
+                marginTop: 'var(--spacing-sm)', 
+                width: '100%', 
+                height: '100px', 
+                borderRadius: 'var(--radius-md)',
+                overflow: 'hidden',
+                backgroundColor: 'var(--bg-page)'
+              }}>
+                <img 
+                  src={formData.previewImage} 
+                  alt="Preview" 
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  onError={(e) => { e.target.style.display = 'none'; }}
+                />
+              </div>
+            )}
           </div>
 
-          <div style={styles.formGroup}>
-            <label style={styles.label}>Estado</label>
-            <select
-              name="status"
-              value={formData.status}
-              onChange={handleChange}
-              style={styles.input}
-            >
-              <option value="activa">Activa</option>
-              <option value="cerrada">Cerrada</option>
-            </select>
+          <div style={styles.formRow}>
+            <div>
+              <label style={styles.label}>
+                Grado <span style={styles.required}>*</span>
+              </label>
+              <select
+                name="grade"
+                value={formData.grade}
+                onChange={handleChange}
+                style={styles.input}
+                required
+              >
+                <option value="1° Primaria">1° Primaria</option>
+                <option value="2° Primaria">2° Primaria</option>
+                <option value="3° Primaria">3° Primaria</option>
+                <option value="4° Primaria">4° Primaria</option>
+                <option value="5° Primaria">5° Primaria</option>
+                <option value="6° Primaria">6° Primaria</option>
+              </select>
+            </div>
+
+            <div>
+              <label style={styles.label}>Estado</label>
+              <select
+                name="status"
+                value={formData.status}
+                onChange={handleChange}
+                style={styles.input}
+              >
+                <option value="activa">Activa</option>
+                <option value="cerrada">Cerrada</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Separador */}
+          <div style={{
+            width: '100%',
+            height: '1px',
+            backgroundColor: 'var(--border-color)',
+            margin: 'var(--spacing-xl) 0'
+          }} />
+
+          {/* Sección de roles */}
+          <h3 style={{
+            fontSize: 'var(--text-lg)',
+            fontWeight: 600,
+            color: 'var(--text-primary)',
+            margin: '0 0 var(--spacing-md) 0'
+          }}>
+            Roles de la Misión
+          </h3>
+
+          {/* Rol Lógica */}
+          <div style={{
+            padding: 'var(--spacing-md)',
+            backgroundColor: 'var(--bg-page)',
+            borderRadius: 'var(--radius-md)',
+            marginBottom: 'var(--spacing-md)'
+          }}>
+            <h4 style={{
+              fontSize: 'var(--text-base)',
+              fontWeight: 600,
+              color: 'var(--text-primary)',
+              margin: '0 0 var(--spacing-sm) 0',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 'var(--spacing-xs)'
+            }}>
+              <FiAward size={16} style={{ color: 'var(--primary)' }} />
+              Rol Lógica
+            </h4>
+            <div style={styles.formGroup}>
+              <label style={styles.label}>Título del Rol</label>
+              <input
+                type="text"
+                name="logicTitle"
+                value={formData.logicTitle}
+                onChange={handleChange}
+                style={styles.input}
+                placeholder="Ej: El Estratega"
+              />
+            </div>
+            <div style={styles.formGroup}>
+              <label style={styles.label}>Historia</label>
+              <textarea
+                name="logicStory"
+                value={formData.logicStory}
+                onChange={handleChange}
+                style={{ ...styles.input, ...styles.textarea }}
+                placeholder="Describe la historia de este rol..."
+                rows="3"
+              />
+            </div>
+            <div style={styles.formGroup}>
+              <label style={styles.label}>Recompensa (puntos)</label>
+              <input
+                type="number"
+                name="logicReward"
+                value={formData.logicReward}
+                onChange={handleChange}
+                style={styles.input}
+                min="0"
+                max="100"
+              />
+            </div>
+          </div>
+
+          {/* Rol Creatividad */}
+          <div style={{
+            padding: 'var(--spacing-md)',
+            backgroundColor: 'var(--bg-page)',
+            borderRadius: 'var(--radius-md)',
+            marginBottom: 'var(--spacing-md)'
+          }}>
+            <h4 style={{
+              fontSize: 'var(--text-base)',
+              fontWeight: 600,
+              color: 'var(--text-primary)',
+              margin: '0 0 var(--spacing-sm) 0',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 'var(--spacing-xs)'
+            }}>
+              <FiAward size={16} style={{ color: 'var(--primary)' }} />
+              Rol Creatividad
+            </h4>
+            <div style={styles.formGroup}>
+              <label style={styles.label}>Título del Rol</label>
+              <input
+                type="text"
+                name="creativityTitle"
+                value={formData.creativityTitle}
+                onChange={handleChange}
+                style={styles.input}
+                placeholder="Ej: El Artista"
+              />
+            </div>
+            <div style={styles.formGroup}>
+              <label style={styles.label}>Historia</label>
+              <textarea
+                name="creativityStory"
+                value={formData.creativityStory}
+                onChange={handleChange}
+                style={{ ...styles.input, ...styles.textarea }}
+                placeholder="Describe la historia de este rol..."
+                rows="3"
+              />
+            </div>
+            <div style={styles.formGroup}>
+              <label style={styles.label}>Recompensa (puntos)</label>
+              <input
+                type="number"
+                name="creativityReward"
+                value={formData.creativityReward}
+                onChange={handleChange}
+                style={styles.input}
+                min="0"
+                max="100"
+              />
+            </div>
+          </div>
+
+          {/* Rol Escritura */}
+          <div style={{
+            padding: 'var(--spacing-md)',
+            backgroundColor: 'var(--bg-page)',
+            borderRadius: 'var(--radius-md)',
+            marginBottom: 'var(--spacing-md)'
+          }}>
+            <h4 style={{
+              fontSize: 'var(--text-base)',
+              fontWeight: 600,
+              color: 'var(--text-primary)',
+              margin: '0 0 var(--spacing-sm) 0',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 'var(--spacing-xs)'
+            }}>
+              <FiAward size={16} style={{ color: 'var(--primary)' }} />
+              Rol Escritura
+            </h4>
+            <div style={styles.formGroup}>
+              <label style={styles.label}>Título del Rol</label>
+              <input
+                type="text"
+                name="writingTitle"
+                value={formData.writingTitle}
+                onChange={handleChange}
+                style={styles.input}
+                placeholder="Ej: El Cronista"
+              />
+            </div>
+            <div style={styles.formGroup}>
+              <label style={styles.label}>Historia</label>
+              <textarea
+                name="writingStory"
+                value={formData.writingStory}
+                onChange={handleChange}
+                style={{ ...styles.input, ...styles.textarea }}
+                placeholder="Describe la historia de este rol..."
+                rows="3"
+              />
+            </div>
+            <div style={styles.formGroup}>
+              <label style={styles.label}>Recompensa (puntos)</label>
+              <input
+                type="number"
+                name="writingReward"
+                value={formData.writingReward}
+                onChange={handleChange}
+                style={styles.input}
+                min="0"
+                max="100"
+              />
+            </div>
           </div>
 
           {/* Footer */}
           <div style={{
-            padding: '1.5rem 0 0 0',
-            borderTop: '1px solid var(--color-border)',
+            padding: 'var(--spacing-lg) 0 0 0',
+            borderTop: '1px solid var(--border-color)',
             display: 'flex',
-            gap: '1rem',
+            gap: 'var(--spacing-md)',
             justifyContent: 'flex-end'
           }}>
             <button
               type="button"
               onClick={onClose}
               disabled={loading}
-              className="btn-secondary"
               style={{
-                padding: '0.625rem 1.25rem',
+                padding: 'var(--spacing-sm) var(--spacing-lg)',
                 backgroundColor: 'transparent',
-                border: '1px solid var(--color-border)',
+                border: '1px solid var(--border-color)',
                 borderRadius: 'var(--radius-md)',
-                fontSize: '0.875rem',
+                fontSize: 'var(--text-sm)',
                 fontWeight: 600,
                 cursor: loading ? 'not-allowed' : 'pointer',
-                opacity: loading ? 0.6 : 1
+                opacity: loading ? 0.6 : 1,
+                color: 'var(--text-secondary)',
+                transition: 'all 0.2s ease'
+              }}
+              onMouseEnter={(e) => {
+                if (!loading) {
+                  e.currentTarget.style.backgroundColor = 'var(--bg-page)';
+                  e.currentTarget.style.borderColor = 'var(--text-secondary)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+                e.currentTarget.style.borderColor = 'var(--border-color)';
               }}
             >
               Cancelar
@@ -362,17 +618,27 @@ const MissionFormModal = ({ onClose, onMissionCreated }) => {
             <button
               type="submit"
               disabled={loading}
-              className="btn-primary"
               style={{
-                padding: '0.625rem 1.25rem',
-                backgroundColor: 'var(--color-primary)',
+                padding: 'var(--spacing-sm) var(--spacing-lg)',
+                backgroundColor: 'var(--primary)',
                 color: 'white',
                 border: 'none',
                 borderRadius: 'var(--radius-md)',
-                fontSize: '0.875rem',
+                fontSize: 'var(--text-sm)',
                 fontWeight: 600,
                 cursor: loading ? 'not-allowed' : 'pointer',
-                opacity: loading ? 0.6 : 1
+                opacity: loading ? 0.6 : 1,
+                transition: 'all 0.2s ease'
+              }}
+              onMouseEnter={(e) => {
+                if (!loading) {
+                  e.currentTarget.style.transform = 'translateY(-1px)';
+                  e.currentTarget.style.boxShadow = 'var(--shadow-md)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = 'none';
               }}
             >
               {loading ? 'Creando...' : 'Crear Misión'}

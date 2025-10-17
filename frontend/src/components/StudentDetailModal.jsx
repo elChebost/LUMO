@@ -4,6 +4,13 @@ import { FiX, FiMail, FiUser, FiTrendingUp, FiStar, FiCalendar } from 'react-ico
 const StudentDetailModal = ({ student, isOpen, onClose }) => {
   if (!isOpen || !student) return null;
 
+  // Calcular datos del estudiante
+  const statLogic = student.statLogic || 0;
+  const statCreativity = student.statCreativity || 0;
+  const statWriting = student.statWriting || 0;
+  const avgTimeMinutes = student.avgTimeMinutes || 0;
+  const missionsCompleted = student.missionsCompleted || 0;
+
   return (
     <div style={{
       position: 'fixed',
@@ -15,17 +22,18 @@ const StudentDetailModal = ({ student, isOpen, onClose }) => {
       display: 'flex',
       justifyContent: 'center',
       alignItems: 'center',
-      zIndex: 1000
+      zIndex: 1000,
+      padding: 'var(--spacing-md)'
     }}>
       <div style={{
-        backgroundColor: 'white',
-        borderRadius: '16px',
-        padding: '2rem',
-        maxWidth: '600px',
-        width: '90%',
-        maxHeight: '80vh',
+        backgroundColor: 'var(--panel-bg)',
+        borderRadius: 'var(--radius-xl)',
+        padding: 'var(--spacing-2xl)',
+        maxWidth: '720px',
+        width: '100%',
+        maxHeight: '85vh',
         overflow: 'auto',
-        boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+        boxShadow: 'var(--shadow-strong)',
         position: 'relative'
       }}>
         {/* Botón cerrar */}
@@ -33,229 +41,337 @@ const StudentDetailModal = ({ student, isOpen, onClose }) => {
           onClick={onClose}
           style={{
             position: 'absolute',
-            top: '1rem',
-            right: '1rem',
+            top: 'var(--spacing-md)',
+            right: 'var(--spacing-md)',
             background: 'none',
             border: 'none',
             fontSize: '1.5rem',
             cursor: 'pointer',
-            color: '#666',
-            padding: '0.5rem'
+            color: 'var(--text-muted)',
+            padding: 'var(--spacing-sm)',
+            borderRadius: 'var(--radius-md)',
+            transition: 'background-color 0.15s ease'
           }}
+          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-page)'}
+          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
         >
           <FiX />
         </button>
 
-        {/* Contenido */}
+        {/* Header con Avatar y Nombre */}
         <div style={{
           display: 'flex',
-          gap: '2rem',
-          flexDirection: window.innerWidth < 768 ? 'column' : 'row'
+          alignItems: 'center',
+          gap: 'var(--spacing-xl)',
+          marginBottom: 'var(--spacing-2xl)',
+          paddingBottom: 'var(--spacing-xl)',
+          borderBottom: `1px solid var(--border-color)`
         }}>
-          {/* Datos del estudiante */}
-          <div style={{ flex: 1 }}>
-            <h2 style={{
-              fontSize: '1.5rem',
-              fontWeight: 'bold',
-              color: '#2E7D32',
-              marginBottom: '1.5rem',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.5rem'
-            }}>
-              <FiUser />
-              {student.name}
-            </h2>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              {/* Email */}
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.75rem',
-                padding: '0.75rem',
-                backgroundColor: '#F5F5F5',
-                borderRadius: '8px'
-              }}>
-                <FiMail style={{ color: '#2E7D32', fontSize: '1.1rem' }} />
-                <div>
-                  <div style={{ fontSize: '0.75rem', color: '#666', fontWeight: '600' }}>EMAIL</div>
-                  <div style={{ fontSize: '0.875rem', color: '#333' }}>{student.email}</div>
-                </div>
-              </div>
-
-              {/* Edad */}
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.75rem',
-                padding: '0.75rem',
-                backgroundColor: '#F5F5F5',
-                borderRadius: '8px'
-              }}>
-                <FiCalendar style={{ color: '#2E7D32', fontSize: '1.1rem' }} />
-                <div>
-                  <div style={{ fontSize: '0.75rem', color: '#666', fontWeight: '600' }}>EDAD</div>
-                  <div style={{ fontSize: '0.875rem', color: '#333' }}>{student.age} años</div>
-                </div>
-              </div>
-
-              {/* Nivel */}
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.75rem',
-                padding: '0.75rem',
-                backgroundColor: '#E8F5E8',
-                borderRadius: '8px',
-                border: '1px solid #C8E6C9'
-              }}>
-                <FiTrendingUp style={{ color: '#2E7D32', fontSize: '1.1rem' }} />
-                <div>
-                  <div style={{ fontSize: '0.75rem', color: '#1B5E20', fontWeight: '600' }}>NIVEL</div>
-                  <div style={{ fontSize: '1.25rem', color: '#2E7D32', fontWeight: 'bold' }}>
-                    Nivel {student.level}
-                  </div>
-                </div>
-              </div>
-
-              {/* XP */}
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.75rem',
-                padding: '0.75rem',
-                backgroundColor: '#FFF3E0',
-                borderRadius: '8px',
-                border: '1px solid #FFCC02'
-              }}>
-                <FiStar style={{ color: '#FF8F00', fontSize: '1.1rem' }} />
-                <div>
-                  <div style={{ fontSize: '0.75rem', color: '#E65100', fontWeight: '600' }}>EXPERIENCIA</div>
-                  <div style={{ fontSize: '1.25rem', color: '#FF8F00', fontWeight: 'bold' }}>
-                    {student.xp} XP
-                  </div>
-                </div>
-              </div>
-
-              {/* Horario */}
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.75rem',
-                padding: '0.75rem',
-                backgroundColor: '#F5F5F5',
-                borderRadius: '8px'
-              }}>
-                <FiCalendar style={{ color: '#2E7D32', fontSize: '1.1rem' }} />
-                <div>
-                  <div style={{ fontSize: '0.75rem', color: '#666', fontWeight: '600' }}>HORARIO</div>
-                  <div style={{ fontSize: '0.875rem', color: '#333' }}>{student.schedule}</div>
-                </div>
-              </div>
-
-              {/* Información adicional */}
-              {student.teacher && (
-                <div style={{
-                  padding: '1rem',
-                  backgroundColor: '#E3F2FD',
-                  borderRadius: '8px',
-                  marginTop: '0.5rem'
-                }}>
-                  <div style={{ fontSize: '0.75rem', color: '#1565C0', fontWeight: '600', marginBottom: '0.25rem' }}>
-                    PROFESOR
-                  </div>
-                  <div style={{ fontSize: '0.875rem', color: '#1976D2' }}>
-                    {student.teacher.name}
-                  </div>
-                </div>
-              )}
-
-              {student.classroom && (
-                <div style={{
-                  padding: '1rem',
-                  backgroundColor: '#F3E5F5',
-                  borderRadius: '8px'
-                }}>
-                  <div style={{ fontSize: '0.75rem', color: '#7B1FA2', fontWeight: '600', marginBottom: '0.25rem' }}>
-                    AULA
-                  </div>
-                  <div style={{ fontSize: '0.875rem', color: '#8E24AA' }}>
-                    {student.classroom.name}
-                  </div>
-                </div>
-              )}
-            </div>
+          {/* Avatar 72px */}
+          <div style={{
+            width: '72px',
+            height: '72px',
+            borderRadius: '50%',
+            overflow: 'hidden',
+            border: `3px solid var(--primary)`,
+            flexShrink: 0,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: 'var(--bg-page)'
+          }}>
+            <img
+              src={student.profile?.avatar || '/src/assets/avatar.png'}
+              alt={`Avatar de ${student.name}`}
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover'
+              }}
+            />
           </div>
 
-          {/* Avatar */}
+          {/* Nombre y estadísticas rápidas */}
+          <div style={{ flex: 1 }}>
+            <h2 style={{
+              fontSize: 'var(--text-2xl)',
+              fontWeight: 600,
+              color: 'var(--text-primary)',
+              margin: '0 0 var(--spacing-xs) 0'
+            }}>
+              {student.name}
+            </h2>
+            <p style={{
+              fontSize: 'var(--text-sm)',
+              color: 'var(--text-muted)',
+              margin: 0
+            }}>
+              {student.email}
+            </p>
+          </div>
+
+          {/* Métricas inline */}
           <div style={{
             display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: '1rem'
+            gap: 'var(--spacing-xl)',
+            fontSize: 'var(--text-sm)'
           }}>
-            <div style={{
-              width: '150px',
-              height: '150px',
-              borderRadius: '50%',
-              overflow: 'hidden',
-              border: '4px solid #4CAF50',
-              backgroundColor: '#F5F5F5',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}>
-              <img
-                src={student.profile?.avatar || '/src/assets/avatar.png'}
-                alt={`Avatar de ${student.name}`}
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'cover'
-                }}
-                onError={(e) => {
-                  e.target.style.display = 'none';
-                  e.target.nextSibling.style.display = 'flex';
-                }}
-              />
+            <div style={{ textAlign: 'center' }}>
               <div style={{
-                display: 'none',
-                fontSize: '3rem',
-                color: '#4CAF50'
+                fontSize: 'var(--text-xl)',
+                fontWeight: 600,
+                color: 'var(--primary)'
               }}>
-                <FiUser />
+                {avgTimeMinutes}'
+              </div>
+              <div style={{
+                fontSize: 'var(--text-xs)',
+                color: 'var(--text-muted)',
+                textTransform: 'uppercase'
+              }}>
+                Tiempo prom.
               </div>
             </div>
-            
-            {/* Stats del perfil */}
-            {student.profile && (
+            <div style={{ textAlign: 'center' }}>
               <div style={{
-                textAlign: 'center',
-                padding: '1rem',
-                backgroundColor: '#F8F9FA',
-                borderRadius: '8px',
-                minWidth: '150px'
+                fontSize: 'var(--text-xl)',
+                fontWeight: 600,
+                color: 'var(--primary)'
               }}>
-                <div style={{ fontSize: '0.75rem', color: '#666', fontWeight: '600', marginBottom: '0.5rem' }}>
-                  ESTADÍSTICAS
+                {missionsCompleted}
+              </div>
+              <div style={{
+                fontSize: 'var(--text-xs)',
+                color: 'var(--text-muted)',
+                textTransform: 'uppercase'
+              }}>
+                Completadas
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Contenido principal: Stats Chart */}
+        <div style={{
+          marginBottom: 'var(--spacing-2xl)'
+        }}>
+          <h3 style={{
+            fontSize: 'var(--text-lg)',
+            fontWeight: 600,
+            color: 'var(--text-primary)',
+            margin: '0 0 var(--spacing-lg) 0'
+          }}>
+            Habilidades
+          </h3>
+
+          {/* Chart con 3 barras verticales */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(3, 1fr)',
+            gap: 'var(--spacing-xl)',
+            padding: 'var(--spacing-xl)',
+            backgroundColor: 'var(--bg-page)',
+            borderRadius: 'var(--radius-lg)'
+          }}>
+            {/* Lógica */}
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: 'var(--spacing-sm)'
+            }}>
+              <div style={{
+                fontSize: 'var(--text-sm)',
+                fontWeight: 600,
+                color: 'var(--text-primary)',
+                marginBottom: 'var(--spacing-xs)'
+              }}>
+                Lógica
+              </div>
+              <div style={{
+                width: '60px',
+                height: '180px',
+                backgroundColor: 'rgba(29, 215, 91, 0.1)',
+                borderRadius: 'var(--radius-md)',
+                position: 'relative',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'flex-end',
+                overflow: 'hidden'
+              }}>
+                <div style={{
+                  width: '100%',
+                  height: `${(statLogic / 100) * 100}%`,
+                  backgroundColor: 'var(--primary)',
+                  borderRadius: 'var(--radius-md)',
+                  transition: 'height 0.8s ease-out'
+                }} />
+              </div>
+              <div style={{
+                fontSize: 'var(--text-xl)',
+                fontWeight: 600,
+                color: 'var(--primary)'
+              }}>
+                {statLogic}
+              </div>
+            </div>
+
+            {/* Creatividad */}
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: 'var(--spacing-sm)'
+            }}>
+              <div style={{
+                fontSize: 'var(--text-sm)',
+                fontWeight: 600,
+                color: 'var(--text-primary)',
+                marginBottom: 'var(--spacing-xs)'
+              }}>
+                Creatividad
+              </div>
+              <div style={{
+                width: '60px',
+                height: '180px',
+                backgroundColor: 'rgba(156, 39, 176, 0.1)',
+                borderRadius: 'var(--radius-md)',
+                position: 'relative',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'flex-end',
+                overflow: 'hidden'
+              }}>
+                <div style={{
+                  width: '100%',
+                  height: `${(statCreativity / 100) * 100}%`,
+                  backgroundColor: '#9C27B0',
+                  borderRadius: 'var(--radius-md)',
+                  transition: 'height 0.8s ease-out'
+                }} />
+              </div>
+              <div style={{
+                fontSize: 'var(--text-xl)',
+                fontWeight: 600,
+                color: '#9C27B0'
+              }}>
+                {statCreativity}
+              </div>
+            </div>
+
+            {/* Escritura */}
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: 'var(--spacing-sm)'
+            }}>
+              <div style={{
+                fontSize: 'var(--text-sm)',
+                fontWeight: 600,
+                color: 'var(--text-primary)',
+                marginBottom: 'var(--spacing-xs)'
+              }}>
+                Escritura
+              </div>
+              <div style={{
+                width: '60px',
+                height: '180px',
+                backgroundColor: 'rgba(33, 150, 243, 0.1)',
+                borderRadius: 'var(--radius-md)',
+                position: 'relative',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'flex-end',
+                overflow: 'hidden'
+              }}>
+                <div style={{
+                  width: '100%',
+                  height: `${(statWriting / 100) * 100}%`,
+                  backgroundColor: '#2196F3',
+                  borderRadius: 'var(--radius-md)',
+                  transition: 'height 0.8s ease-out'
+                }} />
+              </div>
+              <div style={{
+                fontSize: 'var(--text-xl)',
+                fontWeight: 600,
+                color: '#2196F3'
+              }}>
+                {statWriting}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Información adicional simplificada */}
+        <div>
+          <h3 style={{
+            fontSize: 'var(--text-lg)',
+            fontWeight: 600,
+            color: 'var(--text-primary)',
+            margin: '0 0 var(--spacing-md) 0'
+          }}>
+            Información
+          </h3>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+            gap: 'var(--spacing-md)'
+          }}>
+            {/* Nivel */}
+            <div className="card" style={{
+              padding: 'var(--spacing-md)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 'var(--spacing-sm)'
+            }}>
+              <FiTrendingUp size={20} color="var(--primary)" />
+              <div>
+                <div style={{
+                  fontSize: 'var(--text-xs)',
+                  color: 'var(--text-muted)',
+                  fontWeight: 600,
+                  textTransform: 'uppercase'
+                }}>
+                  Nivel
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                  <div>
-                    <span style={{ fontSize: '0.75rem', color: '#666' }}>EXP: </span>
-                    <span style={{ fontSize: '0.875rem', fontWeight: 'bold', color: '#FF8F00' }}>
-                      {student.profile.exp}
-                    </span>
-                  </div>
-                  <div>
-                    <span style={{ fontSize: '0.75rem', color: '#666' }}>MONEDAS: </span>
-                    <span style={{ fontSize: '0.875rem', fontWeight: 'bold', color: '#FFD700' }}>
-                      {student.profile.coins}
-                    </span>
-                  </div>
+                <div style={{
+                  fontSize: 'var(--text-lg)',
+                  fontWeight: 600,
+                  color: 'var(--text-primary)'
+                }}>
+                  {student.level}
                 </div>
               </div>
-            )}
+            </div>
+
+            {/* XP */}
+            <div className="card" style={{
+              padding: 'var(--spacing-md)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 'var(--spacing-sm)'
+            }}>
+              <FiStar size={20} color="#FF8F00" />
+              <div>
+                <div style={{
+                  fontSize: 'var(--text-xs)',
+                  color: 'var(--text-muted)',
+                  fontWeight: 600,
+                  textTransform: 'uppercase'
+                }}>
+                  Experiencia
+                </div>
+                <div style={{
+                  fontSize: 'var(--text-lg)',
+                  fontWeight: 600,
+                  color: 'var(--text-primary)'
+                }}>
+                  {student.xp} XP
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

@@ -30,25 +30,12 @@ const Dashboard = () => {
     try {
       setLoading(true);
       
-      // ✅ Construir estadísticas desde múltiples endpoints ya que /stats no existe
-      const [xpRes, missionsRes, studentsRes] = await Promise.all([
-        fetch(`${API_URL}/skillTrees/average-xp`),
-        fetch(`${API_URL}/missions/total-active`),
-        fetch(`${API_URL}/students/total`)
-      ]);
+      // ✅ Usar el nuevo endpoint /dashboard que incluye todas las stats
+      const dashboardRes = await fetch(`${API_URL}/dashboard`);
+      const dashboardData = await dashboardRes.json();
 
-      const xpData = await xpRes.json();
-      const missionsData = await missionsRes.json();
-      const studentsData = await studentsRes.json();
-
-      // Construir el objeto stats con los datos obtenidos
-      const statsData = {
-        avgXP: Math.round(xpData.averageXp * 10) / 10, // Redondear a 1 decimal
-        activeMissions: missionsData.totalActiveMissions,
-        totalStudents: studentsData.totalStudents
-      };
-      
-      setStats(statsData);
+      // Estructura: { avgLogic, avgCreativity, avgWriting, activeMissionsCount, onlineStudentsCount, totalStudents }
+      setStats(dashboardData);
 
       // Cargar misiones activas
       const missionsActiveRes = await fetch(`${API_URL}/missions/active`);
@@ -71,103 +58,112 @@ const Dashboard = () => {
 
   return (
     <div style={{ padding: '0' }}>
-      {/* Header de la página */}
-      <div className={isMobile ? 'mobile-page-header' : ''} style={{ marginBottom: isMobile ? '1.5rem' : '2rem' }}>
-        <h1 style={{
-          fontSize: isMobile ? '1.5rem' : '2rem',
-          fontWeight: 700,
-          color: 'var(--color-text-primary)',
-          margin: '0 0 0.5rem 0'
-        }}>
-          Panel principal
-        </h1>
-        {!isMobile && (
-          <p style={{
-            fontSize: '0.875rem',
-            color: 'var(--color-text-secondary)',
-            margin: 0
-          }}>
-            Resumen general del curso y accesos rápidos
-          </p>
-        )}
-      </div>
+      {/* Header de la página - Removido según especificación (el título ya está en Navbar) */}
 
-      {/* Fila de estadísticas (StatCards) */}
+      {/* Fila de estadísticas (StatCards con barras horizontales) */}
       <div className={isMobile ? 'mobile-stats-grid' : ''} style={{
         display: 'grid',
-        gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(240px, 1fr))',
-        gap: isMobile ? '0.75rem' : '1rem',
-        marginBottom: isMobile ? '1.5rem' : '2rem'
+        gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)',
+        gap: isMobile ? 'var(--spacing-md)' : 'var(--spacing-lg)',
+        marginBottom: isMobile ? 'var(--spacing-xl)' : 'var(--spacing-2xl)'
       }}>
         <StatCard
-          icon={FiTrendingUp}
-          label="XP Promedio"
-          value={loading ? '...' : stats?.avgXP || 0}
+          label="Lógica"
+          value={loading ? 0 : stats?.avgLogic || 0}
+          max={100}
+          color="var(--primary)"
           loading={loading}
+          type="bar"
         />
+        <StatCard
+          label="Creatividad"
+          value={loading ? 0 : stats?.avgCreativity || 0}
+          max={100}
+          color="#9C27B0"
+          loading={loading}
+          type="bar"
+        />
+        <StatCard
+          label="Escritura"
+          value={loading ? 0 : stats?.avgWriting || 0}
+          max={100}
+          color="#2196F3"
+          loading={loading}
+          type="bar"
+        />
+      </div>
+
+      {/* Métricas adicionales: Misiones y Estudiantes */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)',
+        gap: isMobile ? 'var(--spacing-md)' : 'var(--spacing-lg)',
+        marginBottom: isMobile ? 'var(--spacing-xl)' : 'var(--spacing-2xl)'
+      }}>
         <StatCard
           icon={FiTarget}
           label="Misiones Activas"
-          value={loading ? '...' : stats?.activeMissions || 0}
+          value={loading ? '...' : stats?.activeMissionsCount || 0}
           loading={loading}
+          type="number"
         />
         <StatCard
           icon={FiCheckCircle}
-          label="Total Alumnos"
+          label="Total Estudiantes"
           value={loading ? '...' : stats?.totalStudents || 0}
           loading={loading}
+          type="number"
         />
       </div>
 
       {/* Sección: Accesos rápidos */}
-      <section style={{ marginBottom: isMobile ? '1.5rem' : '2rem' }}>
+      <section style={{ marginBottom: isMobile ? 'var(--spacing-xl)' : 'var(--spacing-2xl)' }}>
         <h2 style={{
-          fontSize: isMobile ? '1.125rem' : '1.25rem',
+          fontSize: isMobile ? 'var(--text-lg)' : 'var(--text-xl)',
           fontWeight: 600,
-          color: 'var(--color-text-primary)',
-          margin: '0 0 1rem 0'
+          color: 'var(--text-primary)',
+          margin: '0 0 var(--spacing-md) 0'
         }}>
           Accesos rápidos
         </h2>
 
         <div style={{
           display: 'grid',
-          gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(200px, 1fr))',
-          gap: isMobile ? '0.75rem' : '1rem'
+          gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)',
+          gap: isMobile ? 'var(--spacing-md)' : 'var(--spacing-lg)'
         }}>
           <button
             onClick={() => navigate('/students')}
+            className="card"
             style={{
-              padding: isMobile ? '1.25rem' : '1.5rem',
-              backgroundColor: 'var(--color-card-bg)',
-              borderRadius: 'var(--radius-lg)',
-              border: '1px solid var(--color-border)',
-              boxShadow: 'var(--shadow-sm)',
+              padding: isMobile ? 'var(--spacing-lg)' : 'var(--spacing-xl)',
               textDecoration: 'none',
-              transition: 'all var(--transition-fast)',
+              transition: 'all 0.2s ease',
               cursor: 'pointer',
-              textAlign: 'left'
+              textAlign: 'left',
+              border: 'none',
+              width: '100%'
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.boxShadow = 'var(--shadow-md)';
               e.currentTarget.style.transform = 'translateY(-2px)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
+              e.currentTarget.style.boxShadow = 'var(--shadow-soft)';
               e.currentTarget.style.transform = 'translateY(0)';
             }}
           >
             <h3 style={{
-              fontSize: isMobile ? '0.9rem' : '1rem',
+              fontSize: isMobile ? 'var(--text-base)' : 'var(--text-lg)',
               fontWeight: 600,
-              color: 'var(--color-text-primary)',
-              margin: '0 0 0.5rem 0'
+              color: 'var(--text-primary)',
+              margin: '0 0 var(--spacing-xs) 0'
             }}>
               Gestionar Alumnos
             </h3>
             <p style={{
-              fontSize: isMobile ? '0.8rem' : '0.875rem',
-              color: 'var(--color-text-secondary)',
+              fontSize: isMobile ? 'var(--text-xs)' : 'var(--text-sm)',
+              color: 'var(--text-muted)',
               margin: 0
             }}>
               Ver lista completa y perfiles
@@ -176,79 +172,39 @@ const Dashboard = () => {
 
           <button
             onClick={() => navigate('/missions')}
+            className="card"
             style={{
-              padding: isMobile ? '1.25rem' : '1.5rem',
-              backgroundColor: 'var(--color-card-bg)',
-              borderRadius: 'var(--radius-lg)',
-              border: '1px solid var(--color-border)',
-              boxShadow: 'var(--shadow-sm)',
+              padding: isMobile ? 'var(--spacing-lg)' : 'var(--spacing-xl)',
               textDecoration: 'none',
-              transition: 'all var(--transition-fast)',
+              transition: 'all 0.2s ease',
               cursor: 'pointer',
-              textAlign: 'left'
+              textAlign: 'left',
+              border: 'none',
+              width: '100%'
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.boxShadow = 'var(--shadow-md)';
               e.currentTarget.style.transform = 'translateY(-2px)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
+              e.currentTarget.style.boxShadow = 'var(--shadow-soft)';
               e.currentTarget.style.transform = 'translateY(0)';
             }}
           >
             <h3 style={{
-              fontSize: isMobile ? '0.9rem' : '1rem',
+              fontSize: isMobile ? 'var(--text-base)' : 'var(--text-lg)',
               fontWeight: 600,
-              color: 'var(--color-text-primary)',
-              margin: '0 0 0.5rem 0'
+              color: 'var(--text-primary)',
+              margin: '0 0 var(--spacing-xs) 0'
             }}>
               Crear Misión
             </h3>
             <p style={{
-              fontSize: isMobile ? '0.8rem' : '0.875rem',
-              color: 'var(--color-text-secondary)',
+              fontSize: isMobile ? 'var(--text-xs)' : 'var(--text-sm)',
+              color: 'var(--text-muted)',
               margin: 0
             }}>
               Asignar nuevas tareas al curso
-            </p>
-          </button>
-
-          <button
-            onClick={() => navigate('/settings')}
-            style={{
-              padding: isMobile ? '1.25rem' : '1.5rem',
-              backgroundColor: 'var(--color-card-bg)',
-              borderRadius: 'var(--radius-lg)',
-              border: '1px solid var(--color-border)',
-              boxShadow: 'var(--shadow-sm)',
-              textDecoration: 'none',
-              transition: 'all var(--transition-fast)',
-              cursor: 'pointer',
-              textAlign: 'left'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.boxShadow = 'var(--shadow-md)';
-              e.currentTarget.style.transform = 'translateY(-2px)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
-              e.currentTarget.style.transform = 'translateY(0)';
-            }}
-          >
-            <h3 style={{
-              fontSize: isMobile ? '0.9rem' : '1rem',
-              fontWeight: 600,
-              color: 'var(--color-text-primary)',
-              margin: '0 0 0.5rem 0'
-            }}>
-              Ver Estadísticas
-            </h3>
-            <p style={{
-              fontSize: isMobile ? '0.8rem' : '0.875rem',
-              color: 'var(--color-text-secondary)',
-              margin: 0
-            }}>
-              Métricas y análisis del curso
             </p>
           </button>
         </div>
@@ -260,12 +216,12 @@ const Dashboard = () => {
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          marginBottom: '1rem'
+          marginBottom: 'var(--spacing-md)'
         }}>
           <h2 style={{
-            fontSize: isMobile ? '1.125rem' : '1.25rem',
+            fontSize: isMobile ? 'var(--text-lg)' : 'var(--text-xl)',
             fontWeight: 600,
-            color: 'var(--color-text-primary)',
+            color: 'var(--text-primary)',
             margin: 0
           }}>
             Misiones activas
@@ -273,18 +229,18 @@ const Dashboard = () => {
           <button
             onClick={() => navigate('/missions')}
             style={{
-              fontSize: isMobile ? '0.8rem' : '0.875rem',
-              color: 'var(--color-primary)',
+              fontSize: isMobile ? 'var(--text-xs)' : 'var(--text-sm)',
+              color: 'var(--primary)',
               fontWeight: 600,
               textDecoration: 'none',
-              transition: 'color var(--transition-fast)',
+              transition: 'opacity 0.15s ease',
               background: 'none',
               border: 'none',
               cursor: 'pointer',
-              padding: '0.25rem 0.5rem'
+              padding: 'var(--spacing-xs) var(--spacing-sm)'
             }}
-            onMouseEnter={(e) => e.target.style.color = 'var(--color-primary-hover)'}
-            onMouseLeave={(e) => e.target.style.color = 'var(--color-primary)'}
+            onMouseEnter={(e) => e.target.style.opacity = '0.7'}
+            onMouseLeave={(e) => e.target.style.opacity = '1'}
           >
             Ver todas →
           </button>
@@ -293,7 +249,7 @@ const Dashboard = () => {
         <div style={{
           display: 'grid',
           gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(300px, 1fr))',
-          gap: isMobile ? '0.75rem' : '1rem'
+          gap: isMobile ? 'var(--spacing-md)' : 'var(--spacing-lg)'
         }}>
           {loading ? (
             <>
@@ -309,9 +265,9 @@ const Dashboard = () => {
             <p style={{
               gridColumn: '1 / -1',
               textAlign: 'center',
-              color: 'var(--color-text-secondary)',
-              fontSize: isMobile ? '0.8rem' : '0.875rem',
-              padding: isMobile ? '1.5rem' : '2rem'
+              color: 'var(--text-muted)',
+              fontSize: isMobile ? 'var(--text-xs)' : 'var(--text-sm)',
+              padding: isMobile ? 'var(--spacing-xl)' : 'var(--spacing-2xl)'
             }}>
               No hay misiones activas en este momento
             </p>

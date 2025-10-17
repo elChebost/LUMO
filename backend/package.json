@@ -10,7 +10,12 @@
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:studio": "prisma studio",
-    "prisma:seed": "node prisma/seed.js"
+    "prisma:seed": "node prisma/seed.js",
+    "seed": "node seeds/run-all-seeds.js",
+    "seed:base": "node seeds/base.seed.js",
+    "seed:students": "node seeds/students.seed.js",
+    "seed:missions": "node seeds/missions.seed.js",
+    "seed:notifications": "node seeds/notifications.seed.js"
   },
   "keywords": [
     "education",

@@ -2,6 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FiMail, FiLock, FiAlertCircle } from 'react-icons/fi';
 import { isAuthenticated } from '../utils/auth';
+import './Login.css'; // Importar estilos CSS
+import iconText from '../assets/icon_text.png';
+import portada from '../assets/portada.png';
 
 // ✅ Puerto correcto (3000)
 const API_URL = 'http://localhost:3000';
@@ -48,7 +51,7 @@ const Login = () => {
       
       // Redirigir al dashboard
       navigate('/dashboard');
-    } catch (err) {
+    } catch {
       setError('Error de conexión. Por favor, intenta de nuevo.');
       setLoading(false);
     }
@@ -98,25 +101,27 @@ const Login = () => {
     >
       {/* Mitad izquierda - Formulario login */}
       <div
+        className="login-form-container"
         style={{
           flex: '0 0 50%',
           display: 'flex',
-          alignItems: 'center',
+          alignItems: 'flex-start',
           justifyContent: 'center',
           backgroundColor: '#ffffff',
           padding: '2rem',
           overflowY: 'auto',
+          paddingTop: '3rem',
         }}
       >
         <div
           style={{
             width: '100%',
             maxWidth: 400,
-            padding: '2rem',
+            padding: '1rem',
           }}
         >
         {/* Logo imagen */}
-        <img src={'/src/assets/icon_text.png'} alt="LUMO" style={{ width: 180, marginBottom: 24 }} />
+        <img src={iconText} alt="LUMO" style={{ width: 180, marginBottom: 24 }} />
         <p style={{ fontSize: '1rem', color: '#666', margin: 0, marginBottom: 16 }}>Portal Docente</p>
         <h2 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#1a1a1a', marginBottom: '0.5rem' }}>
           Iniciar sesión
@@ -328,6 +333,7 @@ const Login = () => {
       {/* Mitad derecha - Imagen portada con desplazamiento lateral */}
       <div
         ref={containerRef}
+        className="login-image-container"
         style={{
           flex: '0 0 50%',
           position: 'relative',
@@ -337,7 +343,7 @@ const Login = () => {
       >
         <img
           ref={imgRef}
-          src="/src/assets/portada.png"
+          src={portada}
           alt="LUMO Background"
           style={{
             position: 'absolute',

@@ -55,7 +55,7 @@ const StudentRow = ({ student, loading = false, onClick }) => {
   }
 
   const { id, name, email, level, xp, missions = [] } = student || {};
-  const missionsCompleted = missions.length;
+  const missionsCount = missions.length;
 
   const handleClick = () => {
     if (onClick) {
@@ -157,21 +157,25 @@ const StudentRow = ({ student, loading = false, onClick }) => {
     );
   }
 
-  // Vista desktop: tabla (original)
+  // Vista desktop: tabla con nuevas columnas (Estado y Progreso)
+  const isOnline = student?.isOnline || false;
+  const missionsCompleted = student?.missionsCompleted || 0;
+  const totalMissions = 6; // Por ahora hardcoded, luego vendrá del backend
+  
   return (
     <div
       onClick={handleClick}
       style={{
         display: 'grid',
-        gridTemplateColumns: '2fr 1.5fr 1fr 1fr 0.5fr',
-        padding: '1rem 1.5rem',
-        borderBottom: '1px solid var(--color-border)',
+        gridTemplateColumns: '2fr 1.5fr 1fr 1fr 1fr 0.5fr',
+        padding: 'var(--spacing-md) var(--spacing-xl)',
+        borderBottom: '1px solid var(--border-color)',
         cursor: 'pointer',
-        transition: 'background-color var(--transition-fast)',
+        transition: 'background-color 0.15s ease',
         alignItems: 'center'
       }}
       onMouseEnter={(e) => {
-        e.currentTarget.style.backgroundColor = 'var(--color-bg)';
+        e.currentTarget.style.backgroundColor = 'var(--bg-page)';
       }}
       onMouseLeave={(e) => {
         e.currentTarget.style.backgroundColor = 'transparent';
@@ -181,7 +185,7 @@ const StudentRow = ({ student, loading = false, onClick }) => {
       <div style={{
         display: 'flex',
         alignItems: 'center',
-        gap: '0.75rem'
+        gap: 'var(--spacing-md)'
       }}>
         <img
           src={student?.profile?.avatar || "/src/assets/avatar.png"}
@@ -190,16 +194,16 @@ const StudentRow = ({ student, loading = false, onClick }) => {
             width: '40px',
             height: '40px',
             borderRadius: '50%',
-            border: '2px solid var(--color-primary)',
+            border: `2px solid var(--primary)`,
             objectFit: 'cover',
             flexShrink: 0
           }}
         />
         <div style={{ minWidth: 0 }}>
           <p style={{
-            fontSize: '0.875rem',
+            fontSize: 'var(--text-sm)',
             fontWeight: 600,
-            color: 'var(--color-text-primary)',
+            color: 'var(--text-primary)',
             margin: 0,
             overflow: 'hidden',
             textOverflow: 'ellipsis',
@@ -213,8 +217,8 @@ const StudentRow = ({ student, loading = false, onClick }) => {
       {/* Email */}
       <div>
         <p style={{
-          fontSize: '0.75rem',
-          color: 'var(--color-text-secondary)',
+          fontSize: 'var(--text-xs)',
+          color: 'var(--text-muted)',
           margin: 0,
           overflow: 'hidden',
           textOverflow: 'ellipsis',
@@ -224,32 +228,56 @@ const StudentRow = ({ student, loading = false, onClick }) => {
         </p>
       </div>
 
+      {/* Estado (nuevo) */}
+      <div>
+        <span style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: 'var(--spacing-xs)',
+          padding: '4px 10px',
+          borderRadius: 'var(--radius-full)',
+          backgroundColor: isOnline ? 'rgba(29, 215, 91, 0.1)' : 'rgba(158, 158, 158, 0.1)',
+          border: `1px solid ${isOnline ? 'rgba(29, 215, 91, 0.3)' : 'rgba(158, 158, 158, 0.3)'}`,
+          fontSize: 'var(--text-xs)',
+          fontWeight: 600,
+          color: isOnline ? 'var(--primary)' : 'var(--text-muted)'
+        }}>
+          <span style={{
+            width: '6px',
+            height: '6px',
+            borderRadius: '50%',
+            backgroundColor: isOnline ? 'var(--primary)' : 'var(--text-muted)'
+          }} />
+          {isOnline ? 'Online' : 'Offline'}
+        </span>
+      </div>
+
+      {/* Progreso (nuevo) */}
+      <div>
+        <p style={{
+          fontSize: 'var(--text-sm)',
+          fontWeight: 600,
+          color: 'var(--text-primary)',
+          margin: 0
+        }}>
+          {missionsCompleted}/{totalMissions}
+        </p>
+      </div>
+
       {/* Nivel */}
       <div>
         <div style={{
           display: 'inline-block',
-          padding: '0.25rem 0.75rem',
+          padding: '4px 12px',
           borderRadius: 'var(--radius-full)',
-          backgroundColor: 'rgba(46, 125, 50, 0.1)',
-          border: '1px solid rgba(46, 125, 50, 0.2)',
-          fontSize: '0.75rem',
+          backgroundColor: 'rgba(29, 215, 91, 0.1)',
+          border: '1px solid rgba(29, 215, 91, 0.2)',
+          fontSize: 'var(--text-xs)',
           fontWeight: 600,
-          color: 'var(--color-primary)'
+          color: 'var(--primary)'
         }}>
           Nv. {level}
         </div>
-      </div>
-
-      {/* XP */}
-      <div>
-        <p style={{
-          fontSize: '0.875rem',
-          fontWeight: 600,
-          color: 'var(--color-text-primary)',
-          margin: 0
-        }}>
-          {xp} XP
-        </p>
       </div>
 
       {/* Indicador visual */}
@@ -258,7 +286,7 @@ const StudentRow = ({ student, loading = false, onClick }) => {
         justifyContent: 'flex-end'
       }}>
         <span style={{
-          color: 'var(--color-text-secondary)',
+          color: 'var(--text-muted)',
           fontSize: '1rem'
         }}>
           →

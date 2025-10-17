@@ -42,7 +42,7 @@ const MainLayout = () => {
     <div style={{ 
       minHeight: '100vh', 
       width: '100%', 
-      backgroundColor: 'var(--color-bg)',
+      backgroundColor: 'var(--bg-page)',
       display: 'flex'
     }}>
       {/* Sidebar fija a la izquierda */}
@@ -52,9 +52,9 @@ const MainLayout = () => {
         left: 0,
         height: '100vh',
         width: 'var(--sidebar-width)',
-        backgroundColor: '#f8f9fa',
-        borderRight: '1px solid var(--color-border)',
-        boxShadow: 'var(--shadow-sm)',
+        backgroundColor: 'var(--panel-bg)',
+        borderRight: '1px solid var(--border-color)',
+        boxShadow: 'var(--shadow-soft)',
         zIndex: 30,
         overflowY: 'auto'
       }}>
@@ -68,7 +68,7 @@ const MainLayout = () => {
         display: 'flex',
         flexDirection: 'column',
         minHeight: '100vh',
-        transition: 'margin-left var(--transition-normal)'
+        transition: 'margin-left 0.3s ease'
       }}>
         {/* Navbar sticky superior */}
         <header style={{
@@ -77,8 +77,8 @@ const MainLayout = () => {
           zIndex: 20,
           width: '100%',
           height: 'var(--navbar-height)',
-          backgroundColor: 'var(--color-card-bg)',
-          boxShadow: 'var(--shadow-sm)',
+          backgroundColor: 'var(--panel-bg)',
+          boxShadow: 'var(--shadow-soft)',
           display: 'flex',
           alignItems: 'center'
         }}>
@@ -88,7 +88,7 @@ const MainLayout = () => {
         {/* Main container centrado */}
         <main style={{
           flex: 1,
-          padding: '2rem',
+          padding: 'var(--spacing-2xl)',
           maxWidth: '1280px',
           width: '100%',
           margin: '0 auto'

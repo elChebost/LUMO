@@ -1,0 +1,124 @@
+/* 🎨 LUMO - Design Tokens
+ * Variables de diseño del sistema
+ * Basado en la especificación del rediseño
+ */
+
+:root {
+  /* ========================================
+   * COLORES
+   * ======================================== */
+  
+  /* Backgrounds */
+  --bg-page: #f8f9fa;
+  --panel-bg: #ffffff;
+  --muted-bg: #f3f4f6;
+  
+  /* Primary (Verde LUMO) */
+  --primary: #1DD75B;
+  --primary-hover: #0FB64A;
+  --primary-600: #0FB64A;
+  --primary-light: #E8F9EF;
+  
+  /* Text */
+  --text-primary: #171A1F;
+  --text-secondary: #424955;
+  --text-muted: #6B7280;
+  --text-disabled: #9CA3AF;
+  
+  /* Borders */
+  --border-color: rgba(17, 24, 39, 0.06);
+  --border-strong: rgba(17, 24, 39, 0.12);
+  
+  /* Status Colors */
+  --success: #10B981;
+  --warning: #F59E0B;
+  --error: #EF4444;
+  --info: #3B82F6;
+  
+  /* Status Backgrounds */
+  --success-bg: #ECFDF5;
+  --warning-bg: #FFFBEB;
+  --error-bg: #FEF2F2;
+  --info-bg: #EFF6FF;
+  
+  /* ========================================
+   * SOMBRAS
+   * ======================================== */
+  
+  --shadow-soft: 0 6px 18px rgba(15, 23, 42, 0.06);
+  --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.10);
+  --shadow-medium: 0 10px 24px rgba(15, 23, 42, 0.12);
+  --shadow-strong: 0 20px 40px rgba(15, 23, 42, 0.20);
+  
+  /* ========================================
+   * ESPACIADO
+   * ======================================== */
+  
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-2xl: 48px;
+  
+  /* ========================================
+   * BORDER RADIUS
+   * ======================================== */
+  
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+  
+  /* ========================================
+   * TIPOGRAFÍA - TAMAÑOS
+   * ======================================== */
+  
+  --text-xs: 12px;
+  --text-sm: 14px;
+  --text-base: 16px;
+  --text-lg: 18px;
+  --text-xl: 20px;
+  --text-2xl: 24px;
+  --text-3xl: 30px;
+  --text-4xl: 36px;
+  
+  /* ========================================
+   * LAYOUT
+   * ======================================== */
+  
+  --navbar-height: 64px;
+  --sidebar-width: 240px;
+  --container-max-width: 1200px;
+  
+  /* ========================================
+   * TRANSICIONES
+   * ======================================== */
+  
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.2s ease;
+  --transition-slow: 0.3s ease;
+  
+  /* ========================================
+   * Z-INDEX
+   * ======================================== */
+  
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-modal-backdrop: 900;
+  --z-modal: 1000;
+  --z-toast: 1100;
+}
+
+/* ========================================
+ * DARK MODE (opcional para futuro)
+ * ======================================== */
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Deshabilitado por ahora */
+    /* --bg-page: #0f1419;
+    --panel-bg: #1a1f2e; */
+  }
+}

@@ -56,10 +56,34 @@ export const createStudentHandler = async (req, res) => {
   }
 };
 
-// Listar todos los estudiantes
+// Listar todos los estudiantes (con filtros opcionales)
 export const getStudentsHandler = async (req, res) => {
   try {
-    const students = await getStudents();
+    const { filter, search } = req.query;
+    
+    let students = await getStudents();
+    
+    // Filtro por búsqueda de CI
+    if (search) {
+      students = students.filter(s => 
+        s.ci && s.ci.toLowerCase().includes(search.toLowerCase())
+      );
+    }
+    
+    // Filtro alfabético A-Z
+    if (filter === 'A-Z') {
+      students = students.sort((a, b) => a.name.localeCompare(b.name));
+    }
+    
+    // Agregar campo de progreso calculado
+    students = students.map(student => ({
+      ...student,
+      progress: {
+        completed: student.missionsCompleted || 0,
+        total: 5, // Total de misiones activas (se puede calcular dinámicamente)
+      },
+    }));
+    
     res.json(students);
   } catch (error) {
     console.error('Error al obtener estudiantes:', error);

@@ -1,0 +1,76 @@
+/* Estilos responsive para Login */
+
+/* Desktop - Por defecto (ya está en los estilos inline) */
+/* Asegurar que el contenedor interno tenga suficiente espacio */
+.login-form-container > div {
+  padding-bottom: 2rem;
+}
+
+/* Tablet y móviles - Ocultar imagen y ajustar formulario */
+@media (max-width: 768px) {
+  /* Ocultar la imagen del lado derecho en móviles */
+  .login-image-container {
+    display: none !important;
+  }
+
+  /* Hacer que el formulario ocupe todo el ancho */
+  .login-form-container {
+    flex: 1 !important;
+    max-width: 100% !important;
+    padding: 1.5rem !important;
+    padding-top: 2rem !important;
+    align-items: flex-start !important;
+  }
+}
+
+/* Móviles pequeños - Ajustes adicionales */
+@media (max-width: 480px) {
+  .login-form-container {
+    padding: 1rem !important;
+    padding-top: 1.5rem !important;
+  }
+
+  /* Ajustar el tamaño del logo en móviles */
+  .login-form-container img[alt="LUMO"] {
+    width: 140px !important;
+    margin-bottom: 16px !important;
+  }
+
+  /* Reducir padding del formulario en móviles */
+  .login-form-container > div {
+    padding: 0.5rem !important;
+  }
+
+  /* Ajustar tamaños de fuente */
+  .login-form-container h2 {
+    font-size: 1.25rem !important;
+  }
+
+  .login-form-container p {
+    font-size: 0.8rem !important;
+  }
+
+  /* Inputs más compactos en móviles pequeños */
+  .login-form-container input {
+    height: 44px !important;
+    font-size: 0.8rem !important;
+  }
+
+  /* Botón más compacto */
+  .login-form-container button[type="submit"] {
+    padding: 0.65rem !important;
+    font-size: 0.9rem !important;
+  }
+}
+
+/* Landscape en móviles */
+@media (max-width: 768px) and (orientation: landscape) {
+  .login-form-container {
+    padding: 1rem !important;
+  }
+
+  /* Reducir espaciado vertical en landscape */
+  .login-form-container > div {
+    padding: 0.75rem !important;
+  }
+}

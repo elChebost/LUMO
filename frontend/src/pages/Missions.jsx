@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { FiPlus, FiFilter, FiSearch } from 'react-icons/fi';
 import MissionCard from '../components/MissionCard';
 import MissionFormModal from '../components/MissionFormModal';
+import MissionPreviewModal from '../components/MissionPreviewModal';
 
 // ⚠️ Cambiado de 4000 a 3000 para coincidir con el backend
 const API_URL = 'http://localhost:3000/api';
@@ -13,6 +14,8 @@ const Missions = () => {
   const [filterStatus, setFilterStatus] = useState('all');
   const [showModal, setShowModal] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [selectedMission, setSelectedMission] = useState(null);
+  const [showPreview, setShowPreview] = useState(false);
 
   useEffect(() => {
     loadMissions();
@@ -53,6 +56,20 @@ const Missions = () => {
     const matchesStatus = filterStatus === 'all' || mission.status === filterStatus;
     return matchesSearch && matchesStatus;
   });
+
+  // Handler para abrir preview de misión
+  const handleMissionClick = (mission) => {
+    setSelectedMission(mission);
+    setShowPreview(true);
+  };
+
+  // Handler para seleccionar rol
+  const handleSelectRole = (role) => {
+    console.log('Rol seleccionado:', role);
+    // Aquí se implementaría la lógica para asignar el rol al estudiante
+    setShowPreview(false);
+    setSelectedMission(null);
+  };
 
   return (
     <div style={{ padding: '0' }}>
@@ -203,24 +220,37 @@ const Missions = () => {
         </button>
       </div>
 
-      {/* Grid de misiones */}
+      {/* Grid de misiones - 3 columnas en desktop, 2 en tablet, 1 en móvil */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(320px, 1fr))',
-        gap: isMobile ? '0.75rem' : '1rem'
+        gridTemplateColumns: isMobile 
+          ? '1fr' 
+          : window.innerWidth >= 1024 
+            ? 'repeat(3, 1fr)' 
+            : 'repeat(2, 1fr)',
+        gap: 'var(--spacing-lg)',
+        justifyItems: 'center'
       }}>
         {loading ? (
           <>
             <MissionCard loading />
             {!isMobile && <MissionCard loading />}
             {!isMobile && <MissionCard loading />}
-            {!isMobile && <MissionCard loading />}
-            {!isMobile && <MissionCard loading />}
-            {!isMobile && <MissionCard loading />}
+            {window.innerWidth >= 1024 && (
+              <>
+                <MissionCard loading />
+                <MissionCard loading />
+                <MissionCard loading />
+              </>
+            )}
           </>
         ) : filteredMissions.length > 0 ? (
           filteredMissions.map(mission => (
-            <MissionCard key={mission.id} mission={mission} />
+            <MissionCard 
+              key={mission.id} 
+              mission={mission}
+              onClick={handleMissionClick}
+            />
           ))
         ) : (
           <div style={{
@@ -270,6 +300,17 @@ const Missions = () => {
           onMissionCreated={loadMissions}
         />
       )}
+
+      {/* Modal de preview de misión */}
+      <MissionPreviewModal
+        mission={selectedMission}
+        isOpen={showPreview}
+        onClose={() => {
+          setShowPreview(false);
+          setSelectedMission(null);
+        }}
+        onSelectRole={handleSelectRole}
+      />
     </div>
   );
 };

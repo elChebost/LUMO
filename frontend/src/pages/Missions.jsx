@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { FiPlus, FiFilter, FiSearch } from 'react-icons/fi';
 import MissionCard from '../components/MissionCard';
-import MissionFormModal from '../components/MissionFormModal';
-import MissionPreviewModal from '../components/MissionPreviewModal';
+import MissionModal from '../components/Misiones/MissionModal';
 
-// ⚠️ Cambiado de 4000 a 3000 para coincidir con el backend
 const API_URL = 'http://localhost:3000/api';
 
 const Missions = () => {
@@ -12,10 +10,10 @@ const Missions = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
-  const [showModal, setShowModal] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [selectedMission, setSelectedMission] = useState(null);
-  const [showPreview, setShowPreview] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [modalMode, setModalMode] = useState('view'); // 'view', 'edit', 'create'
 
   useEffect(() => {
     loadMissions();
@@ -34,14 +32,7 @@ const Missions = () => {
       setLoading(true);
       const response = await fetch(`${API_URL}/missions`);
       const data = await response.json();
-      
-      // ✅ Mapear status del backend (active/inactive) al frontend (activa/cerrada)
-      const mappedMissions = data.map(mission => ({
-        ...mission,
-        status: mission.status === 'active' ? 'activa' : 'cerrada'
-      }));
-      
-      setMissions(mappedMissions);
+      setMissions(data);
     } catch (error) {
       console.error('Error cargando misiones:', error);
     } finally {
@@ -51,24 +42,31 @@ const Missions = () => {
 
   // Filtrar misiones
   const filteredMissions = missions.filter(mission => {
-    const matchesSearch = mission.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         mission.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = filterStatus === 'all' || mission.status === filterStatus;
+    const matchesSearch = mission.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         mission.descripcionBreve.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus = filterStatus === 'all' || mission.estado === filterStatus;
     return matchesSearch && matchesStatus;
   });
 
-  // Handler para abrir preview de misión
+  // Handler para abrir modal de vista/edición
   const handleMissionClick = (mission) => {
     setSelectedMission(mission);
-    setShowPreview(true);
+    setModalMode('view');
+    setShowModal(true);
   };
 
-  // Handler para seleccionar rol
-  const handleSelectRole = (role) => {
-    console.log('Rol seleccionado:', role);
-    // Aquí se implementaría la lógica para asignar el rol al estudiante
-    setShowPreview(false);
+  // Handler para crear nueva misión
+  const handleCreateMission = () => {
     setSelectedMission(null);
+    setModalMode('create');
+    setShowModal(true);
+  };
+
+  // Handler para cerrar modal
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setSelectedMission(null);
+    setModalMode('view');
   };
 
   return (
@@ -95,7 +93,7 @@ const Missions = () => {
       </div>
 
       {/* Barra de acciones */}
-      <div className={isMobile ? 'mobile-actions' : ''} style={{
+      <div className="missions-filters" style={{
         display: 'flex',
         gap: '1rem',
         marginBottom: '1.5rem',
@@ -104,7 +102,7 @@ const Missions = () => {
         flexDirection: isMobile ? 'column' : 'row'
       }}>
         {/* Buscador */}
-        <div className={isMobile ? 'mobile-search' : ''} style={{
+        <div style={{
           position: 'relative',
           flex: isMobile ? 'none' : '1',
           minWidth: isMobile ? '100%' : '300px',
@@ -124,6 +122,7 @@ const Missions = () => {
           />
           <input
             type="text"
+            className="missions-search-input"
             placeholder="Buscar misiones..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -158,6 +157,7 @@ const Missions = () => {
         }}>
           {!isMobile && <FiFilter size={18} style={{ color: 'var(--color-text-secondary)' }} />}
           <select
+            className="missions-filter-select"
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
             style={{
@@ -178,13 +178,16 @@ const Missions = () => {
           >
             <option value="all">Todas las misiones</option>
             <option value="activa">Activas</option>
-            <option value="cerrada">Cerradas</option>
+            <option value="proxima">Próximas</option>
+            <option value="inactiva">Inactivas</option>
+            <option value="finalizada">Finalizadas</option>
           </select>
         </div>
 
         {/* Botón Crear Misión */}
         <button
-          onClick={() => setShowModal(true)}
+          className="missions-create-btn"
+          onClick={handleCreateMission}
           style={{
             height: '44px',
             width: isMobile ? '100%' : 'auto',
@@ -220,8 +223,8 @@ const Missions = () => {
         </button>
       </div>
 
-      {/* Grid de misiones - 3 columnas en desktop, 2 en tablet, 1 en móvil */}
-      <div style={{
+      {/* Grid de misiones - Responsive: 3 cols → 2 cols → 1 col */}
+      <div className="missions-grid" style={{
         display: 'grid',
         gridTemplateColumns: isMobile 
           ? '1fr' 
@@ -293,23 +296,13 @@ const Missions = () => {
         </div>
       )}
 
-      {/* Modal para crear misión */}
-      {showModal && (
-        <MissionFormModal
-          onClose={() => setShowModal(false)}
-          onMissionCreated={loadMissions}
-        />
-      )}
-
-      {/* Modal de preview de misión */}
-      <MissionPreviewModal
+      {/* Modal unificado para ver/crear/editar */}
+      <MissionModal
         mission={selectedMission}
-        isOpen={showPreview}
-        onClose={() => {
-          setShowPreview(false);
-          setSelectedMission(null);
-        }}
-        onSelectRole={handleSelectRole}
+        isOpen={showModal}
+        onClose={handleCloseModal}
+        onSave={loadMissions}
+        mode={modalMode}
       />
     </div>
   );

@@ -5,37 +5,23 @@ const StudentProfile = () => {
   const { id } = useParams();
 
   return (
-    <div style={{ padding: '0' }}>
-      <h1 style={{
-        fontSize: '2rem',
-        fontWeight: 700,
-        color: 'var(--color-text-primary)',
-        margin: '0 0 0.5rem 0'
+    <div style={{ 
+      padding: '2rem',
+      textAlign: 'center'
+    }}>
+      <h1 style={{ 
+        color: 'red',
+        fontSize: '3rem',
+        fontWeight: 'bold'
       }}>
-        Perfil del Alumno
+        🎨 TEST - ARCHIVO BÁSICO FUNCIONANDO
       </h1>
-      <p style={{
-        fontSize: '0.875rem',
-        color: 'var(--color-text-secondary)',
-        margin: '0 0 2rem 0'
-      }}>
-        Detalles del alumno ID: {id}
+      <p style={{ fontSize: '1.5rem', marginTop: '1rem' }}>
+        ID del alumno: {id}
       </p>
-
-      <div style={{
-        padding: '3rem',
-        textAlign: 'center',
-        backgroundColor: 'var(--color-card-bg)',
-        borderRadius: 'var(--radius-lg)',
-        border: '1px solid var(--color-border)'
-      }}>
-        <p style={{
-          color: 'var(--color-text-secondary)',
-          fontSize: '0.875rem'
-        }}>
-          Página de perfil de alumno en construcción
-        </p>
-      </div>
+      <p style={{ fontSize: '1rem', color: 'gray', marginTop: '2rem' }}>
+        Si ves este mensaje, el archivo se está cargando correctamente
+      </p>
     </div>
   );
 };

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FiBell, FiEdit } from 'react-icons/fi';
+import { FiSend, FiEdit } from 'react-icons/fi';
 import NotificationPanel from './NotificationPanel';
 import NotificationComposer from './NotificationComposer';
 import { useNotifications } from '../hooks/useNotifications';
@@ -21,9 +21,9 @@ const NotificationFAB = () => {
 
   return (
     <>
-      {/* FAB Panel Notificaciones (Campana) */}
+      {/* FAB Principal - Avión de papel (toggle panel) */}
       <button
-        onClick={() => setShowPanel(true)}
+        onClick={() => setShowPanel(!showPanel)}
         style={{
           position: 'fixed',
           bottom: isMobile ? '80px' : '2rem',
@@ -31,10 +31,10 @@ const NotificationFAB = () => {
           width: '56px',
           height: '56px',
           borderRadius: '50%',
-          backgroundColor: '#2E7D32',
+          backgroundColor: '#1DD75B',
           color: '#fff',
           border: 'none',
-          boxShadow: '0 4px 12px rgba(46, 125, 50, 0.3)',
+          boxShadow: '0 4px 12px rgba(29, 215, 91, 0.4)',
           cursor: 'pointer',
           display: 'flex',
           alignItems: 'center',
@@ -44,14 +44,14 @@ const NotificationFAB = () => {
         }}
         onMouseEnter={(e) => {
           e.currentTarget.style.transform = 'scale(1.1)';
-          e.currentTarget.style.backgroundColor = '#1B5E20';
+          e.currentTarget.style.backgroundColor = '#0FB64A';
         }}
         onMouseLeave={(e) => {
           e.currentTarget.style.transform = 'scale(1)';
-          e.currentTarget.style.backgroundColor = '#2E7D32';
+          e.currentTarget.style.backgroundColor = '#1DD75B';
         }}
       >
-        <FiBell size={24} />
+        <FiSend size={24} />
         {unreadCount > 0 && (
           <span style={{
             position: 'absolute',
@@ -71,38 +71,41 @@ const NotificationFAB = () => {
         )}
       </button>
 
-      {/* FAB Composer (Editar) */}
-      <button
-        onClick={() => setShowComposer(true)}
-        style={{
-          position: 'fixed',
-          bottom: isMobile ? '150px' : '5rem',
-          right: isMobile ? '1rem' : '2rem',
-          width: '56px',
-          height: '56px',
-          borderRadius: '50%',
-          backgroundColor: '#7B1FA2',
-          color: '#fff',
-          border: 'none',
-          boxShadow: '0 4px 12px rgba(123, 31, 162, 0.3)',
-          cursor: 'pointer',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          transition: 'all 0.3s ease',
-          zIndex: 998,
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.transform = 'scale(1.1)';
-          e.currentTarget.style.backgroundColor = '#6A1B9A';
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.transform = 'scale(1)';
-          e.currentTarget.style.backgroundColor = '#7B1FA2';
-        }}
-      >
-        <FiEdit size={24} />
-      </button>
+      {/* FAB Redacción (Solo visible cuando panel abierto) */}
+      {showPanel && (
+        <button
+          onClick={() => setShowComposer(true)}
+          style={{
+            position: 'fixed',
+            bottom: isMobile ? '150px' : '5rem',
+            right: isMobile ? '1rem' : '2rem',
+            width: '48px',
+            height: '48px',
+            borderRadius: '50%',
+            backgroundColor: '#0FB64A',
+            color: '#fff',
+            border: 'none',
+            boxShadow: '0 4px 12px rgba(15, 182, 74, 0.4)',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            transition: 'all 0.3s ease',
+            zIndex: 998,
+            animation: 'fadeInUp 0.3s ease-out',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = 'scale(1.1)';
+            e.currentTarget.style.backgroundColor = '#0A9B3E';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'scale(1)';
+            e.currentTarget.style.backgroundColor = '#0FB64A';
+          }}
+        >
+          <FiEdit size={20} />
+        </button>
+      )}
 
       {/* Modales */}
       {showPanel && (

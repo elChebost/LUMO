@@ -523,7 +523,7 @@ const MissionFormModal = ({ onClose, onMissionCreated }) => {
             </div>
           </div>
 
-          {/* Rol Escritura */}
+          {/* Rol Lengua */}
           <div style={{
             padding: 'var(--spacing-md)',
             backgroundColor: 'var(--bg-page)',
@@ -540,7 +540,7 @@ const MissionFormModal = ({ onClose, onMissionCreated }) => {
               gap: 'var(--spacing-xs)'
             }}>
               <FiAward size={16} style={{ color: 'var(--primary)' }} />
-              Rol Escritura
+              Rol Lengua
             </h4>
             <div style={styles.formGroup}>
               <label style={styles.label}>Título del Rol</label>

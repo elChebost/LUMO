@@ -105,8 +105,10 @@ const Navbar = () => {
       padding: '0 var(--spacing-2xl)',
       gap: 'var(--spacing-2xl)'
     }}>
-      {/* Título y subtítulo de la página */}
-      <div style={{ flex: '0 0 auto' }}>
+      {/* Título de la página (NO clickeable, espacio vacío para descripción eliminada) */}
+      <div style={{ 
+        flex: '0 0 auto'
+      }}>
         <h2 style={{
           fontSize: 'var(--text-xl)',
           fontWeight: 700,
@@ -116,16 +118,7 @@ const Navbar = () => {
         }}>
           {currentPage.title}
         </h2>
-        {currentPage.subtitle && (
-          <p style={{
-            fontSize: 'var(--text-xs)',
-            color: 'var(--text-muted)',
-            margin: '0.125rem 0 0 0',
-            lineHeight: 1.4
-          }}>
-            {currentPage.subtitle}
-          </p>
-        )}
+        {/* Descripción eliminada - espacio vacío */}
       </div>
 
       {/* Buscador centrado con sugerencias */}

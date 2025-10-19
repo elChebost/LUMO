@@ -1,5 +1,5 @@
 import React from 'react';
-import { FiX, FiMail, FiUser, FiTrendingUp, FiStar, FiCalendar } from 'react-icons/fi';
+import { FiMail, FiUser, FiTrendingUp, FiStar, FiCalendar } from 'react-icons/fi';
 
 const StudentDetailModal = ({ student, isOpen, onClose }) => {
   if (!isOpen || !student) return null;
@@ -11,52 +11,45 @@ const StudentDetailModal = ({ student, isOpen, onClose }) => {
   const avgTimeMinutes = student.avgTimeMinutes || 0;
   const missionsCompleted = student.missionsCompleted || 0;
 
+  const handleBackdropClick = (e) => {
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
+
   return (
-    <div style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      backgroundColor: 'rgba(0, 0, 0, 0.5)',
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      zIndex: 1000,
-      padding: 'var(--spacing-md)'
-    }}>
-      <div style={{
-        backgroundColor: 'var(--panel-bg)',
-        borderRadius: 'var(--radius-xl)',
-        padding: 'var(--spacing-2xl)',
-        maxWidth: '720px',
-        width: '100%',
-        maxHeight: '85vh',
-        overflow: 'auto',
-        boxShadow: 'var(--shadow-strong)',
-        position: 'relative'
-      }}>
-        {/* Botón cerrar */}
-        <button
-          onClick={onClose}
-          style={{
-            position: 'absolute',
-            top: 'var(--spacing-md)',
-            right: 'var(--spacing-md)',
-            background: 'none',
-            border: 'none',
-            fontSize: '1.5rem',
-            cursor: 'pointer',
-            color: 'var(--text-muted)',
-            padding: 'var(--spacing-sm)',
-            borderRadius: 'var(--radius-md)',
-            transition: 'background-color 0.15s ease'
-          }}
-          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-page)'}
-          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-        >
-          <FiX />
-        </button>
+    <div 
+      onClick={handleBackdropClick}
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: 1000,
+        padding: 'var(--spacing-md)',
+        cursor: 'pointer'
+      }}
+    >
+      <div 
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          backgroundColor: 'var(--panel-bg)',
+          borderRadius: 'var(--radius-xl)',
+          padding: 'var(--spacing-2xl)',
+          maxWidth: '720px',
+          width: '100%',
+          maxHeight: '85vh',
+          overflow: 'auto',
+          boxShadow: 'var(--shadow-strong)',
+          position: 'relative',
+          cursor: 'default'
+        }}
+      >
 
         {/* Header con Avatar y Nombre */}
         <div style={{
@@ -259,7 +252,7 @@ const StudentDetailModal = ({ student, isOpen, onClose }) => {
               </div>
             </div>
 
-            {/* Escritura */}
+            {/* Lengua */}
             <div style={{
               display: 'flex',
               flexDirection: 'column',
@@ -272,7 +265,7 @@ const StudentDetailModal = ({ student, isOpen, onClose }) => {
                 color: 'var(--text-primary)',
                 marginBottom: 'var(--spacing-xs)'
               }}>
-                Escritura
+                Lengua
               </div>
               <div style={{
                 width: '60px',

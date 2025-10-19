@@ -101,7 +101,7 @@ const Students = () => {
       </div>
 
       {/* Barra de acciones */}
-      <div className={isMobile ? 'mobile-actions' : ''} style={{
+      <div className="students-filters" style={{
         display: 'flex',
         gap: '1rem',
         marginBottom: '1.5rem',
@@ -110,7 +110,7 @@ const Students = () => {
         flexDirection: isMobile ? 'column' : 'row'
       }}>
         {/* Buscador */}
-        <div className={isMobile ? 'mobile-search' : ''} style={{
+        <div style={{
           position: 'relative',
           flex: isMobile ? 'none' : '1',
           minWidth: isMobile ? '100%' : '300px',
@@ -130,6 +130,7 @@ const Students = () => {
           />
           <input
             type="text"
+            className="students-search-input"
             placeholder="Buscar por CI (ej: 1234567-8)..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -158,6 +159,7 @@ const Students = () => {
         {/* Filtro A-Z */}
         <div style={{ position: 'relative' }}>
           <select
+            className="students-filter-select"
             value={filterLetter}
             onChange={(e) => setFilterLetter(e.target.value)}
             style={{
@@ -222,7 +224,7 @@ const Students = () => {
       </div>
 
       {/* Tabla de alumnos */}
-      <div className={isMobile ? 'mobile-table-responsive' : ''} style={{
+      <div className={`students-table ${isMobile ? 'mobile-table-responsive' : ''}`} style={{
         backgroundColor: 'var(--color-card-bg)',
         borderRadius: 'var(--radius-lg)',
         border: '1px solid var(--color-border)',

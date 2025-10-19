@@ -14,8 +14,8 @@ export const useNotifications = () => {
       setLoading(true);
       setError(null);
       
-      // TODO: Cambiar teacherId cuando se implemente auth
-      const response = await fetch(`${API_URL}/notifications/teacher/1`);
+      // ✅ Corregido: usar endpoint correcto
+      const response = await fetch(`${API_URL}/notifications`);
       
       if (!response.ok) {
         throw new Error('Error al cargar notificaciones');
@@ -25,7 +25,7 @@ export const useNotifications = () => {
       setNotifications(data);
       
       // Contar no leídas
-      const unread = data.filter(n => !n.isRead).length;
+      const unread = data.filter(n => !n.read).length;
       setUnreadCount(unread);
     } catch (err) {
       setError(err.message);

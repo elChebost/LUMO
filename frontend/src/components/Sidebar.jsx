@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { FiHome, FiUsers, FiClipboard } from 'react-icons/fi';
 
 const navItems = [
@@ -10,6 +10,7 @@ const navItems = [
 
 const Sidebar = () => {
   const location = useLocation();
+  const navigate = useNavigate();
 
   return (
     <div style={{
@@ -18,13 +19,20 @@ const Sidebar = () => {
       height: '100%',
       padding: 'var(--spacing-xl) var(--spacing-md)'
     }}>
-      {/* Logo LUMO imagen */}
-      <div style={{
-        textAlign: 'center',
-        marginBottom: 'var(--spacing-2xl)',
-        paddingBottom: 'var(--spacing-xl)',
-        borderBottom: '1px solid var(--border-color)'
-      }}>
+      {/* Logo LUMO clickeable → Dashboard */}
+      <div 
+        onClick={() => navigate('/dashboard')}
+        style={{
+          textAlign: 'center',
+          marginBottom: 'var(--spacing-2xl)',
+          paddingBottom: 'var(--spacing-xl)',
+          borderBottom: '1px solid var(--border-color)',
+          cursor: 'pointer',
+          transition: 'opacity 0.2s ease'
+        }}
+        onMouseEnter={(e) => e.currentTarget.style.opacity = '0.7'}
+        onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+      >
         <img src={'/src/assets/icon_text.png'} alt="LUMO" style={{ width: 120, margin: '0 auto' }} />
       </div>
 

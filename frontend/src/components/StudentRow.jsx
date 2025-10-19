@@ -56,6 +56,11 @@ const StudentRow = ({ student, loading = false, onClick }) => {
 
   const { id, name, email, level, xp, missions = [] } = student || {};
   const missionsCount = missions.length;
+  
+  // Variables necesarias para ambas vistas (mobile y desktop)
+  const isOnline = student?.isOnline || false;
+  const missionsCompleted = student?.missionsCompleted || 0;
+  const totalMissions = 6; // Por ahora hardcoded, luego vendrá del backend
 
   const handleClick = () => {
     if (onClick) {
@@ -158,10 +163,6 @@ const StudentRow = ({ student, loading = false, onClick }) => {
   }
 
   // Vista desktop: tabla con nuevas columnas (Estado y Progreso)
-  const isOnline = student?.isOnline || false;
-  const missionsCompleted = student?.missionsCompleted || 0;
-  const totalMissions = 6; // Por ahora hardcoded, luego vendrá del backend
-  
   return (
     <div
       onClick={handleClick}

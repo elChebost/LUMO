@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FiTrendingUp, FiTarget, FiCheckCircle } from 'react-icons/fi';
+import { FiClock, FiTarget, FiUsers, FiCheckCircle } from 'react-icons/fi';
 import StatCard from '../components/StatCard';
 import MissionCard from '../components/MissionCard';
+import MissionPreviewModal from '../components/MissionPreviewModal';
 
 // ⚠️ Cambiado de 4000 a 3000 para coincidir con el backend
 const API_URL = 'http://localhost:3000/api';
@@ -12,7 +13,11 @@ const Dashboard = () => {
   const [activeMissions, setActiveMissions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
+  const [selectedMission, setSelectedMission] = useState(null);
+  const [showMissionPreview, setShowMissionPreview] = useState(false);
   const navigate = useNavigate();
+
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
 
   useEffect(() => {
     loadDashboardData();
@@ -34,7 +39,7 @@ const Dashboard = () => {
       const dashboardRes = await fetch(`${API_URL}/dashboard`);
       const dashboardData = await dashboardRes.json();
 
-      // Estructura: { avgLogic, avgCreativity, avgWriting, activeMissionsCount, onlineStudentsCount, totalStudents }
+      // Estructura: { avgLogic, avgCreativity, avgWriting, activeMissionsCount, onlineStudentsCount, totalStudents, avgTimeMinutes }
       setStats(dashboardData);
 
       // Cargar misiones activas
@@ -56,161 +61,196 @@ const Dashboard = () => {
     }
   };
 
+  const handleMissionClick = (mission) => {
+    setSelectedMission(mission);
+    setShowMissionPreview(true);
+  };
+
   return (
     <div style={{ padding: '0' }}>
-      {/* Header de la página - Removido según especificación (el título ya está en Navbar) */}
-
-      {/* Fila de estadísticas (StatCards con barras horizontales) */}
-      <div className={isMobile ? 'mobile-stats-grid' : ''} style={{
-        display: 'grid',
-        gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)',
-        gap: isMobile ? 'var(--spacing-md)' : 'var(--spacing-lg)',
-        marginBottom: isMobile ? 'var(--spacing-xl)' : 'var(--spacing-2xl)'
-      }}>
-        <StatCard
-          label="Lógica"
-          value={loading ? 0 : stats?.avgLogic || 0}
-          max={100}
-          color="var(--primary)"
-          loading={loading}
-          type="bar"
-        />
-        <StatCard
-          label="Creatividad"
-          value={loading ? 0 : stats?.avgCreativity || 0}
-          max={100}
-          color="#9C27B0"
-          loading={loading}
-          type="bar"
-        />
-        <StatCard
-          label="Escritura"
-          value={loading ? 0 : stats?.avgWriting || 0}
-          max={100}
-          color="#2196F3"
-          loading={loading}
-          type="bar"
-        />
-      </div>
-
-      {/* Métricas adicionales: Misiones y Estudiantes */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)',
-        gap: isMobile ? 'var(--spacing-md)' : 'var(--spacing-lg)',
-        marginBottom: isMobile ? 'var(--spacing-xl)' : 'var(--spacing-2xl)'
-      }}>
-        <StatCard
-          icon={FiTarget}
-          label="Misiones Activas"
-          value={loading ? '...' : stats?.activeMissionsCount || 0}
-          loading={loading}
-          type="number"
-        />
-        <StatCard
-          icon={FiCheckCircle}
-          label="Total Estudiantes"
-          value={loading ? '...' : stats?.totalStudents || 0}
-          loading={loading}
-          type="number"
-        />
-      </div>
-
-      {/* Sección: Accesos rápidos */}
-      <section style={{ marginBottom: isMobile ? 'var(--spacing-xl)' : 'var(--spacing-2xl)' }}>
-        <h2 style={{
-          fontSize: isMobile ? 'var(--text-lg)' : 'var(--text-xl)',
+      {/* Saludo personalizado */}
+      <div style={{ marginBottom: isMobile ? 'var(--spacing-lg)' : 'var(--spacing-xl)' }}>
+        <h1 style={{
+          fontSize: isMobile ? 'var(--text-2xl)' : '2.25rem',
           fontWeight: 600,
           color: 'var(--text-primary)',
-          margin: '0 0 var(--spacing-md) 0'
+          margin: '0 0 var(--spacing-xs) 0'
         }}>
-          Accesos rápidos
-        </h2>
+          Bienvenido, {user.name || 'Profesor'}
+        </h1>
+        <p style={{
+          fontSize: isMobile ? 'var(--text-sm)' : 'var(--text-base)',
+          color: 'var(--text-muted)',
+          margin: 0
+        }}>
+          Resumen de la actividad de tus estudiantes
+        </p>
+      </div>
 
+      {/* Layout principal: Izquierda (stats barras) + Derecha (métricas) */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: isMobile ? '1fr' : '1.5fr 1fr',
+        gap: isMobile ? 'var(--spacing-md)' : 'var(--spacing-lg)',
+        marginBottom: isMobile ? 'var(--spacing-xl)' : 'var(--spacing-2xl)'
+      }}>
+        {/* IZQUIERDA: Tarjeta única con 3 barras horizontales */}
+        <div className="card" style={{
+          padding: isMobile ? 'var(--spacing-lg)' : 'var(--spacing-xl)',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 'var(--spacing-md)'
+        }}>
+          <h3 style={{
+            fontSize: isMobile ? 'var(--text-base)' : 'var(--text-lg)',
+            fontWeight: 600,
+            color: 'var(--text-primary)',
+            margin: '0 0 var(--spacing-sm) 0'
+          }}>
+            Promedio de Habilidades
+          </h3>
+
+          {/* Barra Lógica */}
+          <div style={{ marginBottom: 'var(--spacing-md)' }}>
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              marginBottom: 'var(--spacing-xs)',
+              fontSize: 'var(--text-base)',
+              fontWeight: 600
+            }}>
+              <span style={{ color: 'var(--text-primary)' }}>🧩 Lógica</span>
+              <span style={{ color: '#1DD75B', fontWeight: 700, fontSize: 'var(--text-lg)' }}>
+                {loading ? '...' : `${stats?.avgLogic || 0}%`}
+              </span>
+            </div>
+            <div style={{
+              height: '24px',
+              backgroundColor: '#E8F5E9',
+              borderRadius: '12px',
+              overflow: 'hidden',
+              border: '1px solid #C8E6C9'
+            }}>
+              <div style={{
+                height: '100%',
+                width: `${loading ? 0 : stats?.avgLogic || 0}%`,
+                backgroundColor: '#1DD75B',
+                transition: 'width 0.8s cubic-bezier(0.4, 0, 0.2, 1)',
+                borderRadius: '12px',
+                boxShadow: '0 2px 8px rgba(29, 215, 91, 0.3)'
+              }} />
+            </div>
+          </div>
+
+          {/* Barra Creatividad */}
+          <div style={{ marginBottom: 'var(--spacing-md)' }}>
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              marginBottom: 'var(--spacing-xs)',
+              fontSize: 'var(--text-base)',
+              fontWeight: 600
+            }}>
+              <span style={{ color: 'var(--text-primary)' }}>🎨 Creatividad</span>
+              <span style={{ color: '#E91E63', fontWeight: 700, fontSize: 'var(--text-lg)' }}>
+                {loading ? '...' : `${stats?.avgCreativity || 0}%`}
+              </span>
+            </div>
+            <div style={{
+              height: '24px',
+              backgroundColor: '#FCE4EC',
+              borderRadius: '12px',
+              overflow: 'hidden',
+              border: '1px solid #F8BBD0'
+            }}>
+              <div style={{
+                height: '100%',
+                width: `${loading ? 0 : stats?.avgCreativity || 0}%`,
+                backgroundColor: '#E91E63',
+                transition: 'width 0.8s cubic-bezier(0.4, 0, 0.2, 1)',
+                borderRadius: '12px',
+                boxShadow: '0 2px 8px rgba(233, 30, 99, 0.3)'
+              }} />
+            </div>
+          </div>
+
+          {/* Barra Lengua */}
+          <div>
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              marginBottom: 'var(--spacing-xs)',
+              fontSize: 'var(--text-base)',
+              fontWeight: 600
+            }}>
+              <span style={{ color: 'var(--text-primary)' }}>✏️ Lengua</span>
+              <span style={{ color: '#2196F3', fontWeight: 700, fontSize: 'var(--text-lg)' }}>
+                {loading ? '...' : `${stats?.avgWriting || 0}%`}
+              </span>
+            </div>
+            <div style={{
+              height: '24px',
+              backgroundColor: '#E3F2FD',
+              borderRadius: '12px',
+              overflow: 'hidden',
+              border: '1px solid #BBDEFB'
+            }}>
+              <div style={{
+                height: '100%',
+                width: `${loading ? 0 : stats?.avgWriting || 0}%`,
+                backgroundColor: '#2196F3',
+                transition: 'width 0.8s cubic-bezier(0.4, 0, 0.2, 1)',
+                borderRadius: '12px',
+                boxShadow: '0 2px 8px rgba(33, 150, 243, 0.3)'
+              }} />
+            </div>
+          </div>
+        </div>
+
+        {/* DERECHA: 4 tarjetas de métricas */}
         <div style={{
           display: 'grid',
           gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)',
-          gap: isMobile ? 'var(--spacing-md)' : 'var(--spacing-lg)'
+          gap: isMobile ? 'var(--spacing-md)' : 'var(--spacing-md)'
         }}>
-          <button
-            onClick={() => navigate('/students')}
-            className="card"
-            style={{
-              padding: isMobile ? 'var(--spacing-lg)' : 'var(--spacing-xl)',
-              textDecoration: 'none',
-              transition: 'all 0.2s ease',
-              cursor: 'pointer',
-              textAlign: 'left',
-              border: 'none',
-              width: '100%'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.boxShadow = 'var(--shadow-md)';
-              e.currentTarget.style.transform = 'translateY(-2px)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.boxShadow = 'var(--shadow-soft)';
-              e.currentTarget.style.transform = 'translateY(0)';
-            }}
-          >
-            <h3 style={{
-              fontSize: isMobile ? 'var(--text-base)' : 'var(--text-lg)',
-              fontWeight: 600,
-              color: 'var(--text-primary)',
-              margin: '0 0 var(--spacing-xs) 0'
-            }}>
-              Gestionar Alumnos
-            </h3>
-            <p style={{
-              fontSize: isMobile ? 'var(--text-xs)' : 'var(--text-sm)',
-              color: 'var(--text-muted)',
-              margin: 0
-            }}>
-              Ver lista completa y perfiles
-            </p>
-          </button>
-
-          <button
-            onClick={() => navigate('/missions')}
-            className="card"
-            style={{
-              padding: isMobile ? 'var(--spacing-lg)' : 'var(--spacing-xl)',
-              textDecoration: 'none',
-              transition: 'all 0.2s ease',
-              cursor: 'pointer',
-              textAlign: 'left',
-              border: 'none',
-              width: '100%'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.boxShadow = 'var(--shadow-md)';
-              e.currentTarget.style.transform = 'translateY(-2px)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.boxShadow = 'var(--shadow-soft)';
-              e.currentTarget.style.transform = 'translateY(0)';
-            }}
-          >
-            <h3 style={{
-              fontSize: isMobile ? 'var(--text-base)' : 'var(--text-lg)',
-              fontWeight: 600,
-              color: 'var(--text-primary)',
-              margin: '0 0 var(--spacing-xs) 0'
-            }}>
-              Crear Misión
-            </h3>
-            <p style={{
-              fontSize: isMobile ? 'var(--text-xs)' : 'var(--text-sm)',
-              color: 'var(--text-muted)',
-              margin: 0
-            }}>
-              Asignar nuevas tareas al curso
-            </p>
-          </button>
+          {/* Tiempo promedio */}
+          <StatCard
+            icon={FiClock}
+            label="Tiempo promedio"
+            value={loading ? '...' : `${stats?.avgTimeMinutes || 0} min`}
+            loading={loading}
+            type="number"
+          />
+          {/* Misiones activas */}
+          <StatCard
+            icon={FiTarget}
+            label="Misiones Activas"
+            value={loading ? '...' : stats?.activeMissionsCount || 0}
+            loading={loading}
+            type="number"
+          />
+          {/* Estudiantes en línea */}
+          <StatCard
+            icon={FiUsers}
+            label="Estudiantes en línea"
+            value={loading ? '...' : stats?.onlineStudentsCount || 0}
+            loading={loading}
+            type="number"
+          />
+          {/* Total estudiantes */}
+          <StatCard
+            icon={FiCheckCircle}
+            label="Total Estudiantes"
+            value={loading ? '...' : stats?.totalStudents || 0}
+            loading={loading}
+            type="number"
+          />
         </div>
-      </section>
+      </div>
 
-      {/* Sección: Misiones activas */}
+      {/* Sección "Accesos rápidos" removida según feedback Sprint 9 */}
+
+      {/* Sección: Misiones activas (ahora clickeables para abrir modal) */}
       <section>
         <div style={{
           display: 'flex',
@@ -259,7 +299,11 @@ const Dashboard = () => {
             </>
           ) : activeMissions.length > 0 ? (
             activeMissions.map(mission => (
-              <MissionCard key={mission.id} mission={mission} />
+              <MissionCard 
+                key={mission.id} 
+                mission={mission}
+                onClick={() => handleMissionClick(mission)}
+              />
             ))
           ) : (
             <p style={{
@@ -274,6 +318,17 @@ const Dashboard = () => {
           )}
         </div>
       </section>
+
+      {/* Modal de preview de misión */}
+      {showMissionPreview && selectedMission && (
+        <MissionPreviewModal
+          mission={selectedMission}
+          onClose={() => {
+            setShowMissionPreview(false);
+            setSelectedMission(null);
+          }}
+        />
+      )}
     </div>
   );
 };

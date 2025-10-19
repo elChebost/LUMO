@@ -71,23 +71,39 @@ const Settings = () => {
       return;
     }
 
+    // ✅ Preview inmediato (antes de subir)
+    const previewUrl = URL.createObjectURL(file);
+    setUserData(prev => ({ ...prev, avatar_url: previewUrl }));
+
     // Crear FormData
     const formData = new FormData();
     formData.append('avatar', file);
 
     try {
-      // TODO: Implementar endpoint de upload
+      // ✅ Endpoint funcional implementado
       const response = await fetch(`${API_URL}/teachers/1/avatar`, {
         method: 'POST',
         body: formData
       });
 
       if (response.ok) {
-        const { avatar_url } = await response.json();
-        setUserData(prev => ({ ...prev, avatar_url }));
+        const data = await response.json();
+        // ✅ Actualizar con URL del servidor
+        setUserData(prev => ({ 
+          ...prev, 
+          avatar_url: `http://localhost:3000${data.avatar_url}` 
+        }));
+        // Liberar memoria del preview
+        URL.revokeObjectURL(previewUrl);
+      } else {
+        // Si falla, revertir al avatar anterior
+        loadUserData();
+        alert('Error al subir la imagen');
       }
     } catch (error) {
       console.error('Error uploading avatar:', error);
+      // Si falla, revertir
+      loadUserData();
       alert('Error al subir la imagen');
     }
   };

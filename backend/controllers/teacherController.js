@@ -87,3 +87,36 @@ export const deleteTeacherHandler = async (req, res) => {
     res.status(500).json({ message: 'Error interno del servidor.' });
   }
 };
+
+// Upload avatar del docente
+export const uploadAvatarHandler = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Verificar que el docente existe
+    const existing = await getTeacherById(id);
+    if (!existing) {
+      return res.status(404).json({ message: 'Docente no encontrado.' });
+    }
+
+    // Verificar que se subió un archivo
+    if (!req.file) {
+      return res.status(400).json({ message: 'No se proporcionó ninguna imagen.' });
+    }
+
+    // Construir URL del avatar (relativa al servidor)
+    const avatar_url = `/uploads/avatars/${req.file.filename}`;
+
+    // Actualizar el avatar en la base de datos
+    const updatedTeacher = await updateTeacher(id, { avatar_url });
+
+    res.json({
+      message: 'Avatar actualizado correctamente',
+      avatar_url: avatar_url,
+      teacher: updatedTeacher
+    });
+  } catch (error) {
+    console.error('Error al subir avatar:', error);
+    res.status(500).json({ message: 'Error al procesar la imagen.' });
+  }
+};

@@ -10,22 +10,26 @@ import {
   getTotalActiveMissions,
 } from '../services/missionService.js';
 
-// Crear
+// ✅ Crear misión (nuevo sistema)
 export const createMissionHandler = async (req, res) => {
   try {
-    const { title, description, status, activationDate, dueDate, dueTime, teacherId } = req.body;
+    const { nombre, descripcionBreve, historia, fechaInicio, fechaFin, imagenURL, estado, roles, teacherId } = req.body;
 
-    if (!title || !description || !teacherId) {
-      return res.status(400).json({ message: 'Faltan campos obligatorios: title, description, teacherId' });
+    if (!nombre || !descripcionBreve || !historia || !fechaInicio || !fechaFin || !roles || !teacherId) {
+      return res.status(400).json({ 
+        message: 'Faltan campos obligatorios: nombre, descripcionBreve, historia, fechaInicio, fechaFin, roles, teacherId' 
+      });
     }
 
     const mission = await createMission({ 
-      title, 
-      description, 
-      status: status || 'Borrador', 
-      activationDate, 
-      dueDate, 
-      dueTime, 
+      nombre, 
+      descripcionBreve, 
+      historia, 
+      fechaInicio, 
+      fechaFin, 
+      imagenURL, 
+      estado: estado || 'inactiva', 
+      roles,
       teacherId 
     });
     
@@ -42,37 +46,30 @@ export const createMissionHandler = async (req, res) => {
   }
 };
 
-// Listar todas (con narrativas parseadas)
+// ✅ Listar todas las misiones
 export const getMissionsHandler = async (req, res) => {
   try {
     const missions = await getMissions();
-    
-    // Parsear las narrativas JSON
-    const missionsWithNarratives = missions.map(mission => ({
-      ...mission,
-      narrative: mission.narrative ? JSON.parse(mission.narrative) : null,
-    }));
-    
-    res.json(missionsWithNarratives);
+    res.json(missions);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
-// Buscar misiones por título
+// ✅ Buscar misiones por nombre
 export const getMissionsByTitleHandler = async (req, res) => {
   try {
-    const { title } = req.query;
+    const { nombre } = req.query;
 
-    if (!title) {
-      return res.status(400).json({ message: 'El parámetro "title" es requerido' });
+    if (!nombre) {
+      return res.status(400).json({ message: 'El parámetro "nombre" es requerido' });
     }
 
-    const missions = await getMissionsByTitle(title);
+    const missions = await getMissionsByTitle(nombre);
     
     if (missions.length === 0) {
       return res.status(404).json({ 
-        message: `No se encontraron misiones con el título: ${title}` 
+        message: `No se encontraron misiones con el nombre: ${nombre}` 
       });
     }
 
@@ -115,7 +112,7 @@ export const getTotalActiveMissionsHandler = async (req, res) => {
   }
 };
 
-// Obtener por ID (con narrativas parseadas)
+// ✅ Obtener misión por ID
 export const getMissionByIdHandler = async (req, res) => {
   try {
     const { id } = req.params;
@@ -125,13 +122,7 @@ export const getMissionByIdHandler = async (req, res) => {
       return res.status(404).json({ message: 'Misión no encontrada' });
     }
 
-    // Parsear la narrativa JSON
-    const missionWithNarrative = {
-      ...mission,
-      narrative: mission.narrative ? JSON.parse(mission.narrative) : null,
-    };
-
-    res.json(missionWithNarrative);
+    res.json(mission);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

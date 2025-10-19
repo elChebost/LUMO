@@ -1,6 +1,9 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
 // ✅ Todas las rutas ahora están disponibles
 import authRoutes from './routes/authRoutes.js';
 import userRoutes from './routes/userRoutes.js';
@@ -11,6 +14,7 @@ import studentRoutes from './routes/studentRoutes.js';
 import skillTreeRoutes from './routes/skillTreeRoutes.js';
 import subjectRoutes from './routes/subjectRoutes.js';
 import missionRoutes from './routes/missionRoutes.js';
+import activityRoutes from './routes/activityRoutes.js'; // ✅ Nuevo - Actividades
 import studentProfileRoutes from './routes/studentProfileRoutes.js';
 import teacherProfileRoutes from './routes/teacherProfileRoutes.js';
 import contactRoutes from './routes/contactRoutes.js';
@@ -21,16 +25,26 @@ import { connectDB } from './config/db.js';
 
 dotenv.config();
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Configurar CORS para permitir el frontend
+// ✅ Configurar CORS ANTES de cualquier ruta (acepta múltiples puertos de Vite)
 app.use(cors({
-  origin: 'http://localhost:5173',
-  credentials: true
+  origin: ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:5175'],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
+// ✅ Middleware para parsear JSON
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// ✅ Servir archivos estáticos (uploads)
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // ✅ Todas las rutas activas
 app.use('/api/auth', authRoutes); // ✅ Login
@@ -42,6 +56,7 @@ app.use('/api/students', studentRoutes); // ✅ CRUD Estudiantes
 app.use('/api/skillTrees', skillTreeRoutes); // ✅ Árboles de habilidad
 app.use('/api/subjects', subjectRoutes); // ✅ CRUD Asignaturas
 app.use('/api/missions', missionRoutes); // ✅ CRUD Misiones
+app.use('/api', activityRoutes); // ✅ CRUD Actividades (incluye /missions/:id/activities)
 
 // Rutas de perfiles separados
 app.use('/api/studentProfiles', studentProfileRoutes); // ✅ Perfiles estudiantes

@@ -1,15 +1,13 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { FiCalendar, FiEdit2, FiEye, FiClock } from 'react-icons/fi';
+import { format } from 'date-fns';
+import { es } from 'date-fns/locale';
 
 const MissionCard = ({ mission, loading = false, onClick }) => {
-  const navigate = useNavigate();
-
   if (loading) {
     return (
       <div className="card" style={{
-        width: '280px',
-        height: '180px',
+        width: '320px',
+        height: '200px',
         padding: 0,
         display: 'flex',
         flexDirection: 'column',
@@ -17,7 +15,7 @@ const MissionCard = ({ mission, loading = false, onClick }) => {
       }}>
         <div style={{
           width: '100%',
-          height: '100px',
+          height: '120px',
           backgroundColor: 'var(--bg-page)',
           animation: 'pulse 1.5s ease-in-out infinite'
         }} />
@@ -46,25 +44,42 @@ const MissionCard = ({ mission, loading = false, onClick }) => {
     );
   }
 
-  const { id, title, summary, previewImage, status } = mission || {};
+  const { nombre, descripcionBreve, imagenURL, estado, fechaInicio, fechaFin } = mission || {};
   
-  const isActive = status === 'activa' || status === 'active';
+  const getEstadoColor = () => {
+    switch (estado) {
+      case 'activa': return 'rgba(29, 215, 91, 0.95)';
+      case 'proxima': return 'rgba(255, 193, 7, 0.95)';
+      case 'finalizada': return 'rgba(158, 158, 158, 0.95)';
+      default: return 'rgba(100, 100, 100, 0.95)';
+    }
+  };
 
-  const handleClick = () => {
-    if (onClick) {
-      onClick(mission);
-    } else if (id) {
-      navigate(`/missions/${id}`);
+  const formatDate = (dateString) => {
+    if (!dateString) return '';
+    try {
+      const date = new Date(dateString);
+      const now = new Date();
+      
+      // Si es futura, mostrar "Comienza el..."
+      if (date > now && estado === 'proxima') {
+        return `Comienza el ${format(date, "d 'de' MMMM", { locale: es })}`;
+      }
+      
+      // Si es la fecha de fin, mostrar "Finaliza el..."
+      return `Hasta el ${format(date, "d 'de' MMMM", { locale: es })}`;
+    } catch {
+      return '';
     }
   };
 
   return (
     <div 
-      className="card"
-      onClick={handleClick}
+      className="mission-card card"
+      onClick={() => onClick && onClick(mission)}
       style={{
-        width: '280px',
-        height: '180px',
+        width: '320px',
+        minHeight: '200px',
         padding: 0,
         cursor: 'pointer',
         display: 'flex',
@@ -82,18 +97,18 @@ const MissionCard = ({ mission, loading = false, onClick }) => {
         e.currentTarget.style.boxShadow = 'var(--shadow-soft)';
       }}
     >
-      {/* Imagen de preview (100px) */}
+      {/* Imagen de preview (120px) */}
       <div style={{
         width: '100%',
-        height: '100px',
+        height: '120px',
         backgroundColor: 'var(--bg-page)',
         overflow: 'hidden',
         position: 'relative'
       }}>
-        {previewImage ? (
+        {imagenURL ? (
           <img 
-            src={previewImage} 
-            alt={title}
+            src={imagenURL} 
+            alt={nombre}
             style={{
               width: '100%',
               height: '100%',
@@ -119,27 +134,25 @@ const MissionCard = ({ mission, loading = false, onClick }) => {
           position: 'absolute',
           top: 'var(--spacing-sm)',
           right: 'var(--spacing-sm)',
-          padding: '4px 10px',
+          padding: '5px 12px',
           borderRadius: 'var(--radius-full)',
-          backgroundColor: isActive 
-            ? 'rgba(29, 215, 91, 0.95)' 
-            : 'rgba(158, 158, 158, 0.95)',
+          backgroundColor: getEstadoColor(),
           fontSize: 'var(--text-xs)',
           fontWeight: 600,
           color: 'white',
           textTransform: 'capitalize',
           backdropFilter: 'blur(4px)'
         }}>
-          {isActive ? 'Activa' : 'Cerrada'}
+          {estado}
         </div>
       </div>
 
-      {/* Contenido (título y summary) */}
+      {/* Contenido */}
       <div style={{
         padding: 'var(--spacing-md)',
         display: 'flex',
         flexDirection: 'column',
-        gap: 'var(--spacing-xs)',
+        gap: 'var(--spacing-sm)',
         flex: 1
       }}>
         {/* Título */}
@@ -152,18 +165,32 @@ const MissionCard = ({ mission, loading = false, onClick }) => {
           textOverflow: 'ellipsis',
           whiteSpace: 'nowrap'
         }}>
-          {title}
+          {nombre}
         </h3>
 
-        {/* Summary */}
+        {/* Descripción breve */}
         <p className="line-clamp-2" style={{
           fontSize: 'var(--text-xs)',
           color: 'var(--text-muted)',
           margin: 0,
-          lineHeight: 1.4
+          lineHeight: 1.4,
+          minHeight: '2.8em'
         }}>
-          {summary || 'Sin descripción'}
+          {descripcionBreve || 'Sin descripción'}
         </p>
+
+        {/* Fecha */}
+        {(fechaInicio || fechaFin) && (
+          <div style={{
+            fontSize: 'var(--text-xs)',
+            color: 'var(--text-secondary)',
+            marginTop: 'auto',
+            paddingTop: 'var(--spacing-xs)',
+            borderTop: '1px solid var(--border-color)'
+          }}>
+            {estado === 'proxima' ? formatDate(fechaInicio) : formatDate(fechaFin)}
+          </div>
+        )}
       </div>
     </div>
   );

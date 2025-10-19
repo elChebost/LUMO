@@ -1,7 +1,7 @@
 import prisma from '../config/db.js';
 
-// Crear una mision
-export const createMission = async ({ title, description, status, activationDate, dueDate, dueTime, teacherId }) => {
+// ✅ Crear una misión (nuevo sistema)
+export const createMission = async ({ nombre, descripcionBreve, historia, fechaInicio, fechaFin, imagenURL, estado, roles, teacherId }) => {
   try {
     // Verificar que el profesor existe
     const teacher = await prisma.teacher.findUnique({
@@ -14,12 +14,14 @@ export const createMission = async ({ title, description, status, activationDate
 
     return await prisma.mission.create({
       data: {
-        title,
-        description,
-        status: status || 'Borrador',
-        activationDate: activationDate ? new Date(activationDate) : null,
-        dueDate: dueDate ? new Date(dueDate) : null,
-        dueTime: dueTime || null,
+        nombre,
+        descripcionBreve,
+        historia,
+        fechaInicio: new Date(fechaInicio),
+        fechaFin: new Date(fechaFin),
+        imagenURL: imagenURL || null,
+        estado: estado || 'inactiva',
+        roles: typeof roles === 'string' ? roles : JSON.stringify(roles),
         teacher: { connect: { id: Number(teacherId) } },
       },
     });
@@ -28,92 +30,153 @@ export const createMission = async ({ title, description, status, activationDate
   }
 };
 
-// Obtener todas las misiones
+// ✅ Obtener todas las misiones
 export const getMissions = async () => {
   try {
-    return await prisma.mission.findMany({
+    const missions = await prisma.mission.findMany({
       include: {
-        teacher: true
+        teacher: true,
       },
       orderBy: {
-        createdAt: 'desc'
+        fechaInicio: 'asc'
       }
     });
+    
+    // Parsear roles JSON
+    return missions.map(mission => ({
+      ...mission,
+      roles: typeof mission.roles === 'string' ? JSON.parse(mission.roles) : mission.roles
+    }));
   } catch (error) {
     throw error; 
   }
 };
 
-// Obtener misiones por título (búsqueda)
-export const getMissionsByTitle = async (title) => {
+// ✅ Obtener misiones por nombre (búsqueda)
+export const getMissionsByTitle = async (nombre) => {
   try {
-    const allMissions = await prisma.mission.findMany();
+    const missions = await prisma.mission.findMany({
+      where: {
+        nombre: {
+          contains: nombre,
+          mode: 'insensitive'
+        }
+      },
+      include: {
+        teacher: true,
+      }
+    });
     
-    return allMissions.filter(mission => 
-      mission.title.toLowerCase().includes(title.toLowerCase())
-    );
+    return missions.map(mission => ({
+      ...mission,
+      roles: typeof mission.roles === 'string' ? JSON.parse(mission.roles) : mission.roles
+    }));
   } catch (error) {
     throw error;
   }
 };
 
-// Obtener misiones activas
+// ✅ Obtener misiones activas
 export const getActiveMissions = async () => {
   try {
-    return await prisma.mission.findMany({
-      where: { status: 'active' },
+    const missions = await prisma.mission.findMany({
+      where: { estado: 'activa' },
+      include: {
+        teacher: true,
+      }
     });
+    
+    return missions.map(mission => ({
+      ...mission,
+      roles: typeof mission.roles === 'string' ? JSON.parse(mission.roles) : mission.roles
+    }));
   } catch (error) {
     throw error;
   }
 };
 
-// Obtener misiones inactivas
+// ✅ Obtener misiones inactivas
 export const getInactiveMissions = async () => {
   try {
-    return await prisma.mission.findMany({
-      where: { status: 'inactive' },
+    const missions = await prisma.mission.findMany({
+      where: { estado: 'inactiva' },
+      include: {
+        teacher: true,
+      }
     });
+    
+    return missions.map(mission => ({
+      ...mission,
+      roles: typeof mission.roles === 'string' ? JSON.parse(mission.roles) : mission.roles
+    }));
   } catch (error) {
     throw error;
   }
 };
 
-// Contar total de misiones activas
+// ✅ Contar total de misiones activas
 export const getTotalActiveMissions = async () => {
   try {
     return await prisma.mission.count({
-      where: { status: 'active' },
+      where: { estado: 'activa' },
     });
   } catch (error) {
     throw error;
   }
 };
 
-// Obtener una mision por ID
+// ✅ Obtener una misión por ID
 export const getMissionById = async (id) => {
   try {
-    return await prisma.mission.findUnique({
+    const mission = await prisma.mission.findUnique({
       where: { id: Number(id) },
+      include: {
+        teacher: true,
+      }
     });
+    
+    if (!mission) return null;
+    
+    return {
+      ...mission,
+      roles: typeof mission.roles === 'string' ? JSON.parse(mission.roles) : mission.roles
+    };
   } catch (error) {
     throw error; 
   }
 };
 
-// Actualizar una mision
+// ✅ Actualizar una misión
 export const updateMission = async (id, data) => {
   try {
-    return await prisma.mission.update({
+    // Convertir roles a JSON string si es necesario
+    if (data.roles && typeof data.roles !== 'string') {
+      data.roles = JSON.stringify(data.roles);
+    }
+    
+    // Convertir fechas si existen
+    if (data.fechaInicio) {
+      data.fechaInicio = new Date(data.fechaInicio);
+    }
+    if (data.fechaFin) {
+      data.fechaFin = new Date(data.fechaFin);
+    }
+    
+    const mission = await prisma.mission.update({
       where: { id: Number(id) },
       data,
     });
+    
+    return {
+      ...mission,
+      roles: typeof mission.roles === 'string' ? JSON.parse(mission.roles) : mission.roles
+    };
   } catch (error) {
     throw error; 
   }
 };
 
-// Eliminar una mision
+// ✅ Eliminar una misión
 export const deleteMission = async (id) => {
   try {
     return await prisma.mission.delete({

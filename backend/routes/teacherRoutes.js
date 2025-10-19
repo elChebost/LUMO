@@ -1,18 +1,21 @@
 import express from 'express';
 import {
-  createSchoolHandler,
-  getSchoolsHandler,
-  getSchoolByIdHandler,
-  updateSchoolHandler,
-  deleteSchoolHandler,
-} from '../controllers/schoolController.js';
+  createTeacherHandler,
+  getTeachersHandler,
+  getTeacherByIdHandler,
+  updateTeacherHandler,
+  deleteTeacherHandler,
+  uploadAvatarHandler
+} from '../controllers/teacherController.js';
+import upload from '../middlewares/uploadMiddleware.js';
 
 const router = express.Router();
 
-router.post('/', createSchoolHandler);        // POST /schools
-router.get('/', getSchoolsHandler);           // GET /schools
-router.get('/:id', getSchoolByIdHandler);     // GET /schools/:id
-router.put('/:id', updateSchoolHandler);      // PUT /schools/:id
-router.delete('/:id', deleteSchoolHandler);   // DELETE /schools/:id
+router.post('/', createTeacherHandler);                          // POST /teachers
+router.get('/', getTeachersHandler);                             // GET /teachers
+router.get('/:id', getTeacherByIdHandler);                       // GET /teachers/:id
+router.put('/:id', updateTeacherHandler);                        // PUT /teachers/:id
+router.delete('/:id', deleteTeacherHandler);                     // DELETE /teachers/:id
+router.post('/:id/avatar', upload.single('avatar'), uploadAvatarHandler); // POST /teachers/:id/avatar
 
 export default router;

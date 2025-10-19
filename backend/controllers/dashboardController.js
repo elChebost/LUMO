@@ -1,7 +1,20 @@
 import prisma from '../config/db.js';
 
 /**
- * GET /api/dashboard
+ * GE    res.json({
+      avgLogic,
+      avgCreativity,
+      avgWriting,
+      avgTimeMinutes,
+      activeMissionsCount,
+      onlineStudentsCount,
+      totalStudents,
+    });
+  } catch (error) {
+    console.error('Error en getDashboardStats:', error);
+    res.status(500).json({ message: 'Error al obtener estadísticas del dashboard' });
+  }
+};rd
  * Retorna estadísticas agregadas para el dashboard principal
  */
 export const getDashboardStats = async (req, res) => {
@@ -12,12 +25,14 @@ export const getDashboardStats = async (req, res) => {
         statLogic: true,
         statCreativity: true,
         statWriting: true,
+        avgTimeMinutes: true,
       },
     });
 
     let avgLogic = 0;
     let avgCreativity = 0;
     let avgWriting = 0;
+    let avgTimeMinutes = 0;
 
     if (students.length > 0) {
       avgLogic = Math.round(
@@ -29,6 +44,9 @@ export const getDashboardStats = async (req, res) => {
       avgWriting = Math.round(
         students.reduce((sum, s) => sum + s.statWriting, 0) / students.length
       );
+      avgTimeMinutes = Math.round(
+        students.reduce((sum, s) => sum + s.avgTimeMinutes, 0) / students.length
+      );
     }
 
     // 2. Total de misiones activas
@@ -39,8 +57,8 @@ export const getDashboardStats = async (req, res) => {
     // 3. Total de estudiantes
     const totalStudents = await prisma.student.count();
 
-    // 4. Estudiantes online
-    const studentsOnline = await prisma.student.count({
+    // 4. Estudiantes online (conectados actualmente)
+    const onlineStudentsCount = await prisma.student.count({
       where: { isOnline: true },
     });
 
@@ -48,12 +66,13 @@ export const getDashboardStats = async (req, res) => {
       avgLogic,
       avgCreativity,
       avgWriting,
+      avgTimeMinutes,
       activeMissionsCount,
+      onlineStudentsCount,
       totalStudents,
-      studentsOnline,
     });
   } catch (error) {
     console.error('Error en getDashboardStats:', error);
-    res.status(500).json({ error: 'Error al obtener estadísticas del dashboard' });
+    res.status(500).json({ message: 'Error al obtener estadísticas del dashboard' });
   }
 };

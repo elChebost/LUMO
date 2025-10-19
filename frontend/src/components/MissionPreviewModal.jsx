@@ -1,26 +1,48 @@
 import { FiX, FiAward } from 'react-icons/fi';
+import ActivityAccordion from './ActivityAccordion';
 
 const MissionPreviewModal = ({ mission, isOpen, onClose, onSelectRole }) => {
   if (!isOpen || !mission) return null;
 
-  const { title, summary, narrative, previewImage } = mission;
+  const { title, summary, narrative, previewImage, activities = [] } = mission;
 
-  // Parsear el JSON de narrative para obtener los 3 roles
-  let roles = [];
-  try {
-    const narrativeData = typeof narrative === 'string' ? JSON.parse(narrative) : narrative;
-    roles = [
-      { id: 'logic', title: narrativeData.logicTitle || 'Rol Lógica', story: narrativeData.logicStory || '', rewardPoints: narrativeData.logicReward || 0 },
-      { id: 'creativity', title: narrativeData.creativityTitle || 'Rol Creatividad', story: narrativeData.creativityStory || '', rewardPoints: narrativeData.creativityReward || 0 },
-      { id: 'writing', title: narrativeData.writingTitle || 'Rol Escritura', story: narrativeData.writingStory || '', rewardPoints: narrativeData.writingReward || 0 }
-    ];
-  } catch (e) {
-    console.error('Error parsing narrative:', e);
-    roles = [
-      { id: 'logic', title: 'Rol Lógica', story: 'No disponible', rewardPoints: 0 },
-      { id: 'creativity', title: 'Rol Creatividad', story: 'No disponible', rewardPoints: 0 },
-      { id: 'writing', title: 'Rol Escritura', story: 'No disponible', rewardPoints: 0 }
-    ];
+  // ✅ PRIORIDAD 1: Usar activities si existen
+  let displayActivities = [];
+  
+  if (activities && activities.length > 0) {
+    // Usar las actividades del nuevo sistema
+    displayActivities = activities;
+  } else if (narrative) {
+    // FALLBACK: Parsear narrative (sistema antiguo) y convertir a actividades
+    try {
+      const narrativeData = typeof narrative === 'string' ? JSON.parse(narrative) : narrative;
+      displayActivities = [
+        { 
+          id: 'logic', 
+          title: narrativeData.logicTitle || 'Rol Lógica', 
+          description: narrativeData.logicStory || 'No disponible', 
+          type: 'logic',
+          points: narrativeData.logicReward || 10 
+        },
+        { 
+          id: 'creativity', 
+          title: narrativeData.creativityTitle || 'Rol Creatividad', 
+          description: narrativeData.creativityStory || 'No disponible', 
+          type: 'creativity',
+          points: narrativeData.creativityReward || 10 
+        },
+        { 
+          id: 'writing', 
+          title: narrativeData.writingTitle || 'Rol Lengua', 
+          description: narrativeData.writingStory || 'No disponible', 
+          type: 'writing',
+          points: narrativeData.writingReward || 10 
+        }
+      ];
+    } catch (e) {
+      console.error('Error parsing narrative:', e);
+      displayActivities = [];
+    }
   }
 
   const handleBackdropClick = (e) => {
@@ -155,104 +177,32 @@ const MissionPreviewModal = ({ mission, isOpen, onClose, onSelectRole }) => {
             margin: 'var(--spacing-xl) 0'
           }} />
 
-          {/* Sección de roles */}
+          {/* Acordeón de actividades/roles */}
           <div>
             <h3 style={{
               fontSize: 'var(--text-lg)',
               fontWeight: 600,
               color: 'var(--text-primary)',
-              margin: '0 0 var(--spacing-md) 0'
+              marginBottom: 'var(--spacing-lg)'
             }}>
-              Elige tu rol
+              Selecciona tu rol
             </h3>
-            <p style={{
-              fontSize: 'var(--text-sm)',
-              color: 'var(--text-muted)',
-              margin: '0 0 var(--spacing-lg) 0'
-            }}>
-              Selecciona el rol con el que deseas completar esta misión. Cada rol tiene su propia historia y recompensa.
-            </p>
-
-            {/* Grid de roles */}
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-              gap: 'var(--spacing-md)'
-            }}>
-              {roles.map((role) => (
-                <div
-                  key={role.id}
-                  className="card"
-                  onClick={() => onSelectRole && onSelectRole(role)}
-                  style={{
-                    padding: 'var(--spacing-md)',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s ease',
-                    border: '2px solid transparent',
-                    position: 'relative'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.borderColor = 'var(--primary)';
-                    e.currentTarget.style.transform = 'translateY(-2px)';
-                    e.currentTarget.style.boxShadow = 'var(--shadow-md)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.borderColor = 'transparent';
-                    e.currentTarget.style.transform = 'translateY(0)';
-                    e.currentTarget.style.boxShadow = 'var(--shadow-soft)';
-                  }}
-                >
-                  {/* Icono del rol */}
-                  <div style={{
-                    width: '40px',
-                    height: '40px',
-                    borderRadius: '50%',
-                    backgroundColor: 'var(--bg-page)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    marginBottom: 'var(--spacing-sm)',
-                    color: 'var(--primary)'
-                  }}>
-                    <FiAward size={20} />
-                  </div>
-
-                  {/* Título del rol */}
-                  <h4 style={{
-                    fontSize: 'var(--text-base)',
-                    fontWeight: 600,
-                    color: 'var(--text-primary)',
-                    margin: '0 0 var(--spacing-xs) 0'
-                  }}>
-                    {role.title}
-                  </h4>
-
-                  {/* Historia del rol */}
-                  <p className="line-clamp-3" style={{
-                    fontSize: 'var(--text-sm)',
-                    color: 'var(--text-secondary)',
-                    margin: '0 0 var(--spacing-sm) 0',
-                    lineHeight: 1.5,
-                    minHeight: '60px'
-                  }}>
-                    {role.story}
-                  </p>
-
-                  {/* Recompensa */}
-                  <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 'var(--spacing-xs)',
-                    fontSize: 'var(--text-sm)',
-                    fontWeight: 600,
-                    color: 'var(--primary)'
-                  }}>
-                    <FiAward size={16} />
-                    <span>{role.rewardPoints} puntos</span>
-                  </div>
-                </div>
-              ))}
-            </div>
+            {displayActivities.length > 0 ? (
+              <ActivityAccordion activities={displayActivities} />
+            ) : (
+              <div style={{
+                padding: 'var(--spacing-2xl)',
+                textAlign: 'center',
+                color: 'var(--text-muted)',
+                backgroundColor: 'var(--bg-page)',
+                borderRadius: 'var(--radius-lg)',
+                border: '2px dashed var(--border-color)'
+              }}>
+                <p style={{ margin: 0 }}>
+                  Esta misión aún no tiene actividades definidas.
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </div>

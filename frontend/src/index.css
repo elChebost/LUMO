@@ -483,3 +483,144 @@ textarea::placeholder {
   animation: slideUp 0.3s ease-out;
 }
 
+/* ========================================
+ * RESPONSIVE DESIGN - STUDENTS & MISSIONS
+ * Mobile-First Approach (320px+)
+ * ======================================== */
+
+/* Mobile (320px - 640px) */
+@media (max-width: 640px) {
+  /* Students Page */
+  .students-filters {
+    flex-direction: column !important;
+    gap: 0.75rem !important;
+  }
+
+  .students-search-input,
+  .students-filter-select {
+    width: 100% !important;
+    height: 48px !important;
+    font-size: 1rem !important;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
+  .students-table {
+    font-size: 0.875rem;
+  }
+
+  .students-table td,
+  .students-table th {
+    padding: 0.75rem 0.5rem !important;
+  }
+
+  /* Missions Page */
+  .missions-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+  }
+
+  .mission-card {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .missions-filters {
+    flex-direction: column !important;
+    gap: 0.75rem !important;
+  }
+
+  .missions-search-input,
+  .missions-filter-select,
+  .missions-create-btn {
+    width: 100% !important;
+    height: 48px !important;
+    font-size: 1rem !important;
+  }
+
+  /* Touch-friendly buttons */
+  button {
+    min-height: 44px;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Page headers móvil */
+  .mobile-page-header h1 {
+    font-size: 1.5rem !important;
+  }
+
+  .mobile-page-header p {
+    display: none;
+  }
+}
+
+/* Tablet (641px - 1024px) */
+@media (min-width: 641px) and (max-width: 1024px) {
+  /* Missions Grid - 2 columnas */
+  .missions-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 1.25rem !important;
+  }
+
+  .mission-card {
+    max-width: 100% !important;
+  }
+
+  /* Students - Optimizar tabla */
+  .students-table {
+    font-size: 0.875rem;
+  }
+
+  /* Filtros en tablet */
+  .students-search-input {
+    min-width: 250px !important;
+  }
+
+  .missions-search-input {
+    min-width: 280px !important;
+  }
+}
+
+/* Desktop (1025px+) */
+@media (min-width: 1025px) {
+  /* Missions Grid - 3 columnas */
+  .missions-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 1.5rem !important;
+  }
+
+  .mission-card {
+    max-width: 420px !important;
+  }
+
+  /* Students - Tabla completa */
+  .students-search-input {
+    min-width: 300px !important;
+    max-width: 520px !important;
+  }
+}
+
+/* Hover effects solo en desktop (no touch) */
+@media (hover: hover) and (pointer: fine) {
+  .mission-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  }
+
+  .students-table tbody tr:hover {
+    background-color: rgba(46, 125, 50, 0.04);
+  }
+}
+
+/* Optimizaciones de performance */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+

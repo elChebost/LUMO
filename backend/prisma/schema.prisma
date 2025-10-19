@@ -32,6 +32,7 @@ model Teacher {
   id          Int              @id @default(autoincrement())
   name        String
   email       String           @unique
+  avatar_url  String?          // ✅ URL del avatar del profesor
   subjects    String
   schedule    String
   role        String
@@ -92,21 +93,24 @@ model Subject {
 
 model Mission {
   id               Int                      @id @default(autoincrement())
-  title            String
-  summary          String?                  // ✅ Resumen corto para cards
-  description      String                   // Descripción completa (legacy)
-  previewImage     String?                  // ✅ URL de imagen de preview
-  narrative        String?                  // ✅ JSON con 3 roles narrativos
-  status           String                   // "active", "inactive"
-  activationDate   DateTime?
-  dueDate          DateTime?
-  dueTime          String?
+  nombre           String                   // Nombre de la misión
+  descripcionBreve String                   // Descripción breve para cards
+  historia         String                   // Historia narrativa completa
+  fechaInicio      DateTime                 // Fecha de inicio/activación
+  fechaFin         DateTime                 // Fecha de finalización
+  imagenURL        String?                  // URL de la imagen
+  estado           String                   // "activa", "proxima", "inactiva", "finalizada"
+  roles            String                   // JSON con array de 3 roles con emoji, nombre y descripción
   teacherId        Int
   teacher          Teacher                  @relation(fields: [teacherId], references: [id])
   createdAt        DateTime                 @default(now())
   updatedAt        DateTime                 @updatedAt
+  
+  // ✅ Relaciones
   studentProgress  StudentMissionProgress[]
 }
+
+
 
 model StudentProfile {
   id        Int      @id @default(autoincrement())

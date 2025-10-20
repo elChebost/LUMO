@@ -4,6 +4,13 @@ node_modules
 
 /generated/prisma
 
+# SQLite Database - DO NOT VERSION CONTROL
+*.db
+*.db-shm
+*.db-wal
+prisma/dev.db
+prisma/prisma/dev.db
 backend/prisma/dev.db
+backend/prisma/prisma/dev.db
 
 desktop.ini

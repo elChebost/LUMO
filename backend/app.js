@@ -31,13 +31,40 @@ const __dirname = dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Mostrar PID en logs para detectar procesos duplicados
+const PID = process.pid;
+
 // ✅ Configurar CORS ANTES de cualquier ruta (acepta múltiples puertos de Vite)
-app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:5175'],
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
+// Middleware CORS explícito para entornos de desarrollo
+// Refleja el Origin en Access-Control-Allow-Origin cuando el origen es localhost
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  
+  console.log(`[CORS] ${req.method} ${req.path} | Origin: ${origin || 'no-origin'}`);
+  
+  // permitir requests sin origin (por ejemplo herramientas como curl/postman)
+  if (!origin) return next();
+
+  const localhostRegex = /^https?:\/\/localhost(:\d+)?$/;
+  if (localhostRegex.test(origin)) {
+    // Cuando se permiten credenciales, no usar '*', sino el origen explícito
+    console.log(`[CORS] ✅ Allowing origin: ${origin}`);
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+    res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type,Authorization');
+  } else {
+    console.log(`[CORS] ❌ Rejecting origin: ${origin}`);
+  }
+
+  // Responder inmediatamente a preflight
+  if (req.method === 'OPTIONS') {
+    console.log('[CORS] Responding to OPTIONS preflight');
+    return res.sendStatus(204);
+  }
+
+  next();
+});
 
 // ✅ Middleware para parsear JSON
 app.use(express.json());
@@ -72,6 +99,11 @@ app.use('/api/notifications', notificationRoutes); // ✅ Sistema de notificacio
 // Conexión a la base de datos
 connectDB();
 
+// Ruta de health-check sencilla para confirmar que el servidor está arriba
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok', pid: PID, port: PORT });
+});
+
 app.listen(PORT, () => {
-  console.log(`Servidor corriendo en puerto ${PORT}`);
+  console.log(`Servidor corriendo en puerto ${PORT} (pid=${PID})`);
 });

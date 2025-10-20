@@ -50,9 +50,11 @@ export const createMissionHandler = async (req, res) => {
 export const getMissionsHandler = async (req, res) => {
   try {
     const missions = await getMissions();
-    res.json(missions);
+    res.json(missions || []);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('[ERROR] getMissionsHandler:', error);
+    // Devolver array vacío en lugar de objeto con error
+    res.json([]);
   }
 };
 
@@ -83,9 +85,11 @@ export const getMissionsByTitleHandler = async (req, res) => {
 export const getActiveMissionsHandler = async (req, res) => {
   try {
     const missions = await getActiveMissions();
-    res.json(missions);
+    res.json(missions || []);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('[ERROR] getActiveMissionsHandler:', error);
+    // Devolver array vacío en lugar de objeto con error
+    res.json([]);
   }
 };
 

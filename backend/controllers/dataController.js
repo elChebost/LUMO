@@ -1,4 +1,5 @@
 import prisma from '../config/db.js';
+import { recalculateStudentStats, getStudentProgress } from '../services/statsService.js';
 
 // Obtener datos básicos para formularios
 export const getBasicData = async (req, res) => {
@@ -35,7 +36,12 @@ export const getStudentById = async (req, res) => {
         school: true,
         teacher: true,
         classroom: true,
-        skillTree: true
+        skillTree: true,
+        missionProgress: {
+          include: {
+            mission: true
+          }
+        }
       }
     });
 
@@ -43,7 +49,18 @@ export const getStudentById = async (req, res) => {
       return res.status(404).json({ message: 'Estudiante no encontrado' });
     }
 
-    res.json(student);
+    // Recalcular estadísticas antes de devolver
+    const stats = await recalculateStudentStats(Number(id));
+    const progress = await getStudentProgress(Number(id));
+
+    // Combinar datos
+    const studentData = {
+      ...student,
+      ...stats,
+      ...progress
+    };
+
+    res.json(studentData);
   } catch (error) {
     console.error('Error obteniendo estudiante:', error);
     res.status(500).json({ 

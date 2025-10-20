@@ -61,12 +61,19 @@ model Student {
   classroomId       Int
   classroom         Classroom                @relation(fields: [classroomId], references: [id])
   
-  // ✅ Nuevas estadísticas personales
-  statLogic         Int                      @default(0)
-  statCreativity    Int                      @default(0)
-  statWriting       Int                      @default(0)
+  // ✅ Estadísticas de habilidades (porcentaje calculado automáticamente)
+  statLogic         Int                      @default(0)  // % de veces que eligió Lógica
+  statCreativity    Int                      @default(0)  // % de veces que eligió Creatividad
+  statLanguage      Int                      @default(0)  // % de veces que eligió Lengua (antes Writing)
+  
+  // ✅ Contadores de elección de roles (para calcular los porcentajes)
+  rolesLogicCount      Int                   @default(0)  // Cantidad de veces que eligió Lógica
+  rolesCreativityCount Int                   @default(0)  // Cantidad de veces que eligió Creatividad
+  rolesLanguageCount   Int                   @default(0)  // Cantidad de veces que eligió Lengua
+  
+  // ✅ Métricas generales
   avgTimeMinutes    Int                      @default(0)
-  missionsCompleted Int                      @default(0)
+  missionsCompleted Int                      @default(0)  // Total de misiones completadas
   isOnline          Boolean                  @default(false)
   
   skillTree         SkillTree?
@@ -100,7 +107,7 @@ model Mission {
   fechaFin         DateTime                 // Fecha de finalización
   imagenURL        String?                  // URL de la imagen
   estado           String                   // "activa", "proxima", "inactiva", "finalizada"
-  roles            String                   // JSON con array de 3 roles con emoji, nombre y descripción
+  roles            String                   // JSON con array de 3 roles: [Lógica, Creatividad, Lengua] con emoji, nombre y descripción
   teacherId        Int
   teacher          Teacher                  @relation(fields: [teacherId], references: [id])
   createdAt        DateTime                 @default(now())
@@ -147,7 +154,7 @@ model Contact {
   updatedAt DateTime @updatedAt
 }
 
-// ✅ Nueva tabla para progreso de misiones por estudiante
+// ✅ Tabla para progreso de misiones por estudiante
 model StudentMissionProgress {
   id              Int      @id @default(autoincrement())
   studentId       Int
@@ -155,12 +162,17 @@ model StudentMissionProgress {
   missionId       Int
   mission         Mission  @relation(fields: [missionId], references: [id])
   tasksCompleted  Int      @default(0)
+  
+  // ✅ Rol elegido: 1=Lógica, 2=Creatividad, 3=Lengua
   selectedRoleId  Int?     // ID del rol seleccionado (1-3)
+  selectedRoleName String? // Nombre del rol: "Lógica", "Creatividad" o "Lengua"
+  
   status          String   @default("pending") // pending, in_progress, completed
+  completedAt     DateTime? // Fecha de completación
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
   
-  @@unique([studentId, missionId])
+  @@unique([studentId, missionId]) // Un alumno no puede tener la misma misión dos veces
 }
 
 // ✅ Nueva tabla para notificaciones

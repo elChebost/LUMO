@@ -1,63 +1,38 @@
 import prisma from '../config/db.js';
+import { calculateClassroomAverageStats } from '../services/statsService.js';
 
 /**
- * GE    res.json({
-      avgLogic,
-      avgCreativity,
-      avgWriting,
-      avgTimeMinutes,
-      activeMissionsCount,
-      onlineStudentsCount,
-      totalStudents,
-    });
-  } catch (error) {
-    console.error('Error en getDashboardStats:', error);
-    res.status(500).json({ message: 'Error al obtener estadísticas del dashboard' });
-  }
-};rd
+ * GET /api/dashboard
  * Retorna estadísticas agregadas para el dashboard principal
  */
 export const getDashboardStats = async (req, res) => {
   try {
-    // 1. Promedio de habilidades de todos los estudiantes
+    // 1. Promedio de habilidades de todos los estudiantes (calculado dinámicamente)
+    const { avgLogic, avgCreativity, avgLanguage } = await calculateClassroomAverageStats();
+
+    // 2. Promedio de tiempo en la app
     const students = await prisma.student.findMany({
       select: {
-        statLogic: true,
-        statCreativity: true,
-        statWriting: true,
         avgTimeMinutes: true,
       },
     });
 
-    let avgLogic = 0;
-    let avgCreativity = 0;
-    let avgWriting = 0;
     let avgTimeMinutes = 0;
-
     if (students.length > 0) {
-      avgLogic = Math.round(
-        students.reduce((sum, s) => sum + s.statLogic, 0) / students.length
-      );
-      avgCreativity = Math.round(
-        students.reduce((sum, s) => sum + s.statCreativity, 0) / students.length
-      );
-      avgWriting = Math.round(
-        students.reduce((sum, s) => sum + s.statWriting, 0) / students.length
-      );
       avgTimeMinutes = Math.round(
         students.reduce((sum, s) => sum + s.avgTimeMinutes, 0) / students.length
       );
     }
 
-    // 2. Total de misiones activas
+    // 3. Total de misiones activas
     const activeMissionsCount = await prisma.mission.count({
-      where: { status: 'active' },
+      where: { estado: 'activa' },
     });
 
-    // 3. Total de estudiantes
+    // 4. Total de estudiantes
     const totalStudents = await prisma.student.count();
 
-    // 4. Estudiantes online (conectados actualmente)
+    // 5. Estudiantes online (conectados actualmente)
     const onlineStudentsCount = await prisma.student.count({
       where: { isOnline: true },
     });
@@ -65,14 +40,24 @@ export const getDashboardStats = async (req, res) => {
     res.json({
       avgLogic,
       avgCreativity,
-      avgWriting,
+      avgLanguage,  // ✅ Cambio de avgWriting a avgLanguage
       avgTimeMinutes,
       activeMissionsCount,
       onlineStudentsCount,
       totalStudents,
     });
   } catch (error) {
-    console.error('Error en getDashboardStats:', error);
-    res.status(500).json({ message: 'Error al obtener estadísticas del dashboard' });
+    console.error('[ERROR] getDashboardStats:', error);
+    // Devolver valores por defecto en lugar de error 500
+    res.json({
+      avgLogic: 0,
+      avgCreativity: 0,
+      avgLanguage: 0,  // ✅ Cambio de avgWriting a avgLanguage
+      avgTimeMinutes: 0,
+      activeMissionsCount: 0,
+      onlineStudentsCount: 0,
+      totalStudents: 0,
+    });
   }
 };
+

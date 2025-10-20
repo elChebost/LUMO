@@ -43,7 +43,7 @@ const StudentCard = ({ student, loading = false }) => {
     );
   }
 
-  const { id, name, level, xp, email } = student || {};
+  const { id, name, level, xp } = student || {};
 
   const handleClick = () => {
     if (id) {

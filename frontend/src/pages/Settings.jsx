@@ -406,8 +406,16 @@ const Settings = () => {
         <div style={{ position: 'relative' }}>
           <button
             onClick={() => setShowTooltip(!showTooltip)}
-            onMouseEnter={() => setShowTooltip(true)}
-            onMouseLeave={() => setShowTooltip(false)}
+            onMouseEnter={(e) => {
+              setShowTooltip(true);
+              e.currentTarget.style.backgroundColor = 'var(--panel-bg)';
+              e.currentTarget.style.borderColor = 'var(--primary)';
+            }}
+            onMouseLeave={(e) => {
+              setShowTooltip(false);
+              e.currentTarget.style.backgroundColor = 'var(--bg-page)';
+              e.currentTarget.style.borderColor = 'var(--border-color)';
+            }}
             style={{
               width: '100%',
               padding: 'var(--spacing-md)',
@@ -422,14 +430,6 @@ const Settings = () => {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = 'var(--panel-bg)';
-              e.currentTarget.style.borderColor = 'var(--primary)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = 'var(--bg-page)';
-              e.currentTarget.style.borderColor = 'var(--border-color)';
             }}
           >
             <span>Cambiar contraseña</span>

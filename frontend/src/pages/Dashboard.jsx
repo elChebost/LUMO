@@ -39,7 +39,7 @@ const Dashboard = () => {
       const dashboardRes = await fetch(`${API_URL}/dashboard`);
       const dashboardData = await dashboardRes.json();
 
-      // Estructura: { avgLogic, avgCreativity, avgWriting, activeMissionsCount, onlineStudentsCount, totalStudents, avgTimeMinutes }
+      // Estructura: { avgLogic, avgCreativity, avgLanguage, activeMissionsCount, onlineStudentsCount, totalStudents, avgTimeMinutes }
       setStats(dashboardData);
 
       // Cargar misiones activas
@@ -185,7 +185,7 @@ const Dashboard = () => {
             }}>
               <span style={{ color: 'var(--text-primary)' }}>✏️ Lengua</span>
               <span style={{ color: '#2196F3', fontWeight: 700, fontSize: 'var(--text-lg)' }}>
-                {loading ? '...' : `${stats?.avgWriting || 0}%`}
+                {loading ? '...' : `${stats?.avgLanguage || 0}%`}
               </span>
             </div>
             <div style={{
@@ -197,7 +197,7 @@ const Dashboard = () => {
             }}>
               <div style={{
                 height: '100%',
-                width: `${loading ? 0 : stats?.avgWriting || 0}%`,
+                width: `${loading ? 0 : stats?.avgLanguage || 0}%`,
                 backgroundColor: '#2196F3',
                 transition: 'width 0.8s cubic-bezier(0.4, 0, 0.2, 1)',
                 borderRadius: '12px',

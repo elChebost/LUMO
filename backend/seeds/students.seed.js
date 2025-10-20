@@ -21,9 +21,12 @@ async function seedStudents() {
       schoolId: 1,
       teacherId: 1,
       classroomId: 1,
-      statLogic: 75,
-      statCreativity: 60,
-      statWriting: 80,
+      statLogic: 50,        // 4 de 8 misiones
+      statCreativity: 25,   // 2 de 8 misiones
+      statLanguage: 25,     // 2 de 8 misiones
+      rolesLogicCount: 4,
+      rolesCreativityCount: 2,
+      rolesLanguageCount: 2,
       avgTimeMinutes: 45,
       missionsCompleted: 8,
       isOnline: true,
@@ -40,9 +43,12 @@ async function seedStudents() {
       schoolId: 1,
       teacherId: 1,
       classroomId: 1,
-      statLogic: 90,
-      statCreativity: 85,
-      statWriting: 70,
+      statLogic: 50,        // 6 de 12 misiones
+      statCreativity: 33,   // 4 de 12 misiones
+      statLanguage: 17,     // 2 de 12 misiones
+      rolesLogicCount: 6,
+      rolesCreativityCount: 4,
+      rolesLanguageCount: 2,
       avgTimeMinutes: 52,
       missionsCompleted: 12,
       isOnline: false,
@@ -59,9 +65,12 @@ async function seedStudents() {
       schoolId: 1,
       teacherId: 1,
       classroomId: 1,
-      statLogic: 55,
-      statCreativity: 70,
-      statWriting: 50,
+      statLogic: 20,        // 1 de 5 misiones
+      statCreativity: 40,   // 2 de 5 misiones
+      statLanguage: 40,     // 2 de 5 misiones
+      rolesLogicCount: 1,
+      rolesCreativityCount: 2,
+      rolesLanguageCount: 2,
       avgTimeMinutes: 32,
       missionsCompleted: 5,
       isOnline: true,
@@ -78,9 +87,12 @@ async function seedStudents() {
       schoolId: 1,
       teacherId: 1,
       classroomId: 1,
-      statLogic: 80,
-      statCreativity: 95,
-      statWriting: 90,
+      statLogic: 33,        // 5 de 15 misiones
+      statCreativity: 47,   // 7 de 15 misiones
+      statLanguage: 20,     // 3 de 15 misiones
+      rolesLogicCount: 5,
+      rolesCreativityCount: 7,
+      rolesLanguageCount: 3,
       avgTimeMinutes: 68,
       missionsCompleted: 15,
       isOnline: false,
@@ -97,9 +109,12 @@ async function seedStudents() {
       schoolId: 1,
       teacherId: 1,
       classroomId: 1,
-      statLogic: 40,
-      statCreativity: 45,
-      statWriting: 35,
+      statLogic: 50,        // 1 de 2 misiones
+      statCreativity: 0,    // 0 de 2 misiones
+      statLanguage: 50,     // 1 de 2 misiones
+      rolesLogicCount: 1,
+      rolesCreativityCount: 0,
+      rolesLanguageCount: 1,
       avgTimeMinutes: 25,
       missionsCompleted: 2,
       isOnline: false,
@@ -116,9 +131,12 @@ async function seedStudents() {
       schoolId: 1,
       teacherId: 1,
       classroomId: 1,
-      statLogic: 70,
-      statCreativity: 75,
-      statWriting: 85,
+      statLogic: 22,        // 2 de 9 misiones
+      statCreativity: 33,   // 3 de 9 misiones
+      statLanguage: 45,     // 4 de 9 misiones
+      rolesLogicCount: 2,
+      rolesCreativityCount: 3,
+      rolesLanguageCount: 4,
       avgTimeMinutes: 48,
       missionsCompleted: 9,
       isOnline: true,

@@ -6,7 +6,7 @@
  * Obtiene el token de localStorage
  * @returns {string|null} Token JWT o null si no existe
  */
-export const getToken = () => {
+const getToken = () => {
   return localStorage.getItem('token');
 };
 
@@ -17,16 +17,6 @@ export const getToken = () => {
 export const getUser = () => {
   const user = localStorage.getItem('user');
   return user ? JSON.parse(user) : null;
-};
-
-/**
- * Guarda el token y usuario en localStorage
- * @param {string} token - Token JWT
- * @param {object} user - Datos del usuario
- */
-export const setAuth = (token, user) => {
-  localStorage.setItem('token', token);
-  localStorage.setItem('user', JSON.stringify(user));
 };
 
 /**
@@ -43,16 +33,4 @@ export const clearAuth = () => {
  */
 export const isAuthenticated = () => {
   return !!getToken();
-};
-
-/**
- * Obtiene headers con autorización para fetch
- * @returns {object} Headers con Authorization Bearer token
- */
-export const getAuthHeaders = () => {
-  const token = getToken();
-  return {
-    'Content-Type': 'application/json',
-    ...(token && { Authorization: `Bearer ${token}` })
-  };
 };

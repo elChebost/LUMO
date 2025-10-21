@@ -75,12 +75,13 @@ export const getStudentsHandler = async (req, res) => {
       students = students.sort((a, b) => a.name.localeCompare(b.name));
     }
     
-    // Agregar campo de progreso calculado
+    // Agregar campo totalMissions directamente al estudiante
     students = students.map(student => ({
       ...student,
+      totalMissions: 5, // Total de misiones disponibles
       progress: {
         completed: student.missionsCompleted || 0,
-        total: 5, // Total de misiones activas (se puede calcular dinámicamente)
+        total: 5,
       },
     }));
     

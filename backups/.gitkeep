@@ -1,0 +1,16 @@
+# Este directorio almacena los backups de LUMO
+# Los backups se crean automáticamente con ./backup.sh
+
+# Backups incluyen:
+# - Base de datos SQLite
+# - Archivos .env (configuración)
+# - Uploads (avatars y archivos subidos)
+
+# Para crear un backup:
+# ./backup.sh
+
+# Para restaurar desde un backup:
+# ./restore.sh
+
+# Los backups se mantienen comprimidos en formato .tar.gz
+# Se conservan automáticamente los últimos 7 backups

@@ -54,13 +54,12 @@ const StudentRow = ({ student, loading = false, onClick }) => {
     );
   }
 
-  const { id, name, email, level, xp, missions = [] } = student || {};
-  const missionsCount = missions.length;
+  const { id, name, email, level, xp } = student || {};
   
   // Variables necesarias para ambas vistas (mobile y desktop)
   const isOnline = student?.isOnline || false;
   const missionsCompleted = student?.missionsCompleted || 0;
-  const totalMissions = 6; // Por ahora hardcoded, luego vendrá del backend
+  const totalMissions = student?.totalMissions || 5; // Total de misiones disponibles
 
   const handleClick = () => {
     if (onClick) {

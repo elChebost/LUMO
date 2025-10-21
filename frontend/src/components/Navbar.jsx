@@ -66,7 +66,8 @@ const Navbar = () => {
     const searchTimeout = setTimeout(async () => {
       if (searchValue.length >= 2) {
         try {
-          const response = await fetch(`${API_URL}/api/search?q=${encodeURIComponent(searchValue)}`);
+          // Usar apiUrl para normalizar y evitar duplicar '/api' si API_URL ya lo contiene
+          const response = await fetch(apiUrl(`/search?q=${encodeURIComponent(searchValue)}`));
           const data = await response.json();
           setSearchResults(data);
         } catch (error) {

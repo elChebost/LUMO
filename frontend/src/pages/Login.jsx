@@ -5,7 +5,7 @@ import { isAuthenticated } from '../utils/auth';
 import './Login.css'; // Importar estilos CSS
 import iconText from '../assets/icon_text.png';
 import portada from '../assets/portada.png';
-import { API_URL } from '../config/api.js';
+import { API_URL, apiUrl } from '../config/api.js';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -27,7 +27,7 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const response = await fetch(`${API_URL}/api/auth/login`, {
+  const response = await fetch(apiUrl('/auth/login'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

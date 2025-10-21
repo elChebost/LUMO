@@ -1,18 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { FiUser, FiBell, FiLock, FiLogOut, FiUpload, FiInfo } from 'react-icons/fi';
+import { FiUser, FiLock, FiLogOut, FiUpload, FiInfo } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
 import { API_URL } from '../config/api.js';
 
 const Settings = () => {
   const [isMobile, setIsMobile] = useState(false);
   const [userData, setUserData] = useState(null);
-  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
-  const [notificationTypes, setNotificationTypes] = useState({
-    newMission: true,
-    studentSubmission: true,
-    studentAchievement: true,
-    systemUpdate: false
-  });
   const [avatarHover, setAvatarHover] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
   const navigate = useNavigate();
@@ -26,14 +19,8 @@ const Settings = () => {
 
     // Cargar datos del usuario
     loadUserData();
-    
-    // Verificar permisos de notificaciones
-    if ('Notification' in window) {
-      setNotificationsEnabled(Notification.permission === 'granted');
-    }
 
     return () => window.removeEventListener('resize', checkMobile);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const loadUserData = async () => {
@@ -107,34 +94,7 @@ const Settings = () => {
     }
   };
 
-  const handleNotificationToggle = async () => {
-    if ('Notification' in window) {
-      if (Notification.permission === 'granted') {
-        // Ya está activado, desactivar
-        setNotificationsEnabled(false);
-      } else if (Notification.permission === 'denied') {
-        alert('Los permisos de notificación están bloqueados. Por favor, habilítalos en la configuración del navegador.');
-      } else {
-        // Solicitar permiso
-        const permission = await Notification.requestPermission();
-        if (permission === 'granted') {
-          setNotificationsEnabled(true);
-          new Notification('LUMO', {
-            body: 'Las notificaciones están activadas',
-            icon: '/icon.png'
-          });
-        }
-      }
-    }
-  };
 
-  const handleNotificationTypeChange = (type) => {
-    setNotificationTypes(prev => ({
-      ...prev,
-      [type]: !prev[type]
-    }));
-    // TODO: Guardar preferencias en backend
-  };
 
   return (
     <div style={{ padding: '0' }}>
@@ -262,129 +222,6 @@ const Settings = () => {
             </p>
           </div>
         </div>
-      </div>
-
-      {/* Notificaciones */}
-      <div className="card" style={{
-        padding: 'var(--spacing-lg)',
-        marginBottom: 'var(--spacing-lg)'
-      }}>
-        <h3 style={{
-          fontSize: 'var(--text-lg)',
-          fontWeight: 600,
-          color: 'var(--text-primary)',
-          margin: '0 0 var(--spacing-md) 0'
-        }}>
-          <FiBell size={20} style={{ verticalAlign: 'text-bottom', marginRight: 'var(--spacing-xs)' }} />
-          Notificaciones
-        </h3>
-
-        {/* Toggle principal */}
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          padding: 'var(--spacing-md)',
-          backgroundColor: 'var(--bg-page)',
-          borderRadius: 'var(--radius-md)',
-          marginBottom: 'var(--spacing-md)'
-        }}>
-          <div>
-            <p style={{
-              fontSize: 'var(--text-base)',
-              fontWeight: 600,
-              color: 'var(--text-primary)',
-              margin: 0
-            }}>
-              Habilitar notificaciones en el dispositivo
-            </p>
-            <p style={{
-              fontSize: 'var(--text-sm)',
-              color: 'var(--text-muted)',
-              margin: 'var(--spacing-xs) 0 0 0'
-            }}>
-              Recibe alertas en tiempo real
-            </p>
-          </div>
-          <button
-            onClick={handleNotificationToggle}
-            style={{
-              position: 'relative',
-              width: '48px',
-              height: '26px',
-              borderRadius: 'var(--radius-full)',
-              border: 'none',
-              backgroundColor: notificationsEnabled ? 'var(--primary)' : 'var(--border-color)',
-              cursor: 'pointer',
-              transition: 'background-color 0.2s ease'
-            }}
-          >
-            <div style={{
-              position: 'absolute',
-              top: '3px',
-              left: notificationsEnabled ? '25px' : '3px',
-              width: '20px',
-              height: '20px',
-              borderRadius: '50%',
-              backgroundColor: 'white',
-              transition: 'left 0.2s ease'
-            }} />
-          </button>
-        </div>
-
-        {/* Tipos de notificación */}
-        {notificationsEnabled && (
-          <div style={{
-            padding: 'var(--spacing-md)',
-            backgroundColor: 'var(--bg-page)',
-            borderRadius: 'var(--radius-md)'
-          }}>
-            <p style={{
-              fontSize: 'var(--text-sm)',
-              fontWeight: 600,
-              color: 'var(--text-primary)',
-              margin: '0 0 var(--spacing-sm) 0'
-            }}>
-              Tipos de notificación
-            </p>
-
-            {[
-              { key: 'newMission', label: 'Nuevas misiones creadas' },
-              { key: 'studentSubmission', label: 'Entregas de estudiantes' },
-              { key: 'studentAchievement', label: 'Logros de estudiantes' },
-              { key: 'systemUpdate', label: 'Actualizaciones del sistema' }
-            ].map(({ key, label }) => (
-              <label
-                key={key}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 'var(--spacing-sm)',
-                  padding: 'var(--spacing-sm) 0',
-                  cursor: 'pointer'
-                }}
-              >
-                <input
-                  type="checkbox"
-                  checked={notificationTypes[key]}
-                  onChange={() => handleNotificationTypeChange(key)}
-                  style={{
-                    width: '18px',
-                    height: '18px',
-                    cursor: 'pointer',
-                    accentColor: 'var(--primary)'
-                  }}
-                />
-                <span style={{
-                  fontSize: 'var(--text-sm)',
-                  color: 'var(--text-secondary)'
-                }}>
-                  {label}
-                </span>
-              </label>
-            ))}
-          </div>
-        )}
       </div>
 
       {/* Seguridad y Privacidad */}

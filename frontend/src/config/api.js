@@ -33,3 +33,17 @@ console.log('🔧 LUMO API Configuration:', {
   finalApiUrl: API_URL
 });
 
+// Normaliza y concatena rutas de API en runtime para evitar dobles barras o duplicar '/api'
+export function apiUrl(path = '') {
+  // Asegurar que path comienza con '/'
+  const normalizedPath = path.startsWith('/') ? path : `/${path}`;
+
+  // Si API_URL termina con '/api', queremos evitar: /api/api
+  // Por seguridad, eliminamos cualquier '/' final en API_URL
+  const base = API_URL.replace(/\/+$/g, '');
+
+  // Si base termina en '/api', entonces devolvemos base + normalizedPath sin volver a añadir '/api'
+  // Ej: base = 'https://lumo.anima.edu.uy/api' && path = '/auth/login' => 'https://lumo.anima.edu.uy/api/auth/login'
+  return `${base}${normalizedPath}`;
+}
+

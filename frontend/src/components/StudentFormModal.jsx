@@ -1,7 +1,6 @@
 ﻿import React, { useState, useEffect } from 'react';
 import { FiX, FiAlertCircle } from 'react-icons/fi';
-
-const API_URL = 'http://localhost:3000/api';
+import { API_URL } from '../config/api.js';
 
 const StudentFormModal = ({ isOpen, onClose, onStudentAdded }) => {
   const [formData, setFormData] = useState({

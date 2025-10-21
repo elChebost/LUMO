@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { FiX, FiCalendar, FiClock, FiEdit2, FiSave, FiTrash2 } from 'react-icons/fi';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
-
-const API_URL = 'http://localhost:3000/api';
+import { API_URL } from '../config/api.js';
 
 const MissionModal = ({ mission, isOpen, onClose, onSave, mode = 'view' }) => {
   const [isEditing, setIsEditing] = useState(mode === 'edit' || mode === 'create');

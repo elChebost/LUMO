@@ -4,9 +4,7 @@ import { FiClock, FiTarget, FiUsers, FiCheckCircle } from 'react-icons/fi';
 import StatCard from '../components/StatCard';
 import MissionCard from '../components/MissionCard';
 import MissionPreviewModal from '../components/MissionPreviewModal';
-
-// ⚠️ Cambiado de 4000 a 3000 para coincidir con el backend
-const API_URL = 'http://localhost:3000/api';
+import { API_URL } from '../config/api.js';
 
 const Dashboard = () => {
   const [stats, setStats] = useState(null);

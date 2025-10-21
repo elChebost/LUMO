@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FiUser, FiBell, FiLock, FiLogOut, FiUpload, FiInfo } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
-
-const API_URL = 'http://localhost:3000/api';
+import { API_URL } from '../config/api.js';
 
 const Settings = () => {
   const [isMobile, setIsMobile] = useState(false);
@@ -88,10 +87,10 @@ const Settings = () => {
 
       if (response.ok) {
         const data = await response.json();
-        // ✅ Actualizar con URL del servidor
+        // ✅ Actualizar con URL del servidor (usa ruta relativa)
         setUserData(prev => ({ 
           ...prev, 
-          avatar_url: `http://localhost:3000${data.avatar_url}` 
+          avatar_url: data.avatar_url 
         }));
         // Liberar memoria del preview
         URL.revokeObjectURL(previewUrl);

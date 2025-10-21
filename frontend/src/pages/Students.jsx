@@ -3,9 +3,7 @@ import { FiSearch, FiUserPlus } from 'react-icons/fi';
 import StudentRow from '../components/StudentRow';
 import StudentFormModal from '../components/StudentFormModal';
 import StudentDetailModal from '../components/StudentDetailModal';
-
-// ⚠️ Cambiado de 4000 a 3000 para coincidir con el backend
-const API_URL = 'http://localhost:3000/api';
+import { API_URL } from '../config/api.js';
 
 const Students = () => {
   const [students, setStudents] = useState([]);

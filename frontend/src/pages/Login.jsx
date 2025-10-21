@@ -5,9 +5,7 @@ import { isAuthenticated } from '../utils/auth';
 import './Login.css'; // Importar estilos CSS
 import iconText from '../assets/icon_text.png';
 import portada from '../assets/portada.png';
-
-// ✅ Puerto correcto (3000)
-const API_URL = 'http://localhost:3000';
+import { API_URL } from '../config/api.js';
 
 const Login = () => {
   const [email, setEmail] = useState('');

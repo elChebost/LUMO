@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FiX, FiSearch, FiSend, FiAlertCircle } from 'react-icons/fi';
-
-const API_URL = 'http://localhost:3000/api';
+import { API_URL } from '../config/api.js';
 
 const NotificationComposer = ({ isOpen, onClose, onSent }) => {
   const [searchTerm, setSearchTerm] = useState('');

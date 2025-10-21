@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-
-const API_URL = 'http://localhost:3000/api';
+import { API_URL } from '../config/api.js';
 
 export const useNotifications = () => {
   const [notifications, setNotifications] = useState([]);

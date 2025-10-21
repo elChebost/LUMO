@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { FiPlus, FiFilter, FiSearch } from 'react-icons/fi';
 import MissionCard from '../components/MissionCard';
 import MissionModal from '../components/MissionModal';
-
-const API_URL = 'http://localhost:3000/api';
+import { API_URL } from '../config/api.js';
 
 const Missions = () => {
   const [missions, setMissions] = useState([]);

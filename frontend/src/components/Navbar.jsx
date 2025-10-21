@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { FiSearch, FiChevronDown, FiUser, FiClipboard } from 'react-icons/fi';
 import { clearAuth, getUser } from '../utils/auth';
+import { API_URL } from '../config/api.js';
 
 const pageTitle = {
   '/dashboard': { title: 'Panel principal', subtitle: 'Resumen general del curso y accesos rápidos' },
@@ -10,9 +11,6 @@ const pageTitle = {
   '/missions': { title: 'Misiones', subtitle: 'Administra las misiones del curso' },
   '/settings': { title: 'Configuración', subtitle: 'Ajustes y preferencias' },
 };
-
-// ⚠️ Cambiado de 4000 a 3000 para coincidir con el backend
-const API_URL = 'http://localhost:3000';
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);

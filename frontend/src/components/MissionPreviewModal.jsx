@@ -1,7 +1,7 @@
-import { FiX, FiAward } from 'react-icons/fi';
+import { FiX } from 'react-icons/fi';
 import ActivityAccordion from './ActivityAccordion';
 
-const MissionPreviewModal = ({ mission, isOpen, onClose, onSelectRole }) => {
+const MissionPreviewModal = ({ mission, isOpen, onClose }) => {
   if (!isOpen || !mission) return null;
 
   const { title, summary, narrative, previewImage, activities = [] } = mission;
@@ -120,30 +120,33 @@ const MissionPreviewModal = ({ mission, isOpen, onClose, onSelectRole }) => {
               position: 'absolute',
               top: 'var(--spacing-md)',
               right: 'var(--spacing-md)',
-              width: '36px',
-              height: '36px',
+              width: '40px',
+              height: '40px',
               borderRadius: '50%',
               border: 'none',
               backgroundColor: 'rgba(255, 255, 255, 0.95)',
-              color: 'var(--text-primary)',
+              color: '#1e293b',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              boxShadow: 'var(--shadow-md)',
+              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
               transition: 'all 0.2s ease',
-              backdropFilter: 'blur(4px)'
+              backdropFilter: 'blur(4px)',
+              zIndex: 10
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.transform = 'scale(1.1)';
-              e.currentTarget.style.backgroundColor = 'white';
+              e.currentTarget.style.backgroundColor = '#fff';
+              e.currentTarget.style.boxShadow = '0 6px 12px rgba(0, 0, 0, 0.15)';
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.transform = 'scale(1)';
               e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.95)';
+              e.currentTarget.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
             }}
           >
-            <FiX size={20} />
+            <FiX size={20} strokeWidth={2.5} />
           </button>
         </div>
 
@@ -216,6 +219,67 @@ const MissionPreviewModal = ({ mission, isOpen, onClose, onSelectRole }) => {
           to {
             opacity: 1;
             transform: scale(1);
+          }
+        }
+
+        /* 📱 Responsive Mobile */
+        @media (max-width: 768px) {
+          .card {
+            max-width: 100% !important;
+            margin: 0 !important;
+            border-radius: var(--radius-md) !important;
+          }
+
+          /* Padding más compacto */
+          .card > div:last-child {
+            padding: var(--spacing-md) !important;
+          }
+
+          /* Títulos más pequeños */
+          .card h2 {
+            font-size: var(--text-xl) !important;
+            margin-bottom: var(--spacing-xs) !important;
+          }
+
+          .card h3 {
+            font-size: var(--text-base) !important;
+            margin-bottom: var(--spacing-md) !important;
+          }
+
+          /* Texto más compacto */
+          .card p {
+            font-size: var(--text-sm) !important;
+            line-height: 1.5 !important;
+          }
+
+          /* Separadores más pequeños */
+          .card > div:last-child > div[style*="height: 1px"] {
+            margin: var(--spacing-lg) 0 !important;
+          }
+        }
+
+        @media (max-width: 480px) {
+          /* Header con imagen más pequeño */
+          .card > div:first-child > div:first-child {
+            height: 150px !important;
+          }
+
+          /* Botón cerrar más pequeño */
+          .card > div:first-child button {
+            width: 36px !important;
+            height: 36px !important;
+            top: var(--spacing-sm) !important;
+            right: var(--spacing-sm) !important;
+          }
+
+          /* Contenido más compacto */
+          .card > div:last-child {
+            padding: var(--spacing-sm) !important;
+          }
+
+          /* Títulos ultra compactos */
+          .card h2 {
+            font-size: var(--text-lg) !important;
           }
         }
       `}</style>

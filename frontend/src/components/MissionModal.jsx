@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FiX, FiCalendar, FiClock, FiEdit2, FiSave } from 'react-icons/fi';
+import { FiX, FiCalendar, FiClock, FiEdit2, FiSave, FiTrash2 } from 'react-icons/fi';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 
@@ -23,6 +23,7 @@ const MissionModal = ({ mission, isOpen, onClose, onSave, mode = 'view' }) => {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   useEffect(() => {
     if (mission) {
@@ -49,9 +50,45 @@ const MissionModal = ({ mission, isOpen, onClose, onSave, mode = 'view' }) => {
         ]
       });
     }
-  }, [mission]);
+    // Resetear estado de edición al abrir
+    setIsEditing(mode === 'edit' || mode === 'create');
+    setShowDeleteConfirm(false);
+  }, [mission, mode, isOpen]);
 
   if (!isOpen) return null;
+
+  const handleClose = () => {
+    // Resetear estado de edición al cerrar
+    setIsEditing(false);
+    setShowDeleteConfirm(false);
+    onClose();
+  };
+
+  const handleDelete = async () => {
+    if (!mission?.id) return;
+
+    setLoading(true);
+    setError('');
+
+    try {
+      const response = await fetch(`${API_URL}/missions/${mission.id}`, {
+        method: 'DELETE'
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.message || 'Error al eliminar la misión');
+      }
+
+      if (onSave) await onSave();
+      handleClose();
+    } catch (err) {
+      setError(err.message);
+      setShowDeleteConfirm(false);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -227,7 +264,7 @@ const MissionModal = ({ mission, isOpen, onClose, onSave, mode = 'view' }) => {
 
           {/* Botón cerrar */}
           <button
-            onClick={onClose}
+            onClick={handleClose}
             style={{
               position: 'absolute',
               top: 'var(--spacing-md)',
@@ -237,29 +274,31 @@ const MissionModal = ({ mission, isOpen, onClose, onSave, mode = 'view' }) => {
               borderRadius: '50%',
               border: 'none',
               backgroundColor: 'rgba(255, 255, 255, 0.95)',
-              color: 'var(--text-primary)',
+              color: '#1e293b',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              boxShadow: 'var(--shadow-md)',
+              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
               transition: 'all 0.2s ease',
               backdropFilter: 'blur(4px)',
               zIndex: 10
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.transform = 'scale(1.1)';
-              e.currentTarget.style.backgroundColor = 'white';
+              e.currentTarget.style.backgroundColor = '#fff';
+              e.currentTarget.style.boxShadow = '0 6px 12px rgba(0, 0, 0, 0.15)';
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.transform = 'scale(1)';
               e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.95)';
+              e.currentTarget.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
             }}
           >
-            <FiX size={20} />
+            <FiX size={20} strokeWidth={2.5} />
           </button>
 
-          {/* Botón editar/guardar */}
+          {/* Botón editar */}
           {!isEditing && mode !== 'create' && (
             <button
               onClick={() => setIsEditing(true)}
@@ -277,21 +316,23 @@ const MissionModal = ({ mission, isOpen, onClose, onSave, mode = 'view' }) => {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                boxShadow: 'var(--shadow-md)',
+                boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
                 transition: 'all 0.2s ease',
                 backdropFilter: 'blur(4px)',
                 zIndex: 10
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.transform = 'scale(1.1)';
-                e.currentTarget.style.backgroundColor = 'white';
+                e.currentTarget.style.backgroundColor = '#fff';
+                e.currentTarget.style.boxShadow = '0 6px 12px rgba(0, 0, 0, 0.15)';
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform = 'scale(1)';
                 e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.95)';
+                e.currentTarget.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
               }}
             >
-              <FiEdit2 size={18} />
+              <FiEdit2 size={18} strokeWidth={2.5} />
             </button>
           )}
         </div>
@@ -391,7 +432,7 @@ const MissionModal = ({ mission, isOpen, onClose, onSave, mode = 'view' }) => {
           </div>
 
           {/* Fechas */}
-          <div style={{
+          <div className="dates-container" style={{
             display: 'grid',
             gridTemplateColumns: isEditing ? '1fr' : '1fr 1fr',
             gap: 'var(--spacing-md)',
@@ -654,60 +695,189 @@ const MissionModal = ({ mission, isOpen, onClose, onSave, mode = 'view' }) => {
           {isEditing && (
             <div style={{
               display: 'flex',
-              justifyContent: 'flex-end',
+              justifyContent: 'space-between',
+              alignItems: 'center',
               gap: 'var(--spacing-md)',
               marginTop: 'var(--spacing-xl)',
               paddingTop: 'var(--spacing-xl)',
-              borderTop: '1px solid var(--border-color)'
+              borderTop: '1px solid var(--border-color)',
+              flexWrap: 'wrap'
             }}>
-              {mode !== 'create' && (
+              {/* Botón eliminar - solo en modo edición de misión existente */}
+              {mode !== 'create' && mission?.id && (
                 <button
                   type="button"
-                  onClick={() => setIsEditing(false)}
+                  onClick={() => setShowDeleteConfirm(true)}
+                  disabled={loading}
+                  style={{
+                    padding: 'var(--spacing-sm) var(--spacing-lg)',
+                    borderRadius: 'var(--radius-md)',
+                    border: '1px solid #dc2626',
+                    backgroundColor: 'transparent',
+                    color: '#dc2626',
+                    fontSize: 'var(--text-sm)',
+                    fontWeight: 600,
+                    cursor: loading ? 'not-allowed' : 'pointer',
+                    transition: 'all 0.2s ease',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 'var(--spacing-sm)',
+                    opacity: loading ? 0.5 : 1
+                  }}
+                  onMouseEnter={(e) => !loading && (e.currentTarget.style.backgroundColor = '#fee', e.currentTarget.style.borderColor = '#b91c1c')}
+                  onMouseLeave={(e) => !loading && (e.currentTarget.style.backgroundColor = 'transparent', e.currentTarget.style.borderColor = '#dc2626')}
+                >
+                  <FiTrash2 size={16} />
+                  Eliminar
+                </button>
+              )}
+
+              {/* Botones de acción derecha */}
+              <div style={{
+                display: 'flex',
+                gap: 'var(--spacing-md)',
+                marginLeft: 'auto',
+                flexWrap: 'wrap'
+              }}>
+                {mode !== 'create' && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsEditing(false);
+                      setShowDeleteConfirm(false);
+                    }}
+                    style={{
+                      padding: 'var(--spacing-sm) var(--spacing-xl)',
+                      borderRadius: 'var(--radius-md)',
+                      border: '1px solid var(--border-color)',
+                      backgroundColor: 'transparent',
+                      color: 'var(--text-primary)',
+                      fontSize: 'var(--text-sm)',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease'
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-page)'}
+                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                  >
+                    Cancelar
+                  </button>
+                )}
+                <button
+                  type="submit"
+                  disabled={loading}
                   style={{
                     padding: 'var(--spacing-sm) var(--spacing-xl)',
                     borderRadius: 'var(--radius-md)',
-                    border: '1px solid var(--border-color)',
-                    backgroundColor: 'transparent',
-                    color: 'var(--text-primary)',
+                    border: 'none',
+                    backgroundColor: 'var(--color-primary)',
+                    color: 'white',
                     fontSize: 'var(--text-sm)',
                     fontWeight: 600,
-                    cursor: 'pointer',
-                    transition: 'all 0.2s ease'
+                    cursor: loading ? 'not-allowed' : 'pointer',
+                    transition: 'all 0.2s ease',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 'var(--spacing-sm)',
+                    opacity: loading ? 0.6 : 1
                   }}
-                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-page)'}
-                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                  onMouseEnter={(e) => !loading && (e.currentTarget.style.backgroundColor = 'var(--color-primary-hover)')}
+                  onMouseLeave={(e) => !loading && (e.currentTarget.style.backgroundColor = 'var(--color-primary)')}
                 >
-                  Cancelar
+                  <FiSave size={18} />
+                  {loading ? 'Guardando...' : 'Guardar Misión'}
                 </button>
-              )}
-              <button
-                type="submit"
-                disabled={loading}
-                style={{
-                  padding: 'var(--spacing-sm) var(--spacing-xl)',
-                  borderRadius: 'var(--radius-md)',
-                  border: 'none',
-                  backgroundColor: 'var(--color-primary)',
-                  color: 'white',
-                  fontSize: 'var(--text-sm)',
-                  fontWeight: 600,
-                  cursor: loading ? 'not-allowed' : 'pointer',
-                  transition: 'all 0.2s ease',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 'var(--spacing-sm)',
-                  opacity: loading ? 0.6 : 1
-                }}
-                onMouseEnter={(e) => !loading && (e.currentTarget.style.backgroundColor = 'var(--color-primary-hover)')}
-                onMouseLeave={(e) => !loading && (e.currentTarget.style.backgroundColor = 'var(--color-primary)')}
-              >
-                <FiSave size={18} />
-                {loading ? 'Guardando...' : 'Guardar Misión'}
-              </button>
+              </div>
             </div>
           )}
         </form>
+
+        {/* Confirmación de eliminación */}
+        {showDeleteConfirm && (
+          <div style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.7)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 20,
+            borderRadius: 'var(--radius-lg)'
+          }}>
+            <div style={{
+              backgroundColor: 'white',
+              padding: 'var(--spacing-2xl)',
+              borderRadius: 'var(--radius-lg)',
+              maxWidth: '400px',
+              width: '90%',
+              boxShadow: 'var(--shadow-xl)'
+            }}>
+              <h3 style={{
+                fontSize: 'var(--text-lg)',
+                fontWeight: 600,
+                color: 'var(--text-primary)',
+                marginBottom: 'var(--spacing-md)'
+              }}>
+                ¿Eliminar misión?
+              </h3>
+              <p style={{
+                fontSize: 'var(--text-sm)',
+                color: 'var(--text-secondary)',
+                marginBottom: 'var(--spacing-xl)',
+                lineHeight: 1.6
+              }}>
+                Esta acción no se puede deshacer. Se eliminará permanentemente la misión <strong>"{mission?.nombre}"</strong> y todo su progreso asociado.
+              </p>
+              <div style={{
+                display: 'flex',
+                gap: 'var(--spacing-md)',
+                justifyContent: 'flex-end'
+              }}>
+                <button
+                  onClick={() => setShowDeleteConfirm(false)}
+                  disabled={loading}
+                  style={{
+                    padding: 'var(--spacing-sm) var(--spacing-lg)',
+                    borderRadius: 'var(--radius-md)',
+                    border: '1px solid var(--border-color)',
+                    backgroundColor: 'white',
+                    color: 'var(--text-primary)',
+                    fontSize: 'var(--text-sm)',
+                    fontWeight: 600,
+                    cursor: loading ? 'not-allowed' : 'pointer',
+                    opacity: loading ? 0.5 : 1
+                  }}
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleDelete}
+                  disabled={loading}
+                  style={{
+                    padding: 'var(--spacing-sm) var(--spacing-lg)',
+                    borderRadius: 'var(--radius-md)',
+                    border: 'none',
+                    backgroundColor: '#dc2626',
+                    color: 'white',
+                    fontSize: 'var(--text-sm)',
+                    fontWeight: 600,
+                    cursor: loading ? 'not-allowed' : 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 'var(--spacing-sm)',
+                    opacity: loading ? 0.6 : 1
+                  }}
+                >
+                  <FiTrash2 size={16} />
+                  {loading ? 'Eliminando...' : 'Eliminar'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       <style>{`
@@ -719,6 +889,74 @@ const MissionModal = ({ mission, isOpen, onClose, onSave, mode = 'view' }) => {
           to {
             opacity: 1;
             transform: scale(1);
+          }
+        }
+
+        /* 📱 Responsive Mobile */
+        @media (max-width: 768px) {
+          .card {
+            max-width: 100% !important;
+            margin: 0 !important;
+            border-radius: var(--radius-md) !important;
+          }
+
+          .dates-container {
+            grid-template-columns: 1fr !important;
+          }
+
+          /* Ajustar padding en móviles */
+          .card form {
+            padding: var(--spacing-md) !important;
+          }
+
+          /* Botones más compactos */
+          .card button {
+            font-size: var(--text-xs) !important;
+            padding: var(--spacing-xs) var(--spacing-sm) !important;
+          }
+
+          /* Títulos más pequeños */
+          .card h2 {
+            font-size: var(--text-xl) !important;
+          }
+
+          .card h3 {
+            font-size: var(--text-base) !important;
+          }
+
+          /* Textarea más compacto */
+          .card textarea {
+            font-size: var(--text-sm) !important;
+          }
+
+          /* Inputs más pequeños */
+          .card input {
+            font-size: var(--text-sm) !important;
+            padding: var(--spacing-xs) var(--spacing-sm) !important;
+          }
+        }
+
+        @media (max-width: 480px) {
+          /* Header con imagen más pequeño */
+          .card > div:first-child > div:first-child {
+            height: 150px !important;
+          }
+
+          /* Botones header más pequeños */
+          .card > div:first-child button {
+            width: 36px !important;
+            height: 36px !important;
+            top: var(--spacing-sm) !important;
+            right: var(--spacing-sm) !important;
+          }
+
+          .card > div:first-child button:nth-of-type(2) {
+            right: calc(var(--spacing-sm) + 44px) !important;
+          }
+
+          /* Roles en columna completa */
+          .card form > div:last-of-type > div {
+            padding: var(--spacing-md) !important;
           }
         }
       `}</style>

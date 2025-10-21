@@ -141,6 +141,7 @@ model User {
   name      String
   email     String   @unique
   password  String
+  role      String   @default("alumno") // "alumno" o "profesor"
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

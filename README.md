@@ -149,6 +149,7 @@ chmod +x *.sh
 - ✅ Backend con PM2 (proceso permanente)
 - ✅ Frontend servido por Nginx
 - ✅ CORS configurado correctamente
+- ✅ **Detección automática de URL de API** (sin configuración manual)
 - ✅ SELinux configurado
 - ✅ Firewall configurado
 - ✅ Listo para SSL/HTTPS
@@ -157,6 +158,7 @@ chmod +x *.sh
 - [DEPLOYMENT-ROCKY-LINUX.md](DEPLOYMENT-ROCKY-LINUX.md) - Guía completa
 - [CHECKLIST-DEPLOYMENT.md](CHECKLIST-DEPLOYMENT.md) - Checklist paso a paso
 - [CORS-TROUBLESHOOTING.md](CORS-TROUBLESHOOTING.md) - Solución de problemas CORS
+- [DETECCION-AUTOMATICA-API.md](DETECCION-AUTOMATICA-API.md) - 🆕 Cómo funciona la detección automática
 
 Ver [DEPLOYMENT.md](DEPLOYMENT.md) para guía completa de deployment en otros sistemas.
 

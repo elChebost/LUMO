@@ -157,16 +157,24 @@ NODE_ENV=production
 ```bash
 # Copiar archivo de ejemplo
 cp frontend/.env.example frontend/.env
-
-# Editar
-nano frontend/.env
 ```
 
-Configuración para producción:
+⚠️ **IMPORTANTE**: Ya **NO es necesario** editar `frontend/.env` en producción.
 
-```env
-# URL del backend a través de Nginx
-VITE_API_URL=http://lumo.anima.edu.uy/api
+El frontend ahora **detecta automáticamente** el entorno:
+
+- ✅ En **desarrollo** (`npm run dev`): Usa `http://localhost:3000`
+- ✅ En **producción** (`npm run build`): Usa automáticamente `{origin}/api`
+
+**Ejemplos de detección automática:**
+- Si el dominio es `http://lumo.anima.edu.uy` → Usa `http://lumo.anima.edu.uy/api`
+- Si el dominio es `https://lumo.anima.edu.uy` → Usa `https://lumo.anima.edu.uy/api`
+
+**Solo edita `frontend/.env` si quieres forzar una URL específica:**
+
+```bash
+# Opcional: Forzar una URL específica (descomenta si es necesario)
+# VITE_API_URL=http://lumo.anima.edu.uy/api
 ```
 
 ## 🗄️ Paso 4: Configurar Base de Datos
@@ -327,16 +335,25 @@ sudo certbot --nginx -d lumo.anima.edu.uy
 sudo certbot renew --dry-run
 ```
 
-### 9.2 Actualizar frontend/.env para HTTPS
+### 9.2 Reconstruir Frontend (automáticamente detectará HTTPS)
+
+⚠️ **Ya NO es necesario** modificar `frontend/.env` para HTTPS.
+
+El frontend detecta automáticamente el protocolo del dominio:
 
 ```bash
-nano /opt/proyecto/LUMO/frontend/.env
+cd /opt/proyecto/LUMO/frontend
+
+# Simplemente reconstruir
+npm run build
+
+# Reiniciar Nginx
+sudo systemctl reload nginx
 ```
 
-Cambiar a:
-```env
-VITE_API_URL=https://lumo.anima.edu.uy/api
-```
+✅ **El frontend ahora usará automáticamente:**
+- `https://lumo.anima.edu.uy/api` si accedes con HTTPS
+- `http://lumo.anima.edu.uy/api` si accedes con HTTP
 
 ### 9.3 Reconstruir frontend
 

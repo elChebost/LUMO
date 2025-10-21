@@ -80,7 +80,7 @@ Sistema integral para gestión educativa con gamificación, misiones, árbol de 
 
 ```bash
 # Clonar el repositorio
-git clone https://github.com/tu-usuario/LUMO.git
+git clone https://github.com/elChebost/LUMO.git
 cd LUMO
 
 # Dar permisos de ejecución a los scripts (Linux/Mac)
@@ -97,14 +97,14 @@ La aplicación estará disponible en:
 - **Frontend**: http://localhost:5173
 - **Backend**: http://localhost:3000
 
-### Producción (Servidor SSH)
+### Producción (Servidor SSH con Ubuntu/Debian)
 
 ```bash
 # Conectar al servidor
 ssh usuario@tu-servidor.com
 
 # Clonar el proyecto
-git clone https://github.com/tu-usuario/LUMO.git
+git clone https://github.com/elChebost/LUMO.git
 cd LUMO
 
 # Dar permisos de ejecución
@@ -121,7 +121,44 @@ La aplicación estará disponible en:
 - **Frontend**: http://tu-servidor:4173
 - **Backend**: http://tu-servidor:3000
 
-Ver [DEPLOYMENT.md](DEPLOYMENT.md) para guía completa de deployment.
+### Producción en Rocky Linux 9.6 con Nginx
+
+**Configuración específica para Rocky Linux con dominio personalizado:**
+
+```bash
+# Conectar al servidor
+ssh usuario@servidor.com
+
+# Crear directorio del proyecto
+sudo mkdir -p /opt/proyecto
+cd /opt/proyecto
+
+# Clonar proyecto
+sudo git clone https://github.com/elChebost/LUMO.git
+sudo chown -R $USER:$USER LUMO
+cd LUMO
+
+# Dar permisos
+chmod +x *.sh
+
+# Ejecutar deployment para Rocky Linux
+./deploy-rocky.sh
+```
+
+**Características del deployment en Rocky Linux:**
+- ✅ Backend con PM2 (proceso permanente)
+- ✅ Frontend servido por Nginx
+- ✅ CORS configurado correctamente
+- ✅ SELinux configurado
+- ✅ Firewall configurado
+- ✅ Listo para SSL/HTTPS
+
+**Documentación específica para Rocky Linux:**
+- [DEPLOYMENT-ROCKY-LINUX.md](DEPLOYMENT-ROCKY-LINUX.md) - Guía completa
+- [CHECKLIST-DEPLOYMENT.md](CHECKLIST-DEPLOYMENT.md) - Checklist paso a paso
+- [CORS-TROUBLESHOOTING.md](CORS-TROUBLESHOOTING.md) - Solución de problemas CORS
+
+Ver [DEPLOYMENT.md](DEPLOYMENT.md) para guía completa de deployment en otros sistemas.
 
 ## 💻 Uso
 

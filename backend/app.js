@@ -30,34 +30,49 @@ const __dirname = dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const HOST = process.env.HOST || '0.0.0.0'; // Escuchar en todas las interfaces
 
 // Mostrar PID en logs para detectar procesos duplicados
 const PID = process.pid;
 
-// ✅ Configurar CORS ANTES de cualquier ruta (acepta múltiples puertos de Vite)
-// Middleware CORS explícito para entornos de desarrollo
-// Refleja el Origin en Access-Control-Allow-Origin cuando el origen es localhost
+// ✅ Configurar CORS para producción y desarrollo
+// Lista de orígenes permitidos
+const allowedOrigins = [
+  'http://localhost:5173',           // Desarrollo local
+  'http://localhost:4173',           // Preview local
+  'http://lumo.anima.edu.uy',        // Producción HTTP
+  'https://lumo.anima.edu.uy',       // Producción HTTPS
+  process.env.FRONTEND_URL,          // URL configurada en .env
+].filter(Boolean); // Filtrar valores undefined
+
 app.use((req, res, next) => {
   const origin = req.headers.origin;
   
   console.log(`[CORS] ${req.method} ${req.path} | Origin: ${origin || 'no-origin'}`);
   
-  // permitir requests sin origin (por ejemplo herramientas como curl/postman)
-  if (!origin) return next();
+  // Permitir requests sin origin (por ejemplo curl/postman o requests del mismo origen)
+  if (!origin) {
+    return next();
+  }
 
-  const localhostRegex = /^https?:\/\/localhost(:\d+)?$/;
-  if (localhostRegex.test(origin)) {
-    // Cuando se permiten credenciales, no usar '*', sino el origen explícito
+  // Verificar si el origin está en la lista de permitidos
+  if (allowedOrigins.includes(origin)) {
     console.log(`[CORS] ✅ Allowing origin: ${origin}`);
     res.setHeader('Access-Control-Allow-Origin', origin);
     res.setHeader('Access-Control-Allow-Credentials', 'true');
-    res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type,Authorization');
+    res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,PATCH,OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type,Authorization,X-Requested-With');
   } else {
-    console.log(`[CORS] ❌ Rejecting origin: ${origin}`);
+    console.log(`[CORS] ⚠️  Unknown origin: ${origin}`);
+    // En producción, aún permitir pero sin credentials
+    if (process.env.NODE_ENV === 'production') {
+      res.setHeader('Access-Control-Allow-Origin', origin);
+      res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,PATCH,OPTIONS');
+      res.setHeader('Access-Control-Allow-Headers', 'Content-Type,Authorization,X-Requested-With');
+    }
   }
 
-  // Responder inmediatamente a preflight
+  // Responder inmediatamente a preflight requests
   if (req.method === 'OPTIONS') {
     console.log('[CORS] Responding to OPTIONS preflight');
     return res.sendStatus(204);
@@ -101,9 +116,17 @@ connectDB();
 
 // Ruta de health-check sencilla para confirmar que el servidor está arriba
 app.get('/health', (req, res) => {
-  res.json({ status: 'ok', pid: PID, port: PORT });
+  res.json({ 
+    status: 'ok', 
+    pid: PID, 
+    port: PORT,
+    host: HOST,
+    environment: process.env.NODE_ENV || 'development'
+  });
 });
 
-app.listen(PORT, () => {
-  console.log(`Servidor corriendo en puerto ${PORT} (pid=${PID})`);
+app.listen(PORT, HOST, () => {
+  console.log(`🚀 Servidor corriendo en ${HOST}:${PORT} (pid=${PID})`);
+  console.log(`📝 Modo: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`🌐 CORS permitido desde: ${allowedOrigins.join(', ')}`);
 });

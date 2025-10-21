@@ -1,35 +1,35 @@
 // Configuración de la API
 // ======================
 
-// Detectar automáticamente el entorno
-const isProduction = import.meta.env.PROD;
-const isLocalhost = window.location.hostname === 'localhost' || 
-                    window.location.hostname === '127.0.0.1';
+// Esta función se ejecuta en RUNTIME (tiempo de ejecución), no en build time
+function getApiUrl() {
+  // 1. Si hay una variable de entorno explícita en build time, usarla
+  const envApiUrl = import.meta.env.VITE_API_URL;
+  if (envApiUrl) {
+    return envApiUrl;
+  }
 
-// Determinar la URL de la API
-let apiUrl;
+  // 2. Detectar el hostname actual (RUNTIME - funciona en producción)
+  const hostname = window.location.hostname;
+  const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1';
 
-if (import.meta.env.VITE_API_URL) {
-  // Si hay una variable de entorno explícita, usarla
-  apiUrl = import.meta.env.VITE_API_URL;
-} else if (isProduction && !isLocalhost) {
-  // En producción (build) y NO en localhost, usar la ruta relativa /api
-  apiUrl = `${window.location.origin}/api`;
-} else {
-  // En desarrollo o localhost, usar el backend local
-  apiUrl = 'http://localhost:3000';
+  // 3. Si NO es localhost, usar el mismo dominio con /api
+  if (!isLocalhost) {
+    return `${window.location.origin}/api`;
+  }
+
+  // 4. Si es localhost, usar el backend local
+  return 'http://localhost:3000';
 }
 
-export const API_URL = apiUrl;
+export const API_URL = getApiUrl();
 
-// Logging para debugging (solo en desarrollo)
-if (!isProduction) {
-  console.log('🔧 API Configuration:', {
-    mode: import.meta.env.MODE,
-    isProduction,
-    isLocalhost,
-    hostname: window.location.hostname,
-    origin: window.location.origin,
-    apiUrl: API_URL
-  });
-}
+// Logging para debugging (siempre activado para diagnosticar)
+console.log('🔧 LUMO API Configuration:', {
+  hostname: window.location.hostname,
+  origin: window.location.origin,
+  isLocalhost: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1',
+  envApiUrl: import.meta.env.VITE_API_URL || 'not set',
+  finalApiUrl: API_URL
+});
+

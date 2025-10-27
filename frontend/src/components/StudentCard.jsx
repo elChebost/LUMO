@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { ASSETS } from '../utils/assets';
 
 const StudentCard = ({ student, loading = false }) => {
   const navigate = useNavigate();
@@ -79,7 +80,7 @@ const StudentCard = ({ student, loading = false }) => {
     >
       {/* Avatar */}
       <img
-        src="/assets/avatar.png"
+        src={ASSETS.AVATAR_DEFAULT}
         alt={name}
         style={{
           width: '40px',

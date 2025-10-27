@@ -85,6 +85,7 @@ const StudentFormModal = ({ isOpen, onClose, onStudentAdded }) => {
         setErrors({ general: errorData.message || 'Error al crear el estudiante' });
       }
     } catch (error) {
+      console.error(error);
       setErrors({ general: 'Error de conexión. Intenta nuevamente.' });
     } finally {
       setLoading(false);

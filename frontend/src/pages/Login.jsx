@@ -4,6 +4,7 @@ import { FiMail, FiLock, FiAlertCircle } from 'react-icons/fi';
 import { isAuthenticated } from '../utils/auth';
 import './Login.css'; // Importar estilos CSS
 import { API_URL, apiUrl } from '../config/api.js';
+import { ASSETS } from '../utils/assets';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -117,7 +118,7 @@ const Login = () => {
           }}
         >
         {/* Logo imagen */}
-        <img src="/assets/icon_text.png" alt="LUMO" style={{ width: 180, marginBottom: 24 }} />
+        <img src={ASSETS.ICON_TEXT} alt="LUMO" style={{ width: 180, marginBottom: 24 }} />
         <p style={{ fontSize: '1rem', color: '#666', margin: 0, marginBottom: 16 }}>Portal Docente</p>
         <h2 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#1a1a1a', marginBottom: '0.5rem' }}>
           Iniciar sesión
@@ -339,7 +340,7 @@ const Login = () => {
       >
         <img
           ref={imgRef}
-          src="/assets/portada.png"
+          src={ASSETS.PORTADA}
           alt="LUMO Background"
           style={{
             position: 'absolute',

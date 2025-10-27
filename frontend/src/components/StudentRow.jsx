@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { ASSETS } from '../utils/assets';
 
 const StudentRow = ({ student, loading = false, onClick }) => {
   const navigate = useNavigate();
@@ -96,7 +97,7 @@ const StudentRow = ({ student, loading = false, onClick }) => {
           marginBottom: '0.5rem'
         }}>
           <img
-            src={student?.profile?.avatar || "/assets/avatar.png"}
+            src={student?.profile?.avatar || ASSETS.AVATAR_DEFAULT}
             alt={name}
             style={{
               width: '40px',
@@ -188,7 +189,7 @@ const StudentRow = ({ student, loading = false, onClick }) => {
         gap: 'var(--spacing-md)'
       }}>
         <img
-          src={student?.profile?.avatar || "/assets/avatar.png"}
+          src={student?.profile?.avatar || ASSETS.AVATAR_DEFAULT}
           alt={name}
           style={{
             width: '40px',

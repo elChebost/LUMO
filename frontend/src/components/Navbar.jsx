@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { FiSearch, FiChevronDown, FiUser, FiClipboard } from 'react-icons/fi';
 import { clearAuth, getUser } from '../utils/auth';
 import { API_URL } from '../config/api.js';
+import { ASSETS } from '../utils/assets';
 
 const pageTitle = {
   '/dashboard': { title: 'Panel principal', subtitle: 'Resumen general del curso y accesos rápidos' },
@@ -253,7 +254,7 @@ const Navbar = () => {
             }}
           >
             <img
-              src="/assets/avatar.png"
+              src={ASSETS.AVATAR_DEFAULT}
               alt="Avatar"
               style={{
                 width: '32px',

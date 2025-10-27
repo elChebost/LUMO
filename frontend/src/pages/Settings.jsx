@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { FiUser, FiLock, FiLogOut, FiUpload, FiInfo } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
 import { API_URL } from '../config/api.js';
+import { ASSETS } from '../utils/assets';
 
 const Settings = () => {
   const [isMobile, setIsMobile] = useState(false);
@@ -38,7 +39,7 @@ const Settings = () => {
         name: 'Elias Diaz',
         email: 'remindevelopment@gmail.com',
         role: 'Profesor',
-        avatar_url: '/assets/avatar.png'
+        avatar_url: ASSETS.AVATAR_DEFAULT
       });
     }
   };
@@ -150,7 +151,7 @@ const Settings = () => {
             onMouseLeave={() => setAvatarHover(false)}
           >
             <img
-              src={userData?.avatar_url || '/assets/avatar.png'}
+              src={userData?.avatar_url || ASSETS.AVATAR_DEFAULT}
               alt="Avatar"
               style={{
                 width: '100%',

@@ -1,6 +1,7 @@
 import React from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { FiHome, FiUsers, FiClipboard } from 'react-icons/fi';
+import { ASSETS } from '../utils/assets';
 
 const navItems = [
   { to: '/dashboard', icon: FiHome, label: 'Inicio' },
@@ -33,7 +34,7 @@ const Sidebar = () => {
         onMouseEnter={(e) => e.currentTarget.style.opacity = '0.7'}
         onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
       >
-        <img src={'/assets/icon_text.png'} alt="LUMO" style={{ width: 120, margin: '0 auto' }} />
+        <img src={ASSETS.ICON_TEXT} alt="LUMO" style={{ width: 120, margin: '0 auto' }} />
       </div>
 
       {/* Navegación */}
@@ -42,6 +43,7 @@ const Sidebar = () => {
         flexDirection: 'column',
         gap: 'var(--spacing-md)'
       }}>
+        {/* eslint-disable-next-line no-unused-vars */}
         {navItems.map(({ to, icon: Icon, label }) => {
           const isActive = location.pathname === to || (to === '/dashboard' && location.pathname === '/');
           

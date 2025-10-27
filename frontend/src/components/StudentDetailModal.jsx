@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FiClock, FiCheckCircle, FiTrendingUp } from 'react-icons/fi';
 import BarChart from './BarChart';
+import { ASSETS } from '../utils/assets';
 
 const StudentDetailModal = ({ student, isOpen, onClose }) => {
   const [isMobile, setIsMobile] = useState(false);
@@ -168,7 +169,7 @@ const StudentDetailModal = ({ student, isOpen, onClose }) => {
                   animation: 'zoomIn 0.6s ease-out'
                 }}>
                   <img
-                    src="/assets/avatar.png"
+                    src={ASSETS.AVATAR_DEFAULT}
                     alt={student.name}
                     style={{
                       width: '100%',

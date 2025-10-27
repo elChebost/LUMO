@@ -168,7 +168,7 @@ const StudentDetailModal = ({ student, isOpen, onClose }) => {
                   animation: 'zoomIn 0.6s ease-out'
                 }}>
                   <img
-                    src="/src/assets/avatar.png"
+                    src="/assets/avatar.png"
                     alt={student.name}
                     style={{
                       width: '100%',

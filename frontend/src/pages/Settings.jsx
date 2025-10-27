@@ -38,7 +38,7 @@ const Settings = () => {
         name: 'Elias Diaz',
         email: 'remindevelopment@gmail.com',
         role: 'Profesor',
-        avatar_url: '/avatar.png'
+        avatar_url: '/assets/avatar.png'
       });
     }
   };
@@ -150,7 +150,7 @@ const Settings = () => {
             onMouseLeave={() => setAvatarHover(false)}
           >
             <img
-              src={userData?.avatar_url || '/avatar.png'}
+              src={userData?.avatar_url || '/assets/avatar.png'}
               alt="Avatar"
               style={{
                 width: '100%',

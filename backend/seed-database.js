@@ -102,7 +102,7 @@ async function seedDatabase() {
         where: { studentId: student.id },
         update: {},
         create: {
-          avatar: '/src/assets/avatar.png',
+          avatar: '/assets/avatar.png',
           exp: studentData.xp,
           coins: Math.floor(studentData.xp / 10),
           studentId: student.id

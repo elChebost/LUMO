@@ -79,7 +79,7 @@ const StudentCard = ({ student, loading = false }) => {
     >
       {/* Avatar */}
       <img
-        src="/avatar.png"
+        src="/assets/avatar.png"
         alt={name}
         style={{
           width: '40px',

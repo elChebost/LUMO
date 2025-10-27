@@ -96,7 +96,7 @@ const StudentRow = ({ student, loading = false, onClick }) => {
           marginBottom: '0.5rem'
         }}>
           <img
-            src={student?.profile?.avatar || "/src/assets/avatar.png"}
+            src={student?.profile?.avatar || "/assets/avatar.png"}
             alt={name}
             style={{
               width: '40px',
@@ -188,7 +188,7 @@ const StudentRow = ({ student, loading = false, onClick }) => {
         gap: 'var(--spacing-md)'
       }}>
         <img
-          src={student?.profile?.avatar || "/src/assets/avatar.png"}
+          src={student?.profile?.avatar || "/assets/avatar.png"}
           alt={name}
           style={{
             width: '40px',

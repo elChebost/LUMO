@@ -3,8 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { FiMail, FiLock, FiAlertCircle } from 'react-icons/fi';
 import { isAuthenticated } from '../utils/auth';
 import './Login.css'; // Importar estilos CSS
-import iconText from '../assets/icon_text.png';
-import portada from '../assets/portada.png';
 import { API_URL, apiUrl } from '../config/api.js';
 
 const Login = () => {
@@ -119,7 +117,7 @@ const Login = () => {
           }}
         >
         {/* Logo imagen */}
-        <img src={iconText} alt="LUMO" style={{ width: 180, marginBottom: 24 }} />
+        <img src="/assets/icon_text.png" alt="LUMO" style={{ width: 180, marginBottom: 24 }} />
         <p style={{ fontSize: '1rem', color: '#666', margin: 0, marginBottom: 16 }}>Portal Docente</p>
         <h2 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#1a1a1a', marginBottom: '0.5rem' }}>
           Iniciar sesión
@@ -341,7 +339,7 @@ const Login = () => {
       >
         <img
           ref={imgRef}
-          src={portada}
+          src="/assets/portada.png"
           alt="LUMO Background"
           style={{
             position: 'absolute',

@@ -253,7 +253,7 @@ const Navbar = () => {
             }}
           >
             <img
-              src="/avatar.png"
+              src="/assets/avatar.png"
               alt="Avatar"
               style={{
                 width: '32px',

@@ -33,7 +33,7 @@ const Sidebar = () => {
         onMouseEnter={(e) => e.currentTarget.style.opacity = '0.7'}
         onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
       >
-        <img src={'/src/assets/icon_text.png'} alt="LUMO" style={{ width: 120, margin: '0 auto' }} />
+        <img src={'/assets/icon_text.png'} alt="LUMO" style={{ width: 120, margin: '0 auto' }} />
       </div>
 
       {/* Navegación */}

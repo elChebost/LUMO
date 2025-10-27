@@ -24,7 +24,7 @@ export const createStudent = async ({ name, email, password, age, level, xp, sch
     // Crear perfil del estudiante automáticamente
     await prisma.studentProfile.create({
       data: {
-        avatar: '/src/assets/avatar.png',
+        avatar: '/assets/avatar.png',
         exp: Number(xp) || 0,
         coins: Math.floor((Number(xp) || 0) / 10),
         studentId: student.id

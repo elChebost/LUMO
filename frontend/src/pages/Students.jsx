@@ -3,6 +3,8 @@ import { FiSearch, FiUserPlus } from 'react-icons/fi';
 import StudentRow from '../components/StudentRow';
 import StudentFormModal from '../components/StudentFormModal';
 import StudentDetailModal from '../components/StudentDetailModal';
+import TutorialModal from '../components/TutorialModal';
+import useTutorialModal from '../hooks/useTutorialModal';
 import { API_URL } from '../config/api.js';
 
 const Students = () => {
@@ -14,6 +16,9 @@ const Students = () => {
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [detailModalOpen, setDetailModalOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+
+  // ✅ Hook para modal de tutorial (tecla "T")
+  const { showModal: showTutorialModal, setShowModal: setShowTutorialModal } = useTutorialModal();
 
   useEffect(() => {
     // Detectar móvil
@@ -312,6 +317,12 @@ const Students = () => {
           setDetailModalOpen(false);
           setSelectedStudent(null);
         }}
+      />
+
+      {/* Modal de Tutorial - Se abre con tecla "T" */}
+      <TutorialModal 
+        isOpen={showTutorialModal} 
+        onClose={() => setShowTutorialModal(false)} 
       />
     </div>
   );

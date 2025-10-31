@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { FiPlus, FiFilter, FiSearch } from 'react-icons/fi';
 import MissionCard from '../components/MissionCard';
 import MissionModal from '../components/MissionModal';
+import TutorialModal from '../components/TutorialModal';
+import useTutorialModal from '../hooks/useTutorialModal';
 import { API_URL } from '../config/api.js';
 
 const Missions = () => {
@@ -13,6 +15,9 @@ const Missions = () => {
   const [selectedMission, setSelectedMission] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [modalMode, setModalMode] = useState('view'); // 'view', 'edit', 'create'
+
+  // ✅ Hook para modal de tutorial (tecla "T")
+  const { showModal: showTutorialModal, setShowModal: setShowTutorialModal } = useTutorialModal();
 
   useEffect(() => {
     loadMissions();
@@ -302,6 +307,12 @@ const Missions = () => {
         onClose={handleCloseModal}
         onSave={loadMissions}
         mode={modalMode}
+      />
+
+      {/* Modal de Tutorial - Se abre con tecla "T" */}
+      <TutorialModal 
+        isOpen={showTutorialModal} 
+        onClose={() => setShowTutorialModal(false)} 
       />
     </div>
   );

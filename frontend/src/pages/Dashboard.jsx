@@ -5,6 +5,7 @@ import StatCard from '../components/StatCard';
 import MissionCard from '../components/MissionCard';
 import MissionPreviewModal from '../components/MissionPreviewModal';
 import TutorialModal from '../components/TutorialModal';
+import useTutorialModal from '../hooks/useTutorialModal';
 import { API_URL } from '../config/api.js';
 
 const Dashboard = () => {
@@ -14,21 +15,15 @@ const Dashboard = () => {
   const [isMobile, setIsMobile] = useState(false);
   const [selectedMission, setSelectedMission] = useState(null);
   const [showMissionPreview, setShowMissionPreview] = useState(false);
-  const [showTutorialModal, setShowTutorialModal] = useState(false);
   const navigate = useNavigate();
+
+  // ✅ Hook para modal de tutorial (con auto-show después del login)
+  const { showModal: showTutorialModal, setShowModal: setShowTutorialModal } = useTutorialModal(true);
 
   const user = JSON.parse(localStorage.getItem('user') || '{}');
 
   useEffect(() => {
     loadDashboardData();
-    
-    // ✅ Verificar si debe mostrarse el modal de tutorial
-    const shouldShowTutorial = sessionStorage.getItem('showTutorialModal');
-    if (shouldShowTutorial === 'true') {
-      setShowTutorialModal(true);
-      // Remover la bandera para que no se muestre nuevamente
-      sessionStorage.removeItem('showTutorialModal');
-    }
     
     // Detectar móvil
     const checkMobile = () => {
@@ -36,7 +31,10 @@ const Dashboard = () => {
     };
     checkMobile();
     window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
+    
+    return () => {
+      window.removeEventListener('resize', checkMobile);
+    };
   }, []);
 
   const loadDashboardData = async () => {

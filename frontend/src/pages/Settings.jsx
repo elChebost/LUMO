@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { FiUser, FiLock, FiLogOut, FiUpload, FiInfo } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
+import TutorialModal from '../components/TutorialModal';
+import useTutorialModal from '../hooks/useTutorialModal';
 import { API_URL } from '../config/api.js';
 import { ASSETS } from '../utils/assets';
 
@@ -10,6 +12,9 @@ const Settings = () => {
   const [avatarHover, setAvatarHover] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
   const navigate = useNavigate();
+
+  // ✅ Hook para modal de tutorial (tecla "T")
+  const { showModal: showTutorialModal, setShowModal: setShowTutorialModal } = useTutorialModal();
 
   useEffect(() => {
     const checkMobile = () => {
@@ -324,6 +329,12 @@ const Settings = () => {
         <FiLogOut size={18} />
         Cerrar sesión
       </button>
+
+      {/* Modal de Tutorial - Se abre con tecla "T" */}
+      <TutorialModal 
+        isOpen={showTutorialModal} 
+        onClose={() => setShowTutorialModal(false)} 
+      />
 
       <style>{`
         @keyframes fadeIn {

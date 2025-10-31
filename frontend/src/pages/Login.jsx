@@ -5,14 +5,12 @@ import { isAuthenticated } from '../utils/auth';
 import './Login.css'; // Importar estilos CSS
 import { API_URL, apiUrl } from '../config/api.js';
 import { ASSETS } from '../utils/assets';
-import TutorialModal from '../components/TutorialModal';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [showTutorialModal, setShowTutorialModal] = useState(false);
   const navigate = useNavigate();
 
   // ✅ Redirigir al dashboard si ya está autenticado
@@ -48,14 +46,11 @@ const Login = () => {
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
       
-      // Mostrar modal de tutorial antes de redirigir
-      setShowTutorialModal(true);
+      // ✅ Marcar que debe mostrarse el modal de tutorial en el dashboard
+      sessionStorage.setItem('showTutorialModal', 'true');
       
-      // Redirigir al dashboard después de cerrar el modal
-      // (el modal se cerrará cuando el usuario haga clic en cualquier botón)
-      setTimeout(() => {
-        navigate('/dashboard');
-      }, 500);
+      // Redirigir al dashboard
+      navigate('/dashboard');
     } catch {
       setError('Error de conexión. Por favor, intenta de nuevo.');
       setLoading(false);
@@ -364,12 +359,6 @@ const Login = () => {
           }}
         />
       </div>
-
-      {/* Modal de Tutorial */}
-      <TutorialModal 
-        isOpen={showTutorialModal} 
-        onClose={() => setShowTutorialModal(false)} 
-      />
     </div>
   );
 };

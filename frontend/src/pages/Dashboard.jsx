@@ -4,6 +4,7 @@ import { FiClock, FiTarget, FiUsers, FiCheckCircle } from 'react-icons/fi';
 import StatCard from '../components/StatCard';
 import MissionCard from '../components/MissionCard';
 import MissionPreviewModal from '../components/MissionPreviewModal';
+import TutorialModal from '../components/TutorialModal';
 import { API_URL } from '../config/api.js';
 
 const Dashboard = () => {
@@ -13,12 +14,21 @@ const Dashboard = () => {
   const [isMobile, setIsMobile] = useState(false);
   const [selectedMission, setSelectedMission] = useState(null);
   const [showMissionPreview, setShowMissionPreview] = useState(false);
+  const [showTutorialModal, setShowTutorialModal] = useState(false);
   const navigate = useNavigate();
 
   const user = JSON.parse(localStorage.getItem('user') || '{}');
 
   useEffect(() => {
     loadDashboardData();
+    
+    // ✅ Verificar si debe mostrarse el modal de tutorial
+    const shouldShowTutorial = sessionStorage.getItem('showTutorialModal');
+    if (shouldShowTutorial === 'true') {
+      setShowTutorialModal(true);
+      // Remover la bandera para que no se muestre nuevamente
+      sessionStorage.removeItem('showTutorialModal');
+    }
     
     // Detectar móvil
     const checkMobile = () => {
@@ -327,6 +337,12 @@ const Dashboard = () => {
           }}
         />
       )}
+
+      {/* Modal de Tutorial - Se muestra solo una vez después del login */}
+      <TutorialModal 
+        isOpen={showTutorialModal} 
+        onClose={() => setShowTutorialModal(false)} 
+      />
     </div>
   );
 };

@@ -7,6 +7,7 @@ import Missions from '../pages/Missions';
 import MissionEdit from '../pages/MissionEdit';
 import Settings from '../pages/Settings';
 import Login from '../pages/Login';
+import TutorialModalDemo from '../pages/TutorialModalDemo';
 import { isAuthenticated } from '../utils/auth';
 
 /**
@@ -24,6 +25,9 @@ const AppRouter = () => (
     <Routes>
       {/* Ruta de login sin layout */}
       <Route path="/login" element={<Login />} />
+      
+      {/* Ruta de demo del modal de tutorial (sin autenticación) */}
+      <Route path="/tutorial-demo" element={<TutorialModalDemo />} />
       
       {/* ✅ Rutas protegidas con autenticación */}
       <Route path="/" element={
